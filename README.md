@@ -29,13 +29,11 @@ Plain HTML + CSS + JS. No frameworks, no build step, no dependencies.
 
 ## Development
 
-Serve the files with any static server:
-
 ```sh
-npx serve .
+npm run dev
 ```
 
-Then open http://localhost:3000.
+Opens a browser with live reload on file changes (uses browser-sync).
 
 ## Testing
 
