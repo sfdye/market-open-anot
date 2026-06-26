@@ -292,6 +292,18 @@ body {
   color: #c62828;
 }
 
+.data-source {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.7rem;
+  color: #999;
+  text-align: center;
+}
+
+.data-source a {
+  color: #999;
+  text-decoration: underline;
+}
+
 /* ===== Status Footer ===== */
 
 .status-footer {
