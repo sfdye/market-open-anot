@@ -26,6 +26,8 @@
       weeklyRest: 'Most stalls closed',
       cleaning: 'Cleaning',
       otherWorks: 'Maintenance',
+      marketStalls: 'market stalls',
+      foodStalls: 'food stalls',
       addMarkets: '+ Add Markets',
       chooseMarkets: 'Choose Your Markets',
       tapToAdd: 'Tap to add to favorites',
@@ -52,6 +54,8 @@
       weeklyRest: '多数摊位休息',
       cleaning: '清洁',
       otherWorks: '维修',
+      marketStalls: '个巴刹摊位',
+      foodStalls: '个熟食摊位',
       addMarkets: '+ 添加巴刹',
       chooseMarkets: '选择你的巴刹',
       tapToAdd: '点击添加到收藏',
@@ -376,8 +380,16 @@
         }
       }
 
+      var photoUrl = market.photourl || '';
+      var address = market.address_myenv || '';
+      var marketStalls = parseInt(market.no_of_market_stalls, 10) || 0;
+      var foodStalls = parseInt(market.no_of_food_stalls, 10) || 0;
+
       html += '<div class="market-card" data-market="' + escapeAttr(marketName) + '">';
       html += '<div class="card-summary">';
+      if (photoUrl) {
+        html += '<img class="card-thumb" src="' + escapeAttr(photoUrl) + '" alt="" loading="lazy">';
+      }
       html += '<div class="card-info">';
       html += '<div class="card-name">' + escapeHtml(getDisplayName(parsed)) + '</div>';
       html += '<div class="card-next">' + escapeHtml(nextText) + '</div>';
@@ -387,8 +399,21 @@
 
       // Expanded details
       html += '<div class="card-details">';
-      if (parsed.street) {
-        html += '<div class="card-address">' + escapeHtml(parsed.street) + '</div>';
+      if (address) {
+        html += '<div class="card-address">' + escapeHtml(address) + '</div>';
+      }
+      if (marketStalls > 0 || foodStalls > 0) {
+        html += '<div class="card-stalls">';
+        if (marketStalls > 0) {
+          html += '<span>' + marketStalls + ' ' + t('marketStalls') + '</span>';
+        }
+        if (marketStalls > 0 && foodStalls > 0) {
+          html += '<span class="stall-sep"> · </span>';
+        }
+        if (foodStalls > 0) {
+          html += '<span>' + foodStalls + ' ' + t('foodStalls') + '</span>';
+        }
+        html += '</div>';
       }
 
       if (isClosed) {
