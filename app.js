@@ -75,6 +75,8 @@
   let allMarkets = [];
   let favorites = [];
   let lang = 'en';
+  let userLat = null;
+  let userLng = null;
 
   var parseDateDMY = MarketLogic.parseDateDMY;
   var stripTime = MarketLogic.stripTime;
@@ -369,6 +371,37 @@
     });
   }
 
+  function distanceBetween(lat1, lng1, lat2, lng2) {
+    var R = 6371;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLng = (lng2 - lng1) * Math.PI / 180;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function getMarketDistance(market) {
+    if (userLat === null || userLng === null) return null;
+    var lat = parseFloat(market.latitude_hc);
+    var lng = parseFloat(market.longitude_hc);
+    if (isNaN(lat) || isNaN(lng)) return null;
+    return distanceBetween(userLat, userLng, lat, lng);
+  }
+
+  function requestGeolocation() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        userLat = pos.coords.latitude;
+        userLng = pos.coords.longitude;
+        renderMarketList(document.getElementById('search-input').value);
+      },
+      function () {},
+      { timeout: 5000, maximumAge: 300000 }
+    );
+  }
+
   function renderPickerScreen() {
     document.getElementById('picker-title').textContent = t('chooseMarkets');
     document.getElementById('picker-subtitle').textContent = t('tapToAdd');
@@ -377,6 +410,7 @@
 
     renderMarketList('');
     updateDoneButton();
+    requestGeolocation();
   }
 
   function renderMarketList(query) {
@@ -394,13 +428,24 @@
       });
     }
 
-    filtered.sort(function (a, b) {
-      var parsedA = parseMarketName(a.name);
-      var parsedB = parseMarketName(b.name);
-      var nameA = getDisplayName(parsedA).toLowerCase();
-      var nameB = getDisplayName(parsedB).toLowerCase();
-      return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
-    });
+    if (userLat !== null && userLng !== null) {
+      filtered.sort(function (a, b) {
+        var distA = getMarketDistance(a);
+        var distB = getMarketDistance(b);
+        if (distA === null && distB === null) return 0;
+        if (distA === null) return 1;
+        if (distB === null) return -1;
+        return distA - distB;
+      });
+    } else {
+      filtered.sort(function (a, b) {
+        var parsedA = parseMarketName(a.name);
+        var parsedB = parseMarketName(b.name);
+        var nameA = getDisplayName(parsedA).toLowerCase();
+        var nameB = getDisplayName(parsedB).toLowerCase();
+        return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+      });
+    }
 
     var html = '';
     for (var i = 0; i < filtered.length; i++) {
@@ -409,11 +454,19 @@
       var isFav = favorites.indexOf(market.name) !== -1;
 
       var displayName = getDisplayName(parsed);
+      var dist = getMarketDistance(market);
+      var distText = '';
+      if (dist !== null) {
+        distText = dist < 1 ? Math.round(dist * 1000) + 'm' : dist.toFixed(1) + 'km';
+      }
+
       html += '<li class="market-list-item' + (isFav ? ' favorited' : '') + '" data-market="' + escapeAttr(market.name) + '">';
       html += '<span class="star">' + (isFav ? '★' : '☆') + '</span>';
       html += '<div class="market-item-info">';
       html += '<div class="market-item-name">' + escapeHtml(displayName) + '</div>';
-      if (lang === 'zh' && zhNames[parsed.friendly]) {
+      if (distText) {
+        html += '<div class="market-item-address">' + distText + '</div>';
+      } else if (lang === 'zh' && zhNames[parsed.friendly]) {
         html += '<div class="market-item-address">' + escapeHtml(parsed.friendly) + '</div>';
       } else if (parsed.street) {
         html += '<div class="market-item-address">' + escapeHtml(parsed.street) + '</div>';
