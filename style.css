@@ -76,6 +76,7 @@ body {
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
+  background: #e0e0e0;
 }
 
 .card-info {
