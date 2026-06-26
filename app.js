@@ -466,7 +466,9 @@
   function setLang(newLang) {
     lang = newLang;
     localStorage.setItem(STORAGE.lang, lang);
-    document.getElementById('lang-toggle').textContent = lang === 'en' ? strings.zh.langToggle : strings.en.langToggle;
+    var label = lang === 'en' ? strings.zh.langToggle : strings.en.langToggle;
+    document.getElementById('lang-toggle').textContent = label;
+    document.getElementById('lang-toggle-picker').textContent = label;
   }
 
   // ===== Init =====
@@ -475,7 +477,9 @@
     lang = loadLang();
     favorites = loadFavorites();
 
-    document.getElementById('lang-toggle').textContent = lang === 'en' ? strings.zh.langToggle : strings.en.langToggle;
+    var langLabel = lang === 'en' ? strings.zh.langToggle : strings.en.langToggle;
+    document.getElementById('lang-toggle').textContent = langLabel;
+    document.getElementById('lang-toggle-picker').textContent = langLabel;
 
     fetchMarkets(function () {
       // Clean up favorites that no longer exist in data
@@ -508,8 +512,8 @@
       renderMarketList(e.target.value);
     });
 
-    // Event: Language toggle
-    document.getElementById('lang-toggle').addEventListener('click', function () {
+    // Event: Language toggles
+    function handleLangToggle() {
       setLang(lang === 'en' ? 'zh' : 'en');
       var currentScreen = document.querySelector('.screen:not(.hidden)');
       if (currentScreen && currentScreen.id === 'status-screen') {
@@ -517,7 +521,9 @@
       } else {
         renderPickerScreen();
       }
-    });
+    }
+    document.getElementById('lang-toggle').addEventListener('click', handleLangToggle);
+    document.getElementById('lang-toggle-picker').addEventListener('click', handleLangToggle);
 
     // Event: Reminder button
     var reminderBtn = document.getElementById('reminder-btn');

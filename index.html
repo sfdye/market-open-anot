@@ -21,7 +21,10 @@
             <h1 id="app-title" class="app-title">Market Open Anot?</h1>
             <div id="today-date" class="today-date"></div>
           </div>
-          <button id="reminder-btn" class="reminder-btn hidden" aria-label="Reminders"></button>
+          <div class="header-actions">
+            <button id="reminder-btn" class="reminder-btn hidden" aria-label="Reminders"></button>
+            <button id="lang-toggle" class="lang-toggle" aria-label="Switch language">中文</button>
+          </div>
         </div>
       </header>
       <main id="market-cards" class="market-cards" aria-live="polite"></main>
@@ -33,7 +36,10 @@
     <!-- Picker Screen -->
     <div id="picker-screen" class="screen hidden">
       <header class="picker-header">
-        <h1 id="picker-title">Choose Your Markets</h1>
+        <div class="picker-header-top">
+          <h1 id="picker-title">Choose Your Markets</h1>
+          <button id="lang-toggle-picker" class="lang-toggle" aria-label="Switch language">中文</button>
+        </div>
         <p id="picker-subtitle" class="subtitle">Tap to add to favorites</p>
       </header>
       <div class="search-container">
@@ -45,8 +51,6 @@
       </footer>
     </div>
   </div>
-
-  <button id="lang-toggle" class="lang-toggle" aria-label="Switch language">中文</button>
 
   <script src="market-logic.js"></script>
   <script src="zh-names.js"></script>
