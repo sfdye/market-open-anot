@@ -39,7 +39,7 @@
       langToggle: 'EN'
     },
     zh: {
-      appTitle: '巴刹开吗？',
+      appTitle: '巴刹今天开吗？',
       open: '开门',
       closed: '关门',
       warning: '多数摊位休息',
