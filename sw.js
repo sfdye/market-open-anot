@@ -59,6 +59,11 @@ self.addEventListener('notificationclick', function (event) {
 self.addEventListener('fetch', function (event) {
   var url = event.request.url;
 
+  // Pass through API calls to the push worker
+  if (url.indexOf('workers.dev') !== -1) {
+    return;
+  }
+
   if (url.indexOf('data.gov.sg') !== -1) {
     // Stale-while-revalidate for API
     event.respondWith(

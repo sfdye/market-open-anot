@@ -50,6 +50,7 @@
       return true;
     } catch (e) {
       console.error('Push subscription failed:', e);
+      setPushEnabled(false);
       return false;
     }
   }
@@ -79,14 +80,14 @@
       var reg = await navigator.serviceWorker.ready;
       subscription = await reg.pushManager.getSubscription();
     }
-    if (!subscription) return;
+    if (!subscription) throw new Error('No push subscription available');
 
     var favorites = [];
     try {
       favorites = JSON.parse(localStorage.getItem('moa_favorites') || '[]');
     } catch (e) {}
 
-    await fetch(WORKER_URL + '/subscribe', {
+    var res = await fetch(WORKER_URL + '/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -94,6 +95,10 @@
         markets: favorites,
       }),
     });
+
+    if (!res.ok) {
+      throw new Error('Subscribe request failed: ' + res.status);
+    }
   }
 
   // Auto-sync when favorites change (called from app.js)
