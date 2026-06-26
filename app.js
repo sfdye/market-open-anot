@@ -399,24 +399,27 @@
 
       // Expanded details
       html += '<div class="card-details">';
+
+      // Info section: address + stalls
+      html += '<div class="card-detail-section">';
       if (address) {
         html += '<div class="card-address">' + escapeHtml(address) + '</div>';
       }
       if (marketStalls > 0 || foodStalls > 0) {
         html += '<div class="card-stalls">';
         if (marketStalls > 0) {
-          html += '<span>' + marketStalls + ' ' + t('marketStalls') + '</span>';
-        }
-        if (marketStalls > 0 && foodStalls > 0) {
-          html += '<span class="stall-sep"> · </span>';
+          html += '<div class="card-stall-item"><span class="stall-count">' + marketStalls + '</span><span class="stall-label">' + t('marketStalls') + '</span></div>';
         }
         if (foodStalls > 0) {
-          html += '<span>' + foodStalls + ' ' + t('foodStalls') + '</span>';
+          html += '<div class="card-stall-item"><span class="stall-count">' + foodStalls + '</span><span class="stall-label">' + t('foodStalls') + '</span></div>';
         }
         html += '</div>';
       }
+      html += '</div>';
 
+      // Closed banner (only for hard closures)
       if (isClosed) {
+        html += '<div class="card-detail-section">';
         html += '<div class="card-status-banner closed">';
         html += '<div class="banner-status-text">' + t('closedToday') + '</div>';
         html += '<div class="banner-reason">' + escapeHtml(reasonText(status)) + '</div>';
@@ -425,9 +428,12 @@
           html += '<div class="banner-opens-again">' + t('opensAgain') + ' ' + formatDate(nextOpen) + '</div>';
         }
         html += '</div>';
+        html += '</div>';
       }
 
+      // Upcoming closures section
       if (upcoming.length > 0) {
+        html += '<div class="card-detail-section">';
         html += '<div class="upcoming-title">' + t('upcoming') + '</div>';
         html += '<ul class="upcoming-list">';
         var shown = Math.min(upcoming.length, 7);
@@ -436,6 +442,7 @@
           html += '<span class="upcoming-reason">' + closureReasonShort(upcoming[j].reason, upcoming[j].remarks) + '</span></li>';
         }
         html += '</ul>';
+        html += '</div>';
       }
 
       html += '<button class="card-remove" data-market="' + escapeAttr(marketName) + '">' + t('remove') + '</button>';

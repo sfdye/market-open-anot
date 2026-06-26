@@ -123,7 +123,7 @@ body {
 /* Expanded card */
 .card-details {
   display: none;
-  padding: 0 1.2rem 1rem;
+  padding: 0.8rem 1.2rem 1rem;
   border-top: 1px solid #eee;
 }
 
@@ -131,16 +131,41 @@ body {
   display: block;
 }
 
+.card-detail-section {
+  padding: 0.6rem 0;
+}
+
+.card-detail-section + .card-detail-section {
+  border-top: 1px solid #f0f0f0;
+}
+
 .card-address {
-  font-size: 0.85rem;
-  color: #888;
-  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.4;
 }
 
 .card-stalls {
-  font-size: 0.85rem;
-  color: #666;
-  margin-top: 0.3rem;
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.4rem;
+}
+
+.card-stall-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.stall-count {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.stall-label {
+  font-size: 0.8rem;
+  color: #888;
 }
 
 .card-status-banner {
