@@ -30,11 +30,11 @@
       foodStalls: 'food stalls',
       addMarkets: '+ Add Markets',
       chooseMarkets: 'Choose Your Markets',
-      tapToAdd: 'Tap to add to favorites',
+      tapToAdd: 'Tap to add your markets or hawker centres',
       search: 'Search...',
       done: 'Done',
       remove: 'Remove from favorites',
-      noFavorites: 'Tap the button below to add your markets',
+      noFavorites: 'Tap the button below to add your markets or hawker centres',
       closedTil: 'til',
       langToggle: 'EN'
     },
@@ -58,11 +58,11 @@
       foodStalls: '个熟食摊位',
       addMarkets: '+ 添加巴刹',
       chooseMarkets: '选择你的巴刹',
-      tapToAdd: '点击添加到收藏',
+      tapToAdd: '点击添加你的巴刹或小贩中心',
       search: '搜索...',
       done: '完成',
       remove: '从收藏中移除',
-      noFavorites: '点击下面的按钮添加你的巴刹',
+      noFavorites: '点击下面的按钮添加你的巴刹或小贩中心',
       closedTil: '至',
       langToggle: '中文'
     }
