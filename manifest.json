@@ -1,6 +1,6 @@
 {
-  "name": "Market Open Anot?",
-  "short_name": "Market?",
+  "name": "Market Open Anot? 巴刹今天开吗？",
+  "short_name": "巴刹开吗",
   "description": "Check if your Singapore wet market or hawker centre is open or closed today",
   "start_url": "./",
   "display": "standalone",
