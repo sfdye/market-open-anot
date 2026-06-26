@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#2e7d32">
+  <meta name="description" content="Check if your Singapore wet market is open or closed today">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/favicon.ico">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Market Open Anot?</title>
+</head>
+<body>
+  <div id="app">
+    <!-- Status Screen (default for returning users) -->
+    <div id="status-screen" class="screen hidden">
+      <header class="status-header">
+        <h1 id="app-title" class="app-title">Market Open Anot?</h1>
+        <div id="today-date" class="today-date"></div>
+      </header>
+      <main id="market-cards" class="market-cards" aria-live="polite"></main>
+      <footer class="status-footer">
+        <button id="add-markets-btn" class="btn-primary">+ Add Markets</button>
+      </footer>
+    </div>
+
+    <!-- Picker Screen -->
+    <div id="picker-screen" class="screen hidden">
+      <header class="picker-header">
+        <h1 id="picker-title">Choose Your Markets</h1>
+        <p id="picker-subtitle" class="subtitle">Tap to add to favorites</p>
+      </header>
+      <div class="search-container">
+        <input type="search" id="search-input" class="search-input" placeholder="Search..." autocomplete="off">
+      </div>
+      <ul id="market-list" class="market-list"></ul>
+      <footer class="picker-footer">
+        <button id="done-btn" class="btn-primary hidden">Done</button>
+      </footer>
+    </div>
+  </div>
+
+  <button id="lang-toggle" class="lang-toggle" aria-label="Switch language">中文</button>
+
+  <script src="app.js"></script>
+</body>
+</html>
