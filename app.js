@@ -29,6 +29,7 @@
       marketStalls: 'market stalls',
       foodStalls: 'food stalls',
       dataSource: 'Data from <a href="https://data.gov.sg/datasets/d_bda4baa634dd1cc7a6c7cad5f19e2d68/view">NEA via data.gov.sg</a>',
+      lastUpdated: 'Last updated:',
       addMarkets: '+ Add Markets',
       chooseMarkets: 'Choose Your Markets',
       tapToAdd: 'Tap to add your markets or hawker centres',
@@ -58,6 +59,7 @@
       marketStalls: '个巴刹摊位',
       foodStalls: '个熟食摊位',
       dataSource: '数据来源：<a href="https://data.gov.sg/datasets/d_bda4baa634dd1cc7a6c7cad5f19e2d68/view">国家环境局 (NEA)</a>',
+      lastUpdated: '最后更新：',
       addMarkets: '+ 添加巴刹',
       chooseMarkets: '选择你的巴刹',
       tapToAdd: '点击添加你的巴刹或小贩中心',
@@ -233,7 +235,13 @@
     document.getElementById('app-title').textContent = t('appTitle');
     document.getElementById('today-date').textContent = formatDateLong(today);
     document.getElementById('add-markets-btn').textContent = t('addMarkets');
-    document.getElementById('data-source').innerHTML = t('dataSource');
+    var fetched = localStorage.getItem(STORAGE.fetched);
+    var lastUpdatedStr = '';
+    if (fetched) {
+      var fetchedDate = new Date(parseInt(fetched, 10));
+      lastUpdatedStr = ' · ' + t('lastUpdated') + ' ' + formatDate(fetchedDate);
+    }
+    document.getElementById('data-source').innerHTML = t('dataSource') + lastUpdatedStr;
 
     if (favorites.length === 0) {
       container.innerHTML = '<div class="empty-state"><p>' + t('noFavorites') + '</p></div>';
