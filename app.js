@@ -50,7 +50,7 @@
       reasonCleaning: '每季度清洁',
       opensAgain: '下次开门：',
       nextClosure: '下次关：',
-      upcoming: '即将关闭',
+      upcoming: '近期不营业',
       weeklyRest: '多数摊位休息',
       cleaning: '清洁',
       otherWorks: '维修',
