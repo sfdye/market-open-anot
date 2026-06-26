@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var WORKER_URL = 'https://market-open-anot-push.YOUR_SUBDOMAIN.workers.dev';
+  var WORKER_URL = 'https://market-open-anot-push.tsfdye.workers.dev';
   var STORAGE_KEY = 'moa_push_enabled';
 
   function isPushSupported() {

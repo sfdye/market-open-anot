@@ -9,8 +9,7 @@ crons = ["0 11 * * *", "0 22 * * *"]
 
 [[kv_namespaces]]
 binding = "SUBSCRIPTIONS"
-id = ""
-preview_id = ""
+id = "35b57141d3594dde93a09d1999b2e598"
 
 [vars]
 DATA_GOV_API = "https://data.gov.sg/api/action/datastore_search?resource_id=d_bda4baa634dd1cc7a6c7cad5f19e2d68&limit=200"
