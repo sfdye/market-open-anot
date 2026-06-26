@@ -2,7 +2,7 @@
   "name": "Market Open Anot?",
   "short_name": "Market?",
   "description": "Check if your Singapore wet market is open or closed today",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#f5f5f5",
   "theme_color": "#2e7d32",

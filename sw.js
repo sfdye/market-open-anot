@@ -1,11 +1,11 @@
 var CACHE_NAME = 'market-open-anot-v2';
 var STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/app.js',
-  '/manifest.json',
-  '/icons/icon-192.png'
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
+  './icons/icon-192.png'
 ];
 
 self.addEventListener('install', function (event) {
