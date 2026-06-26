@@ -21,7 +21,7 @@
       reasonMonday: 'Monday — most stalls rest',
       reasonCleaning: 'Quarterly cleaning',
       opensAgain: 'Opens again:',
-      nextClosure: 'Next:',
+      nextClosure: 'Next closure:',
       upcoming: 'Upcoming Closures',
       weeklyRest: 'Most stalls closed',
       cleaning: 'Cleaning',
