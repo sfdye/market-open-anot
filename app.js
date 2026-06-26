@@ -322,7 +322,7 @@
         html += '<div class="card-detail-section">';
         html += '<div class="upcoming-title">' + t('upcoming') + '</div>';
         html += '<ul class="upcoming-list">';
-        var shown = Math.min(upcoming.length, 7);
+        var shown = Math.min(upcoming.length, 3);
         for (var j = 0; j < shown; j++) {
           html += '<li><span class="upcoming-date">' + formatDate(upcoming[j].date) + '</span>';
           html += '<span class="upcoming-reason">' + closureReasonShort(upcoming[j].reason, upcoming[j].remarks) + '</span></li>';
