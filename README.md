@@ -37,6 +37,16 @@ npx serve .
 
 Then open http://localhost:3000.
 
+## Testing
+
+Unit tests for the closure logic (date parsing, open/closed detection, boundary conditions). Uses Node's built-in test runner — no dependencies.
+
+```sh
+npm test
+```
+
+Tests run automatically on push/PR via GitHub Actions.
+
 ## Deployment
 
 Hosted on GitHub Pages. Any push to `main` triggers a deploy.

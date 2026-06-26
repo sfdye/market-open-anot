@@ -1,0 +1,7 @@
+{
+  "name": "market-open-anot",
+  "private": true,
+  "scripts": {
+    "test": "node --test market-logic.test.js"
+  }
+}
