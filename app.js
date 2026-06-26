@@ -391,18 +391,16 @@
         html += '<div class="card-address">' + escapeHtml(parsed.street) + '</div>';
       }
 
-      html += '<div class="card-status-banner ' + statusClass + '">';
-      html += '<div class="banner-status-text">' + bannerText + '</div>';
-      if (isWarning || isClosed) {
+      if (isClosed) {
+        html += '<div class="card-status-banner closed">';
+        html += '<div class="banner-status-text">' + t('closedToday') + '</div>';
         html += '<div class="banner-reason">' + escapeHtml(reasonText(status)) + '</div>';
-        if (isClosed) {
-          var nextOpen = getNextOpenDate(market, today);
-          if (nextOpen) {
-            html += '<div class="banner-opens-again">' + t('opensAgain') + ' ' + formatDate(nextOpen) + '</div>';
-          }
+        var nextOpen = getNextOpenDate(market, today);
+        if (nextOpen) {
+          html += '<div class="banner-opens-again">' + t('opensAgain') + ' ' + formatDate(nextOpen) + '</div>';
         }
+        html += '</div>';
       }
-      html += '</div>';
 
       if (upcoming.length > 0) {
         html += '<div class="upcoming-title">' + t('upcoming') + '</div>';
