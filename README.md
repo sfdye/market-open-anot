@@ -2,7 +2,7 @@
 
 Check if your Singapore wet market / hawker centre is open or closed today.
 
-**Live:** https://sfdye.github.io/market-open-anot/
+**Live:** https://market-open-anot.sfdye.com
 
 ## Why
 
