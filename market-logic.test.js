@@ -78,10 +78,10 @@ describe('getMarketStatus', () => {
     remarks_other_works: 'nil'
   };
 
-  test('returns closed on Monday', () => {
+  test('returns warning on Monday (stalls may be closed)', () => {
     const monday = new Date(2026, 5, 29); // June 29, 2026 is Monday
     const result = getMarketStatus(market, monday);
-    assert.equal(result.status, 'closed');
+    assert.equal(result.status, 'warning');
     assert.equal(result.reason, 'monday');
   });
 
@@ -124,8 +124,8 @@ describe('getMarketStatus', () => {
     assert.equal(result.status, 'open');
   });
 
-  test('Monday takes priority over cleaning', () => {
-    // If a cleaning day falls on a Monday, reason should be monday
+  test('Monday takes priority over cleaning (warning, not closed)', () => {
+    // If a cleaning day falls on a Monday, reason should be monday (warning)
     const marketMonClean = {
       ...market,
       q1_cleaningstartdate: '29/6/2026', // June 29 is Monday
@@ -133,6 +133,7 @@ describe('getMarketStatus', () => {
     };
     const monday = new Date(2026, 5, 29);
     const result = getMarketStatus(marketMonClean, monday);
+    assert.equal(result.status, 'warning');
     assert.equal(result.reason, 'monday');
   });
 
@@ -164,7 +165,7 @@ describe('getMarketStatus', () => {
   test('handles date with time component', () => {
     const dateWithTime = new Date(2026, 5, 29, 14, 30, 0); // Monday with time
     const result = getMarketStatus(market, dateWithTime);
-    assert.equal(result.status, 'closed');
+    assert.equal(result.status, 'warning');
     assert.equal(result.reason, 'monday');
   });
 });
@@ -198,7 +199,7 @@ describe('getUpcomingClosures', () => {
     const beforeCleaning = new Date(2026, 0, 2); // Jan 2, 2026 = Friday
     const closures = getUpcomingClosures(market, 10, beforeCleaning);
     const cleaning = closures.filter(c => c.reason === 'cleaning');
-    // Jan 5 is Monday (reason=monday), so only Jan 6 and 7 count as cleaning
+    // Jan 5 is Monday (reason=monday/warning), so only Jan 6 and 7 count as cleaning
     assert.equal(cleaning.length, 2);
   });
 
@@ -227,9 +228,12 @@ describe('getNextOpenDate', () => {
     remarks_other_works: ''
   };
 
-  test('returns Tuesday after a Monday', () => {
+  test('returns Tuesday after a Monday (warning counts as open)', () => {
+    // Monday is a warning (most stalls closed), not a hard closure
+    // getNextOpenDate treats warning as "open enough" so it returns the next day
     const monday = new Date(2026, 5, 29);
     const next = getNextOpenDate(market, monday);
+    // Next day (Tuesday) is open/warning — since Monday is warning, Tuesday is fully open
     assert.equal(next.getDay(), 2); // Tuesday
     assert.equal(next.getDate(), 30);
   });
@@ -240,7 +244,7 @@ describe('getNextOpenDate', () => {
     assert.equal(next.getDate(), 8); // Jan 8
   });
 
-  test('skips Monday after cleaning if cleaning ends on Sunday', () => {
+  test('Monday after cleaning counts as open (warning)', () => {
     const marketSunEnd = {
       ...market,
       q2_cleaningstartdate: '27/6/2026', // Saturday
@@ -248,9 +252,9 @@ describe('getNextOpenDate', () => {
     };
     const sunday = new Date(2026, 5, 28);
     const next = getNextOpenDate(marketSunEnd, sunday);
-    // Monday June 29 is closed, so next open is Tuesday June 30
-    assert.equal(next.getDay(), 2);
-    assert.equal(next.getDate(), 30);
+    // Monday June 29 is warning (not hard closed), so it counts as next open
+    assert.equal(next.getDay(), 1); // Monday
+    assert.equal(next.getDate(), 29);
   });
 });
 

@@ -20,7 +20,7 @@
     var today = stripTime(date);
 
     if (today.getDay() === 1) {
-      return { status: 'closed', reason: 'monday' };
+      return { status: 'warning', reason: 'monday' };
     }
 
     var quarters = ['q1', 'q2', 'q3', 'q4'];
@@ -49,7 +49,7 @@
     for (var i = 1; i <= days; i++) {
       var date = new Date(today.getTime() + i * 86400000);
       var result = getMarketStatus(market, date);
-      if (result.status === 'closed') {
+      if (result.status === 'closed' || result.status === 'warning') {
         closures.push({ date: date, reason: result.reason, remarks: result.remarks });
       }
     }
@@ -60,7 +60,8 @@
     var date = stripTime(fromDate);
     for (var i = 1; i <= 60; i++) {
       date = new Date(date.getTime() + 86400000);
-      if (getMarketStatus(market, date).status === 'open') {
+      var s = getMarketStatus(market, date).status;
+      if (s === 'open' || s === 'warning') {
         return date;
       }
     }

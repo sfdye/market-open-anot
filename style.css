@@ -101,6 +101,12 @@ body {
   background: #2e7d32;
 }
 
+.card-status.warning {
+  background: #e65100;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+}
+
 .card-status.closed {
   background: #c62828;
 }
@@ -131,6 +137,11 @@ body {
 
 .card-status-banner.open {
   background: #2e7d32;
+  color: #fff;
+}
+
+.card-status-banner.warning {
+  background: #e65100;
   color: #fff;
 }
 

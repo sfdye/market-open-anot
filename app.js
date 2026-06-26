@@ -14,14 +14,16 @@
       appTitle: 'Market Open Anot?',
       open: 'OPEN',
       closed: 'CLOSED',
+      warning: 'MOST STALLS CLOSED',
       openToday: 'OPEN TODAY',
       closedToday: 'CLOSED TODAY',
-      reasonMonday: 'Monday rest day',
+      warningToday: 'MANY STALLS CLOSED',
+      reasonMonday: 'Monday — most stalls rest',
       reasonCleaning: 'Quarterly cleaning',
       opensAgain: 'Opens again:',
       nextClosure: 'Next:',
       upcoming: 'Upcoming Closures',
-      weeklyRest: 'Weekly rest',
+      weeklyRest: 'Mon rest day',
       cleaning: 'Cleaning',
       otherWorks: 'Maintenance',
       addMarkets: '+ Add Markets',
@@ -38,14 +40,16 @@
       appTitle: '巴刹开吗？',
       open: '开门',
       closed: '关门',
+      warning: '多数摊位休息',
       openToday: '今天开门',
       closedToday: '今天关门',
-      reasonMonday: '星期一休息',
+      warningToday: '多数摊位休息',
+      reasonMonday: '星期一 — 多数摊位休息',
       reasonCleaning: '每季度清洁',
       opensAgain: '下次开门：',
       nextClosure: '下次关：',
       upcoming: '即将关闭',
-      weeklyRest: '每周休息',
+      weeklyRest: '周一休息',
       cleaning: '清洁',
       otherWorks: '维修',
       addMarkets: '+ 添加巴刹',
@@ -349,17 +353,23 @@
       var status = getMarketStatus(market, today);
       var parsed = parseMarketName(market.name);
       var isOpen = status.status === 'open';
+      var isWarning = status.status === 'warning';
+      var isClosed = status.status === 'closed';
       var upcoming = getUpcomingClosures(market, 30);
       var nextClosure = upcoming.length > 0 ? upcoming[0] : null;
+
+      var statusClass = isOpen ? 'open' : isWarning ? 'warning' : 'closed';
+      var statusLabel = isOpen ? t('open') : isWarning ? t('warning') : t('closed');
+      var bannerText = isOpen ? t('openToday') : isWarning ? t('warningToday') : t('closedToday');
 
       var nextText = '';
       if (isOpen && nextClosure) {
         nextText = t('nextClosure') + ' ' + formatDate(nextClosure.date);
-      } else if (!isOpen) {
+      } else if (isWarning) {
+        nextText = reasonText(status);
+      } else if (isClosed) {
         var endDate = status.end;
-        if (status.reason === 'monday') {
-          nextText = reasonText(status);
-        } else if (endDate) {
+        if (endDate) {
           nextText = reasonText(status) + ' ' + t('closedTil') + ' ' + formatDate(endDate);
         } else {
           nextText = reasonText(status);
@@ -372,7 +382,7 @@
       html += '<div class="card-name">' + escapeHtml(getDisplayName(parsed)) + '</div>';
       html += '<div class="card-next">' + escapeHtml(nextText) + '</div>';
       html += '</div>';
-      html += '<div class="card-status ' + (isOpen ? 'open' : 'closed') + '">' + (isOpen ? t('open') : t('closed')) + '</div>';
+      html += '<div class="card-status ' + statusClass + '">' + statusLabel + '</div>';
       html += '</div>';
 
       // Expanded details
@@ -381,13 +391,15 @@
         html += '<div class="card-address">' + escapeHtml(parsed.street) + '</div>';
       }
 
-      html += '<div class="card-status-banner ' + (isOpen ? 'open' : 'closed') + '">';
-      html += '<div class="banner-status-text">' + (isOpen ? t('openToday') : t('closedToday')) + '</div>';
-      if (!isOpen) {
+      html += '<div class="card-status-banner ' + statusClass + '">';
+      html += '<div class="banner-status-text">' + bannerText + '</div>';
+      if (isWarning || isClosed) {
         html += '<div class="banner-reason">' + escapeHtml(reasonText(status)) + '</div>';
-        var nextOpen = getNextOpenDate(market, today);
-        if (nextOpen) {
-          html += '<div class="banner-opens-again">' + t('opensAgain') + ' ' + formatDate(nextOpen) + '</div>';
+        if (isClosed) {
+          var nextOpen = getNextOpenDate(market, today);
+          if (nextOpen) {
+            html += '<div class="banner-opens-again">' + t('opensAgain') + ' ' + formatDate(nextOpen) + '</div>';
+          }
         }
       }
       html += '</div>';
