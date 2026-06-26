@@ -16,8 +16,13 @@
     <!-- Status Screen (default for returning users) -->
     <div id="status-screen" class="screen hidden">
       <header class="status-header">
-        <h1 id="app-title" class="app-title">Market Open Anot?</h1>
-        <div id="today-date" class="today-date"></div>
+        <div class="status-header-top">
+          <div>
+            <h1 id="app-title" class="app-title">Market Open Anot?</h1>
+            <div id="today-date" class="today-date"></div>
+          </div>
+          <button id="reminder-btn" class="reminder-btn hidden" aria-label="Reminders"></button>
+        </div>
       </header>
       <main id="market-cards" class="market-cards" aria-live="polite"></main>
       <footer class="status-footer">
@@ -45,6 +50,7 @@
 
   <script src="market-logic.js"></script>
   <script src="zh-names.js"></script>
+  <script src="push.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

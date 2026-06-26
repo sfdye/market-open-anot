@@ -34,6 +34,28 @@ body {
   border-bottom: 1px solid #e0e0e0;
 }
 
+.status-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.reminder-btn {
+  padding: 0.4rem 0.7rem;
+  font-size: 1.2rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.reminder-btn.active {
+  border-color: #2e7d32;
+  background: #e8f5e9;
+}
+
 .app-title {
   font-size: 1.4rem;
   font-weight: 700;

@@ -1,0 +1,16 @@
+name = "market-open-anot-push"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[triggers]
+crons = ["0 11 * * *", "0 22 * * *"]
+# 11:00 UTC = 7pm SGT (evening before)
+# 22:00 UTC = 6am SGT (morning of)
+
+[[kv_namespaces]]
+binding = "SUBSCRIPTIONS"
+id = ""
+preview_id = ""
+
+[vars]
+DATA_GOV_API = "https://data.gov.sg/api/action/datastore_search?resource_id=d_bda4baa634dd1cc7a6c7cad5f19e2d68&limit=200"

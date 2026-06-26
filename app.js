@@ -135,6 +135,9 @@
 
   function saveFavorites(favs) {
     localStorage.setItem(STORAGE.favorites, JSON.stringify(favs));
+    if (window.MarketPush && MarketPush.isPushEnabled()) {
+      MarketPush.onFavoritesChanged();
+    }
   }
 
   function loadCachedData() {
@@ -515,6 +518,34 @@
         renderPickerScreen();
       }
     });
+
+    // Event: Reminder button
+    var reminderBtn = document.getElementById('reminder-btn');
+    if (MarketPush && MarketPush.isPushSupported()) {
+      reminderBtn.classList.remove('hidden');
+      updateReminderBtn();
+      reminderBtn.addEventListener('click', async function () {
+        if (MarketPush.isPushEnabled()) {
+          await MarketPush.unsubscribeFromPush();
+        } else {
+          await MarketPush.subscribeToPush();
+        }
+        updateReminderBtn();
+      });
+    }
+  }
+
+  function updateReminderBtn() {
+    var btn = document.getElementById('reminder-btn');
+    if (MarketPush.isPushEnabled()) {
+      btn.textContent = '🔔';
+      btn.classList.add('active');
+      btn.title = lang === 'zh' ? '提醒已开启' : 'Reminders on';
+    } else {
+      btn.textContent = '🔕';
+      btn.classList.remove('active');
+      btn.title = lang === 'zh' ? '开启提醒' : 'Enable reminders';
+    }
   }
 
   // Register service worker

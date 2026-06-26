@@ -1,10 +1,11 @@
-var CACHE_NAME = 'market-open-anot-v2';
+var CACHE_NAME = 'market-open-anot-v3';
 var STATIC_ASSETS = [
   './',
   './index.html',
   './style.css',
   './market-logic.js',
   './zh-names.js',
+  './push.js',
   './app.js',
   './manifest.json',
   './icons/icon-192.png'
@@ -29,6 +30,30 @@ self.addEventListener('activate', function (event) {
     })
   );
   self.clients.claim();
+});
+
+self.addEventListener('push', function (event) {
+  var data = { title: 'Market Open Anot?', body: 'A market you follow has a closure coming up.' };
+  try {
+    data = event.data.json();
+  } catch (e) {}
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: './icons/icon-192.png',
+      badge: './icons/icon-192.png',
+      tag: 'market-closure',
+      renotify: true,
+    })
+  );
+});
+
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow('./')
+  );
 });
 
 self.addEventListener('fetch', function (event) {
