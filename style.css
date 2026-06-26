@@ -158,13 +158,13 @@ body {
 }
 
 .stall-count {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #333;
 }
 
 .stall-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #888;
 }
 

@@ -403,15 +403,15 @@
       // Info section: address + stalls
       html += '<div class="card-detail-section">';
       if (address) {
-        html += '<div class="card-address">' + escapeHtml(address) + '</div>';
+        html += '<div class="card-address">📍 ' + escapeHtml(address) + '</div>';
       }
       if (marketStalls > 0 || foodStalls > 0) {
         html += '<div class="card-stalls">';
         if (marketStalls > 0) {
-          html += '<div class="card-stall-item"><span class="stall-count">' + marketStalls + '</span><span class="stall-label">' + t('marketStalls') + '</span></div>';
+          html += '<div class="card-stall-item"><span class="stall-count">🛒 ' + marketStalls + '</span><span class="stall-label">' + t('marketStalls') + '</span></div>';
         }
         if (foodStalls > 0) {
-          html += '<div class="card-stall-item"><span class="stall-count">' + foodStalls + '</span><span class="stall-label">' + t('foodStalls') + '</span></div>';
+          html += '<div class="card-stall-item"><span class="stall-count">🍜 ' + foodStalls + '</span><span class="stall-label">' + t('foodStalls') + '</span></div>';
         }
         html += '</div>';
       }
