@@ -4,6 +4,7 @@ var STATIC_ASSETS = [
   './index.html',
   './style.css',
   './market-logic.js',
+  './zh-names.js',
   './app.js',
   './manifest.json',
   './icons/icon-192.png'
