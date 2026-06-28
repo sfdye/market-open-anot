@@ -35,6 +35,8 @@
       tapToAdd: 'Tap to add your markets or hawker centres',
       search: 'Search...',
       done: 'Done',
+      addFav: 'Add to favorites',
+      removeFav: 'Remove',
       remove: 'Remove from favorites',
       noFavorites: 'Tap the button below to add your markets or hawker centres',
       closedTil: 'til',
@@ -65,6 +67,8 @@
       tapToAdd: '点击添加你的巴刹或小贩中心',
       search: '搜索...',
       done: '完成',
+      addFav: '添加收藏',
+      removeFav: '移除',
       remove: '从收藏中移除',
       noFavorites: '点击下面的按钮添加你的巴刹或小贩中心',
       closedTil: '至',
@@ -556,7 +560,7 @@
       marker.bindPopup(
         '<strong>' + escapeHtml(displayName) + '</strong><br>' +
         '<button class="map-fav-btn" data-market="' + escapeAttr(market.name) + '">' +
-        (isFav ? '★ ' + t('remove') : '☆ ' + t('tapToAdd')) + '</button>'
+        (isFav ? '★ ' + t('removeFav') : '☆ ' + t('addFav')) + '</button>'
       );
 
       marker.on('popupopen', function () {
