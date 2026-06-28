@@ -30,7 +30,7 @@
       foodStalls: 'food stalls',
       dataSource: 'Data from <a href="https://data.gov.sg/datasets/d_bda4baa634dd1cc7a6c7cad5f19e2d68/view">NEA via data.gov.sg</a>',
       lastUpdated: 'Last updated:',
-      addMarkets: '+ Add Markets',
+      addMarkets: '+ Add',
       chooseMarkets: 'Choose Your Markets',
       tapToAdd: 'Tap to add your markets or hawker centres',
       search: 'Search...',
@@ -60,7 +60,7 @@
       foodStalls: '个熟食摊位',
       dataSource: '数据来源：<a href="https://data.gov.sg/datasets/d_bda4baa634dd1cc7a6c7cad5f19e2d68/view">国家环境局 (NEA)</a>',
       lastUpdated: '最后更新：',
-      addMarkets: '+ 添加巴刹',
+      addMarkets: '+ 添加',
       chooseMarkets: '选择你的巴刹',
       tapToAdd: '点击添加你的巴刹或小贩中心',
       search: '搜索...',
@@ -496,7 +496,7 @@
 
   function updateDoneButton() {
     var btn = document.getElementById('done-btn');
-    if (favorites.length > 0) {
+    if (favorites.length > 0 || mapView) {
       btn.classList.remove('hidden');
     } else {
       btn.classList.add('hidden');
@@ -526,6 +526,7 @@
       toggleBtn.classList.remove('active');
       toggleBtn.textContent = '🗺️';
     }
+    updateDoneButton();
   }
 
   function initMap() {
