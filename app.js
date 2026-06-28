@@ -579,12 +579,14 @@
           var idx = favorites.indexOf(market.name);
           if (idx === -1) {
             favorites.push(market.name);
+            saveFavorites(favorites);
+            showScreen('status-screen');
+            renderStatusScreen();
           } else {
             favorites.splice(idx, 1);
+            saveFavorites(favorites);
+            marker.closePopup();
           }
-          saveFavorites(favorites);
-          updateDoneButton();
-          marker.closePopup();
         });
       });
     });
