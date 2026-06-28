@@ -585,7 +585,8 @@
           } else {
             favorites.splice(idx, 1);
             saveFavorites(favorites);
-            marker.closePopup();
+            showScreen('status-screen');
+            renderStatusScreen();
           }
         });
       });
