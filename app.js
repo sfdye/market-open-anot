@@ -412,6 +412,15 @@
     document.getElementById('search-input').placeholder = t('search');
     document.getElementById('done-btn').textContent = t('done');
 
+    // Always reset to list view
+    if (mapView) {
+      mapView = false;
+      document.getElementById('market-list').classList.remove('hidden');
+      document.getElementById('market-map').classList.add('hidden');
+      document.getElementById('view-toggle').classList.remove('active');
+      document.getElementById('view-toggle').textContent = '🗺️';
+    }
+
     renderMarketList('');
     updateDoneButton();
     requestGeolocation();
