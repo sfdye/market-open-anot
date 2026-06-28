@@ -8,6 +8,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/favicon.ico">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="style.css">
   <title>Market Open Anot?</title>
 </head>
@@ -44,15 +45,20 @@
         <p id="picker-subtitle" class="subtitle">Tap to add to favorites</p>
       </header>
       <div class="search-container">
-        <input type="search" id="search-input" class="search-input" placeholder="Search..." autocomplete="off">
+        <div class="search-row">
+          <input type="search" id="search-input" class="search-input" placeholder="Search..." autocomplete="off">
+          <button id="view-toggle" class="view-toggle" aria-label="Toggle map view">🗺️</button>
+        </div>
       </div>
       <ul id="market-list" class="market-list"></ul>
+      <div id="market-map" class="market-map hidden"></div>
       <footer class="picker-footer">
         <button id="done-btn" class="btn-primary hidden">Done</button>
       </footer>
     </div>
   </div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="market-logic.js"></script>
   <script src="zh-names.js"></script>
   <script src="push.js"></script>

@@ -347,8 +347,14 @@ body {
   z-index: 10;
 }
 
+.search-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .search-input {
-  width: 100%;
+  flex: 1;
   padding: 0.7rem 1rem;
   font-size: 1.1rem;
   border: 2px solid #ddd;
@@ -359,6 +365,45 @@ body {
 
 .search-input:focus {
   border-color: #2e7d32;
+}
+
+.view-toggle {
+  padding: 0.6rem 0.8rem;
+  font-size: 1.2rem;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.view-toggle.active {
+  border-color: #2e7d32;
+  background: #e8f5e9;
+}
+
+.market-map {
+  flex: 1;
+  min-height: 400px;
+  height: calc(100vh - 200px);
+}
+
+.market-map.hidden {
+  display: none;
+}
+
+.map-fav-btn {
+  display: block;
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  background: #2e7d32;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
 }
 
 .market-list {

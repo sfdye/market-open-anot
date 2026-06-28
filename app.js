@@ -503,6 +503,86 @@
     }
   }
 
+  // ===== Map View =====
+
+  var mapInstance = null;
+  var mapView = false;
+
+  function toggleMapView() {
+    mapView = !mapView;
+    var list = document.getElementById('market-list');
+    var mapEl = document.getElementById('market-map');
+    var toggleBtn = document.getElementById('view-toggle');
+
+    if (mapView) {
+      list.classList.add('hidden');
+      mapEl.classList.remove('hidden');
+      toggleBtn.classList.add('active');
+      toggleBtn.textContent = '📋';
+      initMap();
+    } else {
+      list.classList.remove('hidden');
+      mapEl.classList.add('hidden');
+      toggleBtn.classList.remove('active');
+      toggleBtn.textContent = '🗺️';
+    }
+  }
+
+  function initMap() {
+    if (mapInstance) {
+      mapInstance.invalidateSize();
+      return;
+    }
+
+    mapInstance = L.map('market-map').setView([1.3521, 103.8198], 12);
+
+    L.tileLayer('https://www.onemap.gov.sg/maps/tiles/Default/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      minZoom: 11,
+      attribution: 'OneMap | &copy; <a href="https://www.sla.gov.sg">Singapore Land Authority</a>'
+    }).addTo(mapInstance);
+
+    allMarkets.forEach(function (market) {
+      var lat = parseFloat(market.latitude_hc);
+      var lng = parseFloat(market.longitude_hc);
+      if (isNaN(lat) || isNaN(lng)) return;
+
+      var parsed = parseMarketName(market.name);
+      var displayName = getDisplayName(parsed);
+      var isFav = favorites.indexOf(market.name) !== -1;
+
+      var marker = L.marker([lat, lng]).addTo(mapInstance);
+      marker.bindPopup(
+        '<strong>' + escapeHtml(displayName) + '</strong><br>' +
+        '<button class="map-fav-btn" data-market="' + escapeAttr(market.name) + '">' +
+        (isFav ? '★ ' + t('remove') : '☆ ' + t('tapToAdd')) + '</button>'
+      );
+
+      marker.on('popupopen', function () {
+        var btn = document.querySelector('.map-fav-btn[data-market="' + CSS.escape(market.name) + '"]');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          var idx = favorites.indexOf(market.name);
+          if (idx === -1) {
+            favorites.push(market.name);
+          } else {
+            favorites.splice(idx, 1);
+          }
+          saveFavorites(favorites);
+          updateDoneButton();
+          marker.closePopup();
+        });
+      });
+    });
+
+    if (userLat !== null && userLng !== null) {
+      L.circleMarker([userLat, userLng], { radius: 8, color: '#4285f4', fillColor: '#4285f4', fillOpacity: 0.8 })
+        .addTo(mapInstance)
+        .bindPopup('You are here');
+      mapInstance.setView([userLat, userLng], 14);
+    }
+  }
+
   function findMarket(name) {
     for (var i = 0; i < allMarkets.length; i++) {
       if (allMarkets[i].name === name) return allMarkets[i];
@@ -574,6 +654,11 @@
     // Event: Search input
     document.getElementById('search-input').addEventListener('input', function (e) {
       renderMarketList(e.target.value);
+    });
+
+    // Event: Map view toggle
+    document.getElementById('view-toggle').addEventListener('click', function () {
+      toggleMapView();
     });
 
     // Event: Language toggles
