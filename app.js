@@ -277,15 +277,11 @@
         var nextNonMonday = upcoming.filter(function (c) { return c.reason !== 'monday'; })[0];
         if (nextNonMonday) {
           nextText = t('nextClosure') + ' ' + formatDate(nextNonMonday.date);
-        } else {
-          nextText = market.address_myenv || '';
         }
       } else if (isClosed) {
-        var endDate = status.end;
-        if (endDate) {
-          nextText = reasonText(status) + ' ' + t('closedTil') + ' ' + formatDate(endDate);
-        } else {
-          nextText = reasonText(status);
+        var nextOpen = getNextOpenDate(market, today);
+        if (nextOpen) {
+          nextText = t('opensAgain') + ' ' + formatDate(nextOpen);
         }
       }
 
