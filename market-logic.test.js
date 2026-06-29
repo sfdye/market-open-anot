@@ -124,8 +124,8 @@ describe('getMarketStatus', () => {
     assert.equal(result.status, 'open');
   });
 
-  test('Monday takes priority over cleaning (warning, not closed)', () => {
-    // If a cleaning day falls on a Monday, reason should be monday (warning)
+  test('cleaning takes priority over Monday warning', () => {
+    // If a cleaning day falls on a Monday, it's a hard closure not just a warning
     const marketMonClean = {
       ...market,
       q1_cleaningstartdate: '29/6/2026', // June 29 is Monday
@@ -133,8 +133,8 @@ describe('getMarketStatus', () => {
     };
     const monday = new Date(2026, 5, 29);
     const result = getMarketStatus(marketMonClean, monday);
-    assert.equal(result.status, 'warning');
-    assert.equal(result.reason, 'monday');
+    assert.equal(result.status, 'closed');
+    assert.equal(result.reason, 'cleaning');
   });
 
   test('handles other works closure', () => {
@@ -199,8 +199,8 @@ describe('getUpcomingClosures', () => {
     const beforeCleaning = new Date(2026, 0, 2); // Jan 2, 2026 = Friday
     const closures = getUpcomingClosures(market, 10, beforeCleaning);
     const cleaning = closures.filter(c => c.reason === 'cleaning');
-    // Jan 5 is Monday (reason=monday/warning), so only Jan 6 and 7 count as cleaning
-    assert.equal(cleaning.length, 2);
+    // Jan 5-7 are all cleaning (cleaning takes priority over Monday on Jan 5)
+    assert.equal(cleaning.length, 3);
   });
 
   test('returns empty for fully open range', () => {

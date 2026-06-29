@@ -19,10 +19,6 @@
   function getMarketStatus(market, date) {
     var today = stripTime(date);
 
-    if (today.getDay() === 1) {
-      return { status: 'warning', reason: 'monday' };
-    }
-
     var quarters = ['q1', 'q2', 'q3', 'q4'];
     for (var i = 0; i < quarters.length; i++) {
       var q = quarters[i];
@@ -38,6 +34,10 @@
     if (owStart && owEnd && today >= owStart && today <= owEnd) {
       var remarks = market['remarks_other_works'] || '';
       return { status: 'closed', reason: 'other_works', remarks: remarks, start: owStart, end: owEnd };
+    }
+
+    if (today.getDay() === 1) {
+      return { status: 'warning', reason: 'monday' };
     }
 
     return { status: 'open' };
