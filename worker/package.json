@@ -4,5 +4,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
   }
 }

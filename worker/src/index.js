@@ -1,4 +1,4 @@
-import { sendPushNotification, generateVAPIDHeaders } from './web-push.js';
+import { sendPushNotification } from './web-push.js';
 import { getMarketsWithCleaningOn } from './schedule.js';
 
 export default {
@@ -28,10 +28,14 @@ export default {
       });
     }
 
-    // Manual trigger for testing
+    // Manual trigger for testing with diagnostics
     if (url.pathname === '/__scheduled' && request.method === 'GET') {
-      await handleScheduled(env);
-      return new Response('Cron triggered manually', { headers: corsHeaders });
+      try {
+        var result = await handleScheduled(env);
+        return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message, stack: e.stack }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
     }
 
     return new Response('Not found', { status: 404, headers: corsHeaders });
@@ -95,6 +99,7 @@ async function handleUnsubscribe(request, env, corsHeaders) {
 }
 
 async function handleScheduled(env) {
+  const diag = { timestamp: new Date().toISOString() };
   const now = new Date();
   // SGT = UTC+8
   const sgt = new Date(now.getTime() + 8 * 60 * 60 * 1000);
@@ -103,21 +108,27 @@ async function handleScheduled(env) {
   // Determine which date to check
   let targetDate;
   if (sgtHour < 12) {
-    // Morning run (6am SGT): notify about TODAY
     targetDate = new Date(sgt.getUTCFullYear(), sgt.getUTCMonth(), sgt.getUTCDate());
   } else {
-    // Evening run (7pm SGT): notify about TOMORROW
     targetDate = new Date(sgt.getUTCFullYear(), sgt.getUTCMonth(), sgt.getUTCDate() + 1);
   }
 
+  diag.sgtHour = sgtHour;
+  diag.targetDate = targetDate.toDateString();
+
   const closedMarkets = await getMarketsWithCleaningOn(targetDate, env.DATA_GOV_API);
-  if (closedMarkets.length === 0) return;
+  diag.closedMarketsCount = closedMarkets.length;
+  diag.closedMarketNames = closedMarkets.map(m => m.name).slice(0, 5);
+
+  if (closedMarkets.length === 0) return diag;
 
   const closedNames = new Set(closedMarkets.map(m => m.name));
 
-  // Iterate all subscriptions
   const listed = await env.SUBSCRIPTIONS.list();
+  diag.subscriptionCount = listed.keys.length;
+
   const staleKeys = [];
+  const results = [];
 
   for (const key of listed.keys) {
     const data = await env.SUBSCRIPTIONS.get(key.name, 'json');
@@ -125,15 +136,23 @@ async function handleScheduled(env) {
 
     const { subscription, markets } = data;
     const affected = markets.filter(m => closedNames.has(m));
-    if (affected.length === 0) continue;
+    if (affected.length === 0) {
+      results.push({ endpoint: subscription.endpoint.slice(0, 50), matched: false });
+      continue;
+    }
 
     const isToday = sgtHour < 12;
-    const title = isToday ? '🛒 Market closed today' : '🛒 Market closed tomorrow';
     const marketNames = affected.map(name => {
       const match = name.match(/\((.+)\)/);
       return match ? match[1] : name;
     });
-    const body = marketNames.join(', ') + (isToday ? ' is closed today for cleaning' : ' is closed tomorrow for cleaning');
+    const names = marketNames.join(', ');
+    const title = isToday
+      ? '🚫 ' + names + ' is CLOSED today'
+      : '⚠️ ' + names + ' is CLOSED tomorrow';
+    const body = isToday
+      ? 'Closed for cleaning — don\'t make the trip! Opens again after cleaning ends.'
+      : 'Closed for cleaning tomorrow — plan your visit for another day.';
 
     try {
       const success = await sendPushNotification(
@@ -143,16 +162,22 @@ async function handleScheduled(env) {
         env.VAPID_PRIVATE_KEY,
         env.VAPID_SUBJECT
       );
+      results.push({ endpoint: subscription.endpoint.slice(0, 50), matched: true, sent: success });
       if (!success) {
         staleKeys.push(key.name);
       }
     } catch (e) {
+      results.push({ endpoint: subscription.endpoint.slice(0, 50), matched: true, error: e.message });
       staleKeys.push(key.name);
     }
   }
 
   // Clean up expired subscriptions
+  diag.staleRemoved = staleKeys.length;
   for (const key of staleKeys) {
     await env.SUBSCRIPTIONS.delete(key);
   }
+
+  diag.results = results;
+  return diag;
 }
