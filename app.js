@@ -273,10 +273,13 @@
       var bannerText = isOpen ? t('openToday') : isWarning ? t('warningToday') : t('closedToday');
 
       var nextText = '';
-      if (isOpen && nextClosure) {
-        nextText = t('nextClosure') + ' ' + formatDate(nextClosure.date);
-      } else if (isWarning) {
-        nextText = reasonText(status);
+      if ((isOpen || isWarning) && nextClosure) {
+        var nextNonMonday = upcoming.filter(function (c) { return c.reason !== 'monday'; })[0];
+        if (nextNonMonday) {
+          nextText = t('nextClosure') + ' ' + formatDate(nextNonMonday.date);
+        } else if (isOpen) {
+          nextText = t('nextClosure') + ' ' + formatDate(nextClosure.date);
+        }
       } else if (isClosed) {
         var endDate = status.end;
         if (endDate) {
