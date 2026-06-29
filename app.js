@@ -94,6 +94,20 @@
     return MarketLogic.getUpcomingClosures(market, days, new Date());
   }
 
+  function getNextCleaningDate(market, today) {
+    var todayStripped = stripTime(today);
+    var dates = [];
+    var quarters = ['q1', 'q2', 'q3', 'q4'];
+    for (var i = 0; i < quarters.length; i++) {
+      var start = parseDateDMY(market[quarters[i] + '_cleaningstartdate']);
+      if (start && start > todayStripped) dates.push(start);
+    }
+    var owStart = parseDateDMY(market['other_works_startdate']);
+    if (owStart && owStart > todayStripped) dates.push(owStart);
+    dates.sort(function (a, b) { return a - b; });
+    return dates.length > 0 ? dates[0] : null;
+  }
+
   function formatDate(date) {
     if (lang === 'zh') {
       var m = date.getMonth() + 1;
@@ -274,9 +288,9 @@
 
       var nextText = '';
       if (isOpen || isWarning) {
-        var nextNonMonday = upcoming.filter(function (c) { return c.reason !== 'monday'; })[0];
-        if (nextNonMonday) {
-          nextText = t('nextClosure') + ' ' + formatDate(nextNonMonday.date);
+        var nextCleaningDate = getNextCleaningDate(market, today);
+        if (nextCleaningDate) {
+          nextText = t('nextClosure') + ' ' + formatDate(nextCleaningDate);
         }
       } else if (isClosed) {
         var nextOpen = getNextOpenDate(market, today);
