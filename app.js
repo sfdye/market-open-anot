@@ -556,6 +556,17 @@
       attribution: 'OneMap | &copy; <a href="https://www.sla.gov.sg">Singapore Land Authority</a>'
     }).addTo(mapInstance);
 
+    var favIcon = L.icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+    var defaultIcon = L.icon({
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+
     allMarkets.forEach(function (market) {
       var lat = parseFloat(market.latitude_hc);
       var lng = parseFloat(market.longitude_hc);
@@ -565,7 +576,18 @@
       var displayName = getDisplayName(parsed);
       var isFav = favorites.indexOf(market.name) !== -1;
 
-      var marker = L.marker([lat, lng]).addTo(mapInstance);
+      var marker = L.marker([lat, lng], { icon: isFav ? favIcon : defaultIcon }).addTo(mapInstance);
+
+      function updatePopup() {
+        var fav = favorites.indexOf(market.name) !== -1;
+        marker.setIcon(fav ? favIcon : defaultIcon);
+        marker.setPopupContent(
+          '<strong>' + escapeHtml(displayName) + '</strong><br>' +
+          '<button class="map-fav-btn" data-market="' + escapeAttr(market.name) + '">' +
+          (fav ? '★ ' + t('removeFav') : '☆ ' + t('addFav')) + '</button>'
+        );
+      }
+
       marker.bindPopup(
         '<strong>' + escapeHtml(displayName) + '</strong><br>' +
         '<button class="map-fav-btn" data-market="' + escapeAttr(market.name) + '">' +
@@ -579,15 +601,13 @@
           var idx = favorites.indexOf(market.name);
           if (idx === -1) {
             favorites.push(market.name);
-            saveFavorites(favorites);
-            showScreen('status-screen');
-            renderStatusScreen();
           } else {
             favorites.splice(idx, 1);
-            saveFavorites(favorites);
-            showScreen('status-screen');
-            renderStatusScreen();
           }
+          saveFavorites(favorites);
+          updateDoneButton();
+          updatePopup();
+          marker.openPopup();
         });
       });
     });
