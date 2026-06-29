@@ -49,7 +49,7 @@ export default {
 async function handleSubscribe(request, env, corsHeaders) {
   try {
     const body = await request.json();
-    const { subscription, markets } = body;
+    const { subscription, markets, lang } = body;
 
     if (!subscription || !subscription.endpoint || !markets || !Array.isArray(markets)) {
       return new Response(JSON.stringify({ error: 'Invalid request' }), {
@@ -59,7 +59,7 @@ async function handleSubscribe(request, env, corsHeaders) {
     }
 
     const key = encodeURIComponent(subscription.endpoint);
-    await env.SUBSCRIPTIONS.put(key, JSON.stringify({ subscription, markets }));
+    await env.SUBSCRIPTIONS.put(key, JSON.stringify({ subscription, markets, lang: lang || 'en' }));
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -134,7 +134,7 @@ async function handleScheduled(env) {
     const data = await env.SUBSCRIPTIONS.get(key.name, 'json');
     if (!data) continue;
 
-    const { subscription, markets } = data;
+    const { subscription, markets, lang } = data;
     const affected = markets.filter(m => closedNames.has(m));
     if (affected.length === 0) {
       results.push({ endpoint: subscription.endpoint.slice(0, 50), matched: false });
@@ -147,12 +147,18 @@ async function handleScheduled(env) {
       return match ? match[1] : name;
     });
     const names = marketNames.join(', ');
-    const title = isToday
-      ? '🚫 ' + names + ' is CLOSED today'
-      : '⚠️ ' + names + ' is CLOSED tomorrow';
-    const body = isToday
-      ? 'Closed for cleaning — don\'t make the trip! Opens again after cleaning ends.'
-      : 'Closed for cleaning tomorrow — plan your visit for another day.';
+    let title, body;
+    if (lang === 'zh') {
+      title = isToday ? '🚫 今天关门（清洁）' : '⚠️ 明天关门（清洁）';
+      body = isToday
+        ? names + ' 今天关闭清洁 — 别白跑一趟！'
+        : names + ' 明天关闭清洁 — 请改天再去。';
+    } else {
+      title = isToday ? '🚫 Closed today for cleaning' : '⚠️ Closed tomorrow for cleaning';
+      body = isToday
+        ? names + ' is closed — don\'t make the trip!'
+        : names + ' is closed tomorrow — plan another day.';
+    }
 
     try {
       const success = await sendPushNotification(

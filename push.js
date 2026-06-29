@@ -87,12 +87,15 @@
       favorites = JSON.parse(localStorage.getItem('moa_favorites') || '[]');
     } catch (e) {}
 
+    var lang = localStorage.getItem('moa_lang') || 'en';
+
     var res = await fetch(WORKER_URL + '/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         subscription: subscription.toJSON(),
         markets: favorites,
+        lang: lang,
       }),
     });
 
