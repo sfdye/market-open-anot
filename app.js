@@ -273,12 +273,12 @@
       var bannerText = isOpen ? t('openToday') : isWarning ? t('warningToday') : t('closedToday');
 
       var nextText = '';
-      if ((isOpen || isWarning) && nextClosure) {
+      if (isOpen || isWarning) {
         var nextNonMonday = upcoming.filter(function (c) { return c.reason !== 'monday'; })[0];
         if (nextNonMonday) {
           nextText = t('nextClosure') + ' ' + formatDate(nextNonMonday.date);
-        } else if (isOpen) {
-          nextText = t('nextClosure') + ' ' + formatDate(nextClosure.date);
+        } else {
+          nextText = market.address_myenv || '';
         }
       } else if (isClosed) {
         var endDate = status.end;
