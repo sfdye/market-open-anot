@@ -667,6 +667,87 @@ body {
   background: rgba(240, 240, 240, 0.95);
 }
 
+/* --- Android Material variant --- */
+
+.install-android .install-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.install-android .install-sheet {
+  gap: 0;
+}
+
+.install-android .install-body {
+  background: #fff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-radius: 28px 28px 0 0;
+  padding: 2rem 1.5rem 0.5rem;
+}
+
+.install-android .install-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.install-android .install-title {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.install-android .install-desc {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.install-android .install-steps {
+  margin: 0;
+}
+
+.install-android .install-step {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+  color: #1a1a1a;
+  font-size: 0.9rem;
+}
+
+.install-android .install-step-num {
+  background: #2e7d32;
+}
+
+.install-android .install-btn {
+  background: #2e7d32;
+  color: #fff;
+  border-radius: 0;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.install-android .install-btn:active {
+  background: #1b5e20;
+}
+
+.install-android .install-dismiss {
+  background: #fff;
+  color: #2e7d32;
+  border-radius: 0 0 28px 28px;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.9rem;
+}
+
+.install-android .install-dismiss:active {
+  background: #f5f5f5;
+}
+
 /* ===== Responsive ===== */
 
 @media (min-width: 600px) {

@@ -13,9 +13,13 @@
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   }
 
-  function isMacSafari() {
-    var ua = navigator.userAgent;
-    return /Macintosh/.test(ua) && /Safari/.test(ua) && !/Chrome/.test(ua) && !/Chromium/.test(ua);
+  function isAndroid() {
+    return /Android/.test(navigator.userAgent);
+  }
+
+  function getPlatform() {
+    if (isIOS()) return 'ios';
+    return 'android';
   }
 
   function wasDismissed() {
@@ -50,11 +54,15 @@
 
   function render() {
     var lang = getLang();
+    var platform = getPlatform();
+    var promptEl = document.getElementById('install-prompt');
     var titleEl = document.getElementById('install-title');
     var descEl = document.getElementById('install-desc');
     var stepsEl = document.getElementById('install-steps');
     var actionBtn = document.getElementById('install-action-btn');
     var dismissBtn = document.getElementById('install-dismiss-btn');
+
+    promptEl.className = 'install-prompt install-' + platform;
 
     if (lang === 'zh') {
       titleEl.textContent = '添加到主屏幕';
@@ -71,25 +79,20 @@
     if (deferredPrompt) {
       actionBtn.textContent = lang === 'zh' ? '安装' : 'Install';
       actionBtn.classList.remove('hidden');
-    } else if (isIOS()) {
+    } else if (platform === 'ios') {
       actionBtn.classList.add('hidden');
       var shareIcon = '<svg style="display:inline-block;vertical-align:middle;width:1em;height:1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>';
       var iosSteps = lang === 'zh'
         ? ['点击底部的「分享」按钮 ' + shareIcon, '向下滑动，点击「添加到主屏幕」']
         : ['Tap the Share button ' + shareIcon + ' at the bottom', 'Scroll down and tap "Add to Home Screen"'];
       renderSteps(stepsEl, iosSteps);
-    } else if (isMacSafari()) {
-      actionBtn.classList.add('hidden');
-      var safariSteps = lang === 'zh'
-        ? ['点击菜单栏的「文件」', '选择「添加到程序坞」']
-        : ['Click "File" in the menu bar', 'Select "Add to Dock"'];
-      renderSteps(stepsEl, safariSteps);
     } else {
-      actionBtn.classList.add('hidden');
-      var desktopSteps = lang === 'zh'
-        ? ['点击地址栏右侧的 安装图标 ⊕', '点击「安装」']
-        : ['Click the install icon ⊕ in the address bar', 'Click "Install"'];
-      renderSteps(stepsEl, desktopSteps);
+      actionBtn.textContent = lang === 'zh' ? '安装' : 'Install';
+      actionBtn.classList.remove('hidden');
+      var androidSteps = lang === 'zh'
+        ? ['点击浏览器菜单 ⋮', '选择「添加到主屏幕」']
+        : ['Tap the browser menu ⋮', 'Select "Add to Home screen"'];
+      renderSteps(stepsEl, androidSteps);
     }
   }
 
