@@ -307,6 +307,23 @@ body {
   text-decoration: underline;
 }
 
+.app-footer {
+  padding: 0.8rem 1.2rem 1.5rem;
+  text-align: center;
+  font-size: 0.65rem;
+  color: #bbb;
+  line-height: 1.8;
+}
+
+.app-footer a {
+  color: #999;
+  text-decoration: none;
+}
+
+.app-footer a:active {
+  color: #666;
+}
+
 /* ===== Status Footer ===== */
 
 .status-footer {
