@@ -28,7 +28,7 @@
       otherWorks: 'Maintenance',
       marketStalls: 'market stalls',
       foodStalls: 'food stalls',
-      dataSource: 'Data from <a href="https://data.gov.sg/datasets/d_bda4baa634dd1cc7a6c7cad5f19e2d68/view">NEA via data.gov.sg</a>',
+      dataSource: 'Data from <a href="https://data.gov.sg/datasets/d_bda4baa634dd1cc7a6c7cad5f19e2d68/view">NEA</a>',
       lastUpdated: 'Last updated:',
       addMarkets: '+ Add Markets',
       chooseMarkets: 'Choose Your Markets',
