@@ -1,4 +1,4 @@
-var CACHE_NAME = 'market-open-anot-v3';
+var CACHE_NAME = 'market-open-anot-v4';
 var STATIC_ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ var STATIC_ASSETS = [
   './market-logic.js',
   './zh-names.js',
   './push.js',
+  './install-prompt.js',
   './app.js',
   './manifest.json',
   './icons/icon-192.png'

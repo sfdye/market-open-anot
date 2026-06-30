@@ -527,6 +527,148 @@ body {
 
 /* ===== Responsive ===== */
 
+/* ===== Install Prompt ===== */
+
+.install-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0.5rem;
+  padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+}
+
+.install-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.install-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.install-body {
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: 14px;
+  padding: 1.4rem 1.2rem;
+  text-align: center;
+}
+
+.install-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.install-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0.3rem;
+}
+
+.install-desc {
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.install-steps {
+  text-align: left;
+  margin: 0 0.2rem;
+}
+
+.install-steps:empty {
+  display: none;
+}
+
+.install-step {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0;
+  font-size: 0.85rem;
+  color: #333;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.install-step:last-child {
+  border-bottom: none;
+}
+
+.install-step-num {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: #007aff;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.install-btn {
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: 14px;
+  border: none;
+  padding: 1rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #007aff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+}
+
+.install-btn:active {
+  background: rgba(240, 240, 240, 0.95);
+}
+
+.install-dismiss {
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: 14px;
+  border: none;
+  padding: 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #007aff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+  display: block;
+}
+
+.install-dismiss:active {
+  background: rgba(240, 240, 240, 0.95);
+}
+
+/* ===== Responsive ===== */
+
 @media (min-width: 600px) {
   #app {
     max-width: 480px;
