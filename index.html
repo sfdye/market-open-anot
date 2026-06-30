@@ -58,10 +58,26 @@
     </div>
   </div>
 
+  <!-- Install Prompt -->
+  <div id="install-prompt" class="install-prompt hidden">
+    <div class="install-backdrop"></div>
+    <div class="install-sheet">
+      <div class="install-body">
+        <div class="install-icon">📲</div>
+        <h2 id="install-title" class="install-title">Add to Home Screen</h2>
+        <p id="install-desc" class="install-desc">Install this app for quick access and a full-screen experience.</p>
+        <div id="install-steps" class="install-steps"></div>
+      </div>
+      <button id="install-action-btn" class="install-btn">Install</button>
+      <button id="install-dismiss-btn" class="install-dismiss">Not now</button>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="market-logic.js"></script>
   <script src="zh-names.js"></script>
   <script src="push.js"></script>
+  <script src="install-prompt.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
