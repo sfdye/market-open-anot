@@ -699,6 +699,9 @@
     document.getElementById('done-btn').addEventListener('click', function () {
       showScreen('status-screen');
       renderStatusScreen();
+      if (window.InstallPrompt) {
+        InstallPrompt.show();
+      }
     });
 
     // Event: Search input
@@ -724,9 +727,10 @@
     document.getElementById('lang-toggle').addEventListener('click', handleLangToggle);
     document.getElementById('lang-toggle-picker').addEventListener('click', handleLangToggle);
 
-    // Event: Reminder button
+    // Event: Reminder button (only in standalone/installed mode)
     var reminderBtn = document.getElementById('reminder-btn');
-    if (MarketPush && MarketPush.isPushSupported()) {
+    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    if (MarketPush && MarketPush.isPushSupported() && isStandalone) {
       reminderBtn.classList.remove('hidden');
       updateReminderBtn();
       reminderBtn.addEventListener('click', async function () {
