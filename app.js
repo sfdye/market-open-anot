@@ -46,6 +46,7 @@
       reminderCardDesc: 'Get a heads-up the day before a market you follow closes.',
       reminderBadge: 'Experimental',
       reminderEnable: 'Enable',
+      reminderEnabling: 'Enabling…',
       reminderDismiss: 'Not now',
       reminderBlocked: 'Notifications are blocked. Enable them for this app in your device settings, then try again.',
       remindersOn: 'Reminders on',
@@ -86,6 +87,7 @@
       reminderCardDesc: '您收藏的巴刹休市前一天，我们会提前通知您。',
       reminderBadge: '实验功能',
       reminderEnable: '开启',
+      reminderEnabling: '开启中…',
       reminderDismiss: '以后再说',
       reminderBlocked: '通知已被封锁。请在设备设置中为此应用开启通知，然后再试一次。',
       remindersOn: '提醒已开启',
@@ -751,21 +753,8 @@
     if (remindersAvailable()) {
       reminderBtn.classList.remove('hidden');
       updateReminderBtn();
-      reminderBtn.addEventListener('click', async function () {
-        if (MarketPush.isPushEnabled()) {
-          await MarketPush.unsubscribeFromPush();
-        } else {
-          await enableReminders();
-        }
-        updateReminderBtn();
-        renderReminderCard();
-      });
-
-      document.getElementById('reminder-enable-btn').addEventListener('click', async function () {
-        await enableReminders();
-        updateReminderBtn();
-        renderReminderCard();
-      });
+      reminderBtn.addEventListener('click', toggleReminders);
+      document.getElementById('reminder-enable-btn').addEventListener('click', toggleReminders);
 
       document.getElementById('reminder-dismiss-btn').addEventListener('click', function () {
         localStorage.setItem(STORAGE.reminderCardDismissed, 'true');
@@ -777,6 +766,40 @@
   function remindersAvailable() {
     var isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
     return !!(window.MarketPush && MarketPush.isPushSupported() && isStandalone);
+  }
+
+  var reminderBusy = false;
+
+  async function toggleReminders() {
+    if (reminderBusy) return;
+    reminderBusy = true;
+    setReminderBusyUI(true);
+    try {
+      if (MarketPush.isPushEnabled()) {
+        await MarketPush.unsubscribeFromPush();
+      } else {
+        await enableReminders();
+      }
+    } finally {
+      reminderBusy = false;
+      setReminderBusyUI(false);
+      updateReminderBtn();
+      renderReminderCard();
+    }
+  }
+
+  function setReminderBusyUI(busy) {
+    var btn = document.getElementById('reminder-btn');
+    var enableBtn = document.getElementById('reminder-enable-btn');
+    var dismissBtn = document.getElementById('reminder-dismiss-btn');
+    btn.disabled = busy;
+    btn.classList.toggle('busy', busy);
+    enableBtn.disabled = busy;
+    dismissBtn.disabled = busy;
+    // Only show "Enabling…" while turning reminders on
+    if (busy && !MarketPush.isPushEnabled()) {
+      enableBtn.textContent = t('reminderEnabling');
+    }
   }
 
   async function enableReminders() {

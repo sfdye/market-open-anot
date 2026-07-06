@@ -63,6 +63,14 @@ body {
   background: #e8f5e9;
 }
 
+.reminder-btn.busy {
+  opacity: 0.5;
+}
+
+.reminder-btn:disabled {
+  cursor: default;
+}
+
 /* ===== Reminder Promo Card ===== */
 
 .reminder-card {
@@ -138,6 +146,16 @@ body {
 
 .reminder-enable-btn:active {
   background: #1b5e20;
+}
+
+.reminder-enable-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.reminder-dismiss-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .reminder-dismiss-btn {
