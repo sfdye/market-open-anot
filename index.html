@@ -28,6 +28,20 @@
           </div>
         </div>
       </header>
+      <div id="reminder-card" class="reminder-card hidden">
+        <div class="reminder-card-icon">🔔</div>
+        <div class="reminder-card-body">
+          <div class="reminder-card-heading">
+            <span id="reminder-card-title" class="reminder-card-title">Get closure reminders</span>
+            <span id="reminder-card-badge" class="reminder-badge">Experimental</span>
+          </div>
+          <p id="reminder-card-desc" class="reminder-card-desc">Get a heads-up the day before a market you follow closes.</p>
+          <div class="reminder-card-actions">
+            <button id="reminder-enable-btn" class="reminder-enable-btn">Enable</button>
+            <button id="reminder-dismiss-btn" class="reminder-dismiss-btn">Not now</button>
+          </div>
+        </div>
+      </div>
       <main id="market-cards" class="market-cards" aria-live="polite"></main>
       <footer class="status-footer">
         <button id="add-markets-btn" class="btn-primary">+ Add Markets</button>

@@ -1,4 +1,4 @@
-var CACHE_NAME = 'market-open-anot-v5';
+var CACHE_NAME = 'market-open-anot-v7';
 var STATIC_ASSETS = [
   './',
   './index.html',
