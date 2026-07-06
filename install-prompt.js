@@ -66,11 +66,11 @@
 
     if (lang === 'zh') {
       titleEl.textContent = '添加到主屏幕';
-      descEl.textContent = '安装此应用，快速访问并获得全屏体验。';
+      descEl.textContent = '安装此应用，即可快速访问、获得全屏体验，并开启休市提醒（实验功能）。';
       dismissBtn.textContent = '以后再说';
     } else {
       titleEl.textContent = 'Add to Home Screen';
-      descEl.textContent = 'Install this app for quick access and a full-screen experience.';
+      descEl.textContent = 'Install this app for quick access, a full-screen experience, and closure reminders (experimental).';
       dismissBtn.textContent = 'Not now';
     }
 

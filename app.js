@@ -6,7 +6,8 @@
     favorites: 'moa_favorites',
     data: 'moa_data',
     fetched: 'moa_fetched',
-    lang: 'moa_lang'
+    lang: 'moa_lang',
+    reminderCardDismissed: 'moa_reminder_card_dismissed'
   };
 
   const strings = {
@@ -40,7 +41,15 @@
       remove: 'Remove from favorites',
       noFavorites: 'Tap the button below to add your markets or hawker centres',
       closedTil: 'til',
-      langToggle: 'EN'
+      langToggle: 'EN',
+      reminderCardTitle: 'Get closure reminders',
+      reminderCardDesc: 'Get a heads-up the day before a market you follow closes.',
+      reminderBadge: 'Experimental',
+      reminderEnable: 'Enable',
+      reminderDismiss: 'Not now',
+      reminderBlocked: 'Notifications are blocked. Enable them for this app in your device settings, then try again.',
+      remindersOn: 'Reminders on',
+      enableReminders: 'Enable reminders'
     },
     zh: {
       appTitle: '巴刹今天开吗？',
@@ -63,16 +72,24 @@
       dataSource: '数据来源：<a href="https://data.gov.sg/datasets/d_bda4baa634dd1cc7a6c7cad5f19e2d68/view">国家环境局 (NEA)</a>',
       lastUpdated: '最后更新：',
       addMarkets: '+ 添加巴刹',
-      chooseMarkets: '选择你的巴刹',
-      tapToAdd: '点击添加你的巴刹或小贩中心',
+      chooseMarkets: '选择您的巴刹',
+      tapToAdd: '点击添加您的巴刹或小贩中心',
       search: '搜索...',
       done: '完成',
       addFav: '添加至收藏',
       removeFav: '从收藏移除',
       remove: '从收藏中移除',
-      noFavorites: '点击下面的按钮添加你的巴刹或小贩中心',
+      noFavorites: '点击下面的按钮添加您的巴刹或小贩中心',
       closedTil: '至',
-      langToggle: '中文'
+      langToggle: '中文',
+      reminderCardTitle: '开启休市提醒',
+      reminderCardDesc: '您收藏的巴刹休市前一天，我们会提前通知您。',
+      reminderBadge: '实验功能',
+      reminderEnable: '开启',
+      reminderDismiss: '以后再说',
+      reminderBlocked: '通知已被封锁。请在设备设置中为此应用开启通知，然后再试一次。',
+      remindersOn: '提醒已开启',
+      enableReminders: '开启提醒'
     }
   };
 
@@ -262,6 +279,8 @@
       lastUpdatedStr = ' · ' + t('lastUpdated') + ' ' + formatDate(fetchedDate);
     }
     document.getElementById('data-source').innerHTML = t('dataSource') + lastUpdatedStr;
+
+    renderReminderCard();
 
     if (favorites.length === 0) {
       container.innerHTML = '<div class="empty-state"><p>' + t('noFavorites') + '</p></div>';
@@ -727,21 +746,64 @@
     document.getElementById('lang-toggle').addEventListener('click', handleLangToggle);
     document.getElementById('lang-toggle-picker').addEventListener('click', handleLangToggle);
 
-    // Event: Reminder button (only in standalone/installed mode)
+    // Reminders: header bell + promo card (only when app is installed and push is supported)
     var reminderBtn = document.getElementById('reminder-btn');
-    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-    if (MarketPush && MarketPush.isPushSupported() && isStandalone) {
+    if (remindersAvailable()) {
       reminderBtn.classList.remove('hidden');
       updateReminderBtn();
       reminderBtn.addEventListener('click', async function () {
         if (MarketPush.isPushEnabled()) {
           await MarketPush.unsubscribeFromPush();
         } else {
-          await MarketPush.subscribeToPush();
+          await enableReminders();
         }
         updateReminderBtn();
+        renderReminderCard();
+      });
+
+      document.getElementById('reminder-enable-btn').addEventListener('click', async function () {
+        await enableReminders();
+        updateReminderBtn();
+        renderReminderCard();
+      });
+
+      document.getElementById('reminder-dismiss-btn').addEventListener('click', function () {
+        localStorage.setItem(STORAGE.reminderCardDismissed, 'true');
+        renderReminderCard();
       });
     }
+  }
+
+  function remindersAvailable() {
+    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    return !!(window.MarketPush && MarketPush.isPushSupported() && isStandalone);
+  }
+
+  async function enableReminders() {
+    var ok = await MarketPush.subscribeToPush();
+    if (!ok && typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+      alert(t('reminderBlocked'));
+    }
+    return ok;
+  }
+
+  function renderReminderCard() {
+    var card = document.getElementById('reminder-card');
+    var dismissed = localStorage.getItem(STORAGE.reminderCardDismissed) === 'true';
+    var show = remindersAvailable() && !MarketPush.isPushEnabled() &&
+      !dismissed && favorites.length > 0;
+
+    if (!show) {
+      card.classList.add('hidden');
+      return;
+    }
+
+    document.getElementById('reminder-card-title').textContent = t('reminderCardTitle');
+    document.getElementById('reminder-card-desc').textContent = t('reminderCardDesc');
+    document.getElementById('reminder-card-badge').textContent = t('reminderBadge');
+    document.getElementById('reminder-enable-btn').textContent = t('reminderEnable');
+    document.getElementById('reminder-dismiss-btn').textContent = t('reminderDismiss');
+    card.classList.remove('hidden');
   }
 
   function updateReminderBtn() {
@@ -749,11 +811,11 @@
     if (MarketPush.isPushEnabled()) {
       btn.textContent = '🔔';
       btn.classList.add('active');
-      btn.title = lang === 'zh' ? '提醒已开启' : 'Reminders on';
+      btn.title = t('remindersOn');
     } else {
       btn.textContent = '🔕';
       btn.classList.remove('active');
-      btn.title = lang === 'zh' ? '开启提醒' : 'Enable reminders';
+      btn.title = t('enableReminders');
     }
   }
 
