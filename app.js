@@ -39,7 +39,7 @@
       doneCount: 'Done ({n})',
       edit: 'Edit',
       doneEditing: 'Done',
-      removeAll: 'Remove all',
+      removeAllCount: 'Remove all ({n})',
       removeAllConfirm: 'Remove all markets from your list?',
       addFav: 'Add to favorites',
       removeFav: 'Remove from favorites',
@@ -84,7 +84,7 @@
       doneCount: '完成（{n}）',
       edit: '编辑',
       doneEditing: '完成',
-      removeAll: '全部移除',
+      removeAllCount: '全部移除（{n}）',
       removeAllConfirm: '确定要移除列表中的所有巴刹吗？',
       addFav: '添加至收藏',
       removeFav: '从收藏移除',
@@ -425,7 +425,6 @@
   function removeMarket(name) {
     favorites = favorites.filter(function (f) { return f !== name; });
     saveFavorites(favorites);
-    if (favorites.length === 0) editMode = false;
     renderStatusScreen();
   }
 
@@ -435,20 +434,27 @@
     renderPickerScreen();
   }
 
-  // Toggle the Edit / Remove-all controls and body state to match editMode + favorites
+  function openStatus() {
+    showScreen('status-screen');
+    renderStatusScreen();
+  }
+
+  // Toggle the Edit / Remove-all controls and body state to match editMode + favorites.
+  // Owns the invariant that edit mode is only valid while there are favorites.
   function updateStatusControls() {
     var editBtn = document.getElementById('edit-btn');
     var addBtn = document.getElementById('add-markets-btn');
     var removeAllBtn = document.getElementById('remove-all-btn');
     var hasFavorites = favorites.length > 0;
 
+    editMode = editMode && hasFavorites;
+
     editBtn.textContent = editMode ? t('doneEditing') : t('edit');
-    editBtn.classList.toggle('active', editMode);
     editBtn.classList.toggle('hidden', !hasFavorites);
 
     // Empty state carries its own add button, so hide the footer entirely
     document.getElementById('status-footer').classList.toggle('hidden', !hasFavorites);
-    removeAllBtn.textContent = t('removeAll') + ' (' + favorites.length + ')';
+    removeAllBtn.textContent = t('removeAllCount').replace('{n}', favorites.length);
     addBtn.classList.toggle('hidden', editMode);
     removeAllBtn.classList.toggle('hidden', !editMode);
 
@@ -749,8 +755,7 @@
       saveFavorites(favorites);
 
       if (favorites.length > 0) {
-        showScreen('status-screen');
-        renderStatusScreen();
+        openStatus();
       } else {
         showScreen('picker-screen');
         renderPickerScreen();
@@ -760,10 +765,11 @@
     // Event: Add Markets button
     document.getElementById('add-markets-btn').addEventListener('click', openPicker);
 
-    // Event: Edit toggle
+    // Event: Edit toggle — inline remove buttons already exist in the DOM,
+    // so a control refresh (which flips #status-screen.editing) is enough.
     document.getElementById('edit-btn').addEventListener('click', function () {
       editMode = !editMode;
-      renderStatusScreen();
+      updateStatusControls();
     });
 
     // Event: Remove all
@@ -771,24 +777,19 @@
       if (!confirm(t('removeAllConfirm'))) return;
       favorites = [];
       saveFavorites(favorites);
-      editMode = false;
       renderStatusScreen();
     });
 
     // Event: Done button
     document.getElementById('done-btn').addEventListener('click', function () {
-      showScreen('status-screen');
-      renderStatusScreen();
+      openStatus();
       if (window.InstallPrompt) {
         InstallPrompt.show();
       }
     });
 
     // Event: Back button — always available exit from the picker
-    document.getElementById('back-btn').addEventListener('click', function () {
-      showScreen('status-screen');
-      renderStatusScreen();
-    });
+    document.getElementById('back-btn').addEventListener('click', openStatus);
 
     // Event: Search input
     document.getElementById('search-input').addEventListener('input', function (e) {

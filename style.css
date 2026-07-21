@@ -59,7 +59,7 @@ body {
   flex-shrink: 0;
 }
 
-.edit-btn.active {
+#status-screen.editing .edit-btn {
   border-color: #2e7d32;
   background: #e8f5e9;
   color: #2e7d32;
