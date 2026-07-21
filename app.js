@@ -36,9 +36,13 @@
       tapToAdd: 'Tap to add your markets or hawker centres',
       search: 'Search...',
       done: 'Done',
+      doneCount: 'Done ({n})',
+      edit: 'Edit',
+      doneEditing: 'Done',
+      removeAll: 'Remove all',
+      removeAllConfirm: 'Remove all markets from your list?',
       addFav: 'Add to favorites',
       removeFav: 'Remove from favorites',
-      remove: 'Remove from favorites',
       noFavorites: 'Tap the button below to add your markets or hawker centres',
       closedTil: 'til',
       langToggle: 'EN',
@@ -77,9 +81,13 @@
       tapToAdd: '点击添加您的巴刹或小贩中心',
       search: '搜索...',
       done: '完成',
+      doneCount: '完成（{n}）',
+      edit: '编辑',
+      doneEditing: '完成',
+      removeAll: '全部移除',
+      removeAllConfirm: '确定要移除列表中的所有巴刹吗？',
       addFav: '添加至收藏',
       removeFav: '从收藏移除',
-      remove: '从收藏中移除',
       noFavorites: '点击下面的按钮添加您的巴刹或小贩中心',
       closedTil: '至',
       langToggle: '中文',
@@ -100,6 +108,7 @@
   let lang = 'en';
   let userLat = null;
   let userLng = null;
+  let editMode = false;
 
   var parseDateDMY = MarketLogic.parseDateDMY;
   var stripTime = MarketLogic.stripTime;
@@ -283,9 +292,14 @@
     document.getElementById('data-source').innerHTML = t('dataSource') + lastUpdatedStr;
 
     renderReminderCard();
+    updateStatusControls();
 
     if (favorites.length === 0) {
-      container.innerHTML = '<div class="empty-state"><p>' + t('noFavorites') + '</p></div>';
+      container.innerHTML = '<div class="empty-state">' +
+        '<p>' + t('noFavorites') + '</p>' +
+        '<button id="empty-add-btn" class="btn-primary empty-add-btn">' + t('addMarkets') + '</button>' +
+        '</div>';
+      container.querySelector('#empty-add-btn').addEventListener('click', openPicker);
       return;
     }
 
@@ -327,6 +341,7 @@
 
       html += '<div class="market-card" data-market="' + escapeAttr(marketName) + '">';
       html += '<div class="card-summary">';
+      html += '<button class="card-remove-inline" data-market="' + escapeAttr(marketName) + '" aria-label="' + escapeAttr(t('removeFav')) + '">−</button>';
       if (photoUrl) {
         html += '<img class="card-thumb" src="' + escapeAttr(photoUrl) + '" alt="" loading="lazy">';
       }
@@ -385,7 +400,6 @@
         html += '</div>';
       }
 
-      html += '<button class="card-remove" data-market="' + escapeAttr(marketName) + '">' + t('remove') + '</button>';
       html += '</div>';
       html += '</div>';
     }
@@ -394,19 +408,51 @@
 
     container.querySelectorAll('.market-card').forEach(function (card) {
       card.querySelector('.card-summary').addEventListener('click', function () {
+        if (editMode) return;
         card.classList.toggle('expanded');
       });
     });
 
-    container.querySelectorAll('.card-remove').forEach(function (btn) {
+    // Inline remove (edit mode) drops a single market
+    container.querySelectorAll('.card-remove-inline').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        var name = btn.getAttribute('data-market');
-        favorites = favorites.filter(function (f) { return f !== name; });
-        saveFavorites(favorites);
-        renderStatusScreen();
+        removeMarket(btn.getAttribute('data-market'));
       });
     });
+  }
+
+  function removeMarket(name) {
+    favorites = favorites.filter(function (f) { return f !== name; });
+    saveFavorites(favorites);
+    if (favorites.length === 0) editMode = false;
+    renderStatusScreen();
+  }
+
+  function openPicker() {
+    editMode = false;
+    showScreen('picker-screen');
+    renderPickerScreen();
+  }
+
+  // Toggle the Edit / Remove-all controls and body state to match editMode + favorites
+  function updateStatusControls() {
+    var editBtn = document.getElementById('edit-btn');
+    var addBtn = document.getElementById('add-markets-btn');
+    var removeAllBtn = document.getElementById('remove-all-btn');
+    var hasFavorites = favorites.length > 0;
+
+    editBtn.textContent = editMode ? t('doneEditing') : t('edit');
+    editBtn.classList.toggle('active', editMode);
+    editBtn.classList.toggle('hidden', !hasFavorites);
+
+    // Empty state carries its own add button, so hide the footer entirely
+    document.getElementById('status-footer').classList.toggle('hidden', !hasFavorites);
+    removeAllBtn.textContent = t('removeAll') + ' (' + favorites.length + ')';
+    addBtn.classList.toggle('hidden', editMode);
+    removeAllBtn.classList.toggle('hidden', !editMode);
+
+    document.getElementById('status-screen').classList.toggle('editing', editMode);
   }
 
   function distanceBetween(lat1, lng1, lat2, lng2) {
@@ -543,11 +589,12 @@
 
   function updateDoneButton() {
     var btn = document.getElementById('done-btn');
-    if (favorites.length > 0 || mapView) {
-      btn.classList.remove('hidden');
-    } else {
-      btn.classList.add('hidden');
-    }
+    // Always visible so users have a clear confirm-and-return action,
+    // even after scrolling the header (with the back button) off-screen.
+    btn.classList.remove('hidden');
+    btn.textContent = favorites.length > 0
+      ? t('doneCount').replace('{n}', favorites.length)
+      : t('done');
   }
 
   // ===== Map View =====
@@ -711,9 +758,21 @@
     });
 
     // Event: Add Markets button
-    document.getElementById('add-markets-btn').addEventListener('click', function () {
-      showScreen('picker-screen');
-      renderPickerScreen();
+    document.getElementById('add-markets-btn').addEventListener('click', openPicker);
+
+    // Event: Edit toggle
+    document.getElementById('edit-btn').addEventListener('click', function () {
+      editMode = !editMode;
+      renderStatusScreen();
+    });
+
+    // Event: Remove all
+    document.getElementById('remove-all-btn').addEventListener('click', function () {
+      if (!confirm(t('removeAllConfirm'))) return;
+      favorites = [];
+      saveFavorites(favorites);
+      editMode = false;
+      renderStatusScreen();
     });
 
     // Event: Done button
@@ -723,6 +782,12 @@
       if (window.InstallPrompt) {
         InstallPrompt.show();
       }
+    });
+
+    // Event: Back button — always available exit from the picker
+    document.getElementById('back-btn').addEventListener('click', function () {
+      showScreen('status-screen');
+      renderStatusScreen();
     });
 
     // Event: Search input

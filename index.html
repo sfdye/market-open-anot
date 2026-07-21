@@ -23,6 +23,7 @@
             <div id="today-date" class="today-date"></div>
           </div>
           <div class="header-actions">
+            <button id="edit-btn" class="edit-btn hidden">Edit</button>
             <button id="reminder-btn" class="reminder-btn hidden" aria-label="Reminders"></button>
             <button id="lang-toggle" class="lang-toggle" aria-label="Switch language">中文</button>
           </div>
@@ -43,8 +44,9 @@
         </div>
       </div>
       <main id="market-cards" class="market-cards" aria-live="polite"></main>
-      <footer class="status-footer">
+      <footer id="status-footer" class="status-footer">
         <button id="add-markets-btn" class="btn-primary">+ Add Markets</button>
+        <button id="remove-all-btn" class="btn-danger hidden">Remove all</button>
       </footer>
       <div id="data-source" class="data-source"></div>
       <footer class="app-footer">
@@ -56,7 +58,10 @@
     <div id="picker-screen" class="screen hidden">
       <header class="picker-header">
         <div class="picker-header-top">
-          <h1 id="picker-title">Choose Your Markets</h1>
+          <div class="picker-header-left">
+            <button id="back-btn" class="back-btn" aria-label="Back">←</button>
+            <h1 id="picker-title">Choose Your Markets</h1>
+          </div>
           <button id="lang-toggle-picker" class="lang-toggle" aria-label="Switch language">中文</button>
         </div>
         <p id="picker-subtitle" class="subtitle">Tap to add to favorites</p>

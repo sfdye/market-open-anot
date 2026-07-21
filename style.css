@@ -47,6 +47,24 @@ body {
   flex-shrink: 0;
 }
 
+.edit-btn {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.edit-btn.active {
+  border-color: #2e7d32;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
 .reminder-btn {
   padding: 0.4rem 0.7rem;
   font-size: 1.2rem;
@@ -209,6 +227,46 @@ body {
   align-items: center;
   padding: 1rem 1.2rem;
   gap: 0.8rem;
+}
+
+/* Inline remove control — collapsed until the screen enters edit mode */
+.card-remove-inline {
+  flex-shrink: 0;
+  width: 0;
+  height: 1.8rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 50%;
+  background: #c62828;
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: width 0.18s ease, opacity 0.18s ease, transform 0.18s ease, margin 0.18s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#status-screen.editing .card-remove-inline {
+  width: 1.8rem;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.card-remove-inline:active {
+  background: #8e1c1c;
+}
+
+/* In edit mode the summary is a remove target, not an expander */
+#status-screen.editing .card-summary {
+  cursor: default;
+}
+
+#status-screen.editing .card-status {
+  opacity: 0.5;
 }
 
 .card-thumb {
@@ -387,25 +445,6 @@ body {
   color: #888;
 }
 
-.card-remove {
-  display: block;
-  margin-top: 0.8rem;
-  padding: 0.5rem 1rem;
-  background: none;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  color: #888;
-  cursor: pointer;
-  width: 100%;
-}
-
-.card-remove:active {
-  background: #fee;
-  border-color: #c62828;
-  color: #c62828;
-}
-
 .data-source {
   padding: 0.6rem 1.2rem;
   font-size: 0.7rem;
@@ -457,6 +496,35 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.picker-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.back-btn {
+  flex-shrink: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  line-height: 1;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: #2e7d32;
+  cursor: pointer;
+  margin-left: -0.4rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.back-btn:active {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .picker-header h1 {
@@ -624,6 +692,23 @@ body {
   background: #1b5e20;
 }
 
+.btn-danger {
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: #fff;
+  color: #c62828;
+  border: 2px solid #c62828;
+  border-radius: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-danger:active {
+  background: #fee;
+}
+
 /* ===== Language Toggle ===== */
 
 .lang-toggle {
@@ -652,6 +737,11 @@ body {
 .empty-state p {
   font-size: 1.1rem;
   line-height: 1.5;
+}
+
+.empty-add-btn {
+  width: auto;
+  margin-top: 1.2rem;
 }
 
 /* ===== Responsive ===== */
