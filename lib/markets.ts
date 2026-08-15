@@ -87,9 +87,15 @@ export function searchMarkets(markets: Market[], query: string): Market[] {
   });
 }
 
-export async function fetchMarketsFromAPI(): Promise<Market[] | null> {
+const FETCH_TIMEOUT_MS = 10_000;
+
+async function attemptFetch(): Promise<Market[] | null> {
+  // A phone on a captive-portal wifi hangs the request rather than failing it, and without a
+  // timeout the splash screen would wait for it.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(API_URL, { signal: controller.signal });
     if (!res.ok) return null;
     const json = (await res.json()) as { result?: { records?: Market[] } };
     const records = json.result?.records;
@@ -98,7 +104,18 @@ export async function fetchMarketsFromAPI(): Promise<Market[] | null> {
     return records;
   } catch {
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
+}
+
+/** The dataset, or null if it could not be had — the caller falls back to the cache. */
+export async function fetchMarketsFromAPI(): Promise<Market[] | null> {
+  const first = await attemptFetch();
+  if (first) return first;
+  // One retry, because the common failure is a request fired while the radio is still waking.
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return attemptFetch();
 }
 
 /**

@@ -12,7 +12,7 @@ import { parseMarketName, type Market } from '../lib/core/market-logic';
 import { getDisplayName, marketCoords } from '../lib/markets';
 import type { Coords } from '../lib/useLocation';
 import { colors, radius, shadow } from '../lib/theme';
-import { useStore } from '../lib/store';
+import { toggleFavorite, useFavorites, useLang, useT } from '../lib/store';
 
 const SINGAPORE_CENTER: [number, number] = [103.8198, 1.3521];
 
@@ -36,8 +36,11 @@ const ONEMAP_STYLE: StyleSpecification = {
 };
 
 export default function MarketMap({ markets, user }: { markets: Market[]; user: Coords | null }) {
-  const { favorites, lang, isFavorite, toggleFavorite, t } = useStore();
+  const favorites = useFavorites();
+  const lang = useLang();
+  const t = useT();
   const [selected, setSelected] = useState<Market | null>(null);
+  const selectedIsFavorite = !!selected && favorites.includes(selected.name);
 
   // Circles are drawn by the GPU from one source, so all ~123 markets stay cheap. Native view
   // annotations would not.
@@ -115,14 +118,12 @@ export default function MarketMap({ markets, user }: { markets: Market[]; user: 
             {getDisplayName(parseMarketName(selected.name), lang)}
           </Text>
           <Pressable
-            style={[styles.calloutBtn, isFavorite(selected.name) && styles.calloutBtnOn]}
+            style={[styles.calloutBtn, selectedIsFavorite && styles.calloutBtnOn]}
             onPress={() => toggleFavorite(selected.name)}
             accessibilityRole="button"
           >
-            <Text
-              style={[styles.calloutBtnText, isFavorite(selected.name) && styles.calloutBtnTextOn]}
-            >
-              {isFavorite(selected.name) ? `★ ${t('removeFav')}` : `☆ ${t('addFav')}`}
+            <Text style={[styles.calloutBtnText, selectedIsFavorite && styles.calloutBtnTextOn]}>
+              {selectedIsFavorite ? `★ ${t('removeFav')}` : `☆ ${t('addFav')}`}
             </Text>
           </Pressable>
         </View>

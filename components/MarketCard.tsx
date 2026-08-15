@@ -12,7 +12,7 @@ import {
 import { decodeEntities, getDisplayName, getNextCleaningDate } from '../lib/markets';
 import { formatDate } from '../lib/date';
 import { colors, radius, shadow } from '../lib/theme';
-import { useStore } from '../lib/store';
+import { useLang, useT, useToday, type Translate } from '../lib/store';
 
 const UPCOMING_SHOWN = 3;
 
@@ -25,7 +25,9 @@ export default function MarketCard({
   editing: boolean;
   onRemove: () => void;
 }) {
-  const { lang, today, t } = useStore();
+  const lang = useLang();
+  const today = useToday();
+  const t = useT();
   const [expanded, setExpanded] = useState(false);
 
   const view = useMemo(() => {
@@ -150,8 +152,6 @@ export default function MarketCard({
     </View>
   );
 }
-
-type Translate = ReturnType<typeof useStore>['t'];
 
 function reasonText(status: MarketStatus, t: Translate): string {
   if (status.status === 'warning') return t('reasonMonday');

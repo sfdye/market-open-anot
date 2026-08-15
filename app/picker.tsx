@@ -18,13 +18,16 @@ import {
   searchMarkets,
 } from '../lib/markets';
 import { useLocation } from '../lib/useLocation';
-import { useStore } from '../lib/store';
+import { toggleFavorite, useFavorites, useLang, useMarkets, useT } from '../lib/store';
 import { colors, radius, shadow } from '../lib/theme';
 
 export default function PickerScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { markets, favorites, lang, t, isFavorite, toggleFavorite } = useStore();
+  const markets = useMarkets();
+  const favorites = useFavorites();
+  const lang = useLang();
+  const t = useT();
   const user = useLocation();
   const [query, setQuery] = useState('');
   const [showMap, setShowMap] = useState(false);
@@ -52,7 +55,7 @@ export default function PickerScreen() {
 
   const renderRow = ({ item }: { item: Market }) => {
     const parsed = parseMarketName(item.name);
-    const fav = isFavorite(item.name);
+    const fav = favorites.includes(item.name);
     const distance = getMarketDistance(item, user?.lat ?? null, user?.lng ?? null);
     const zhName = getDisplayName(parsed, 'zh');
     // Distance if we have it, else the English name under a Chinese one, else the street.

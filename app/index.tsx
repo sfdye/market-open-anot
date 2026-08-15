@@ -15,9 +15,20 @@ import MarketCard from '../components/MarketCard';
 import { findMarket } from '../lib/markets';
 import { formatDate, formatDateLong } from '../lib/date';
 import { DATA_SOURCE_URL } from '../lib/i18n';
-import { loadFetchedAt } from '../lib/storage';
 import { useReminders } from '../lib/useReminders';
-import { useStore } from '../lib/store';
+import {
+  removeAllFavorites,
+  removeFavorite,
+  setLang,
+  useFavorites,
+  useFetchedAt,
+  useLang,
+  useMarkets,
+  useReady,
+  useStale,
+  useT,
+  useToday,
+} from '../lib/store';
 import { colors, radius, shadow } from '../lib/theme';
 
 const REPO_URL = 'https://github.com/sfdye/market-open-anot';
@@ -27,15 +38,16 @@ const FEEDBACK_URL = 'mailto:t@sfdye.com';
 export default function StatusScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { ready, markets, stale, favorites, lang, today, t, toggleLang, removeFavorite, removeAllFavorites } =
-    useStore();
+  const ready = useReady();
+  const markets = useMarkets();
+  const stale = useStale();
+  const favorites = useFavorites();
+  const lang = useLang();
+  const today = useToday();
+  const t = useT();
+  const fetchedAt = useFetchedAt();
   const reminders = useReminders();
   const [editing, setEditing] = useState(false);
-  const [fetchedAt, setFetchedAt] = useState<number | null>(null);
-
-  useEffect(() => {
-    void loadFetchedAt().then(setFetchedAt);
-  }, [markets]);
 
   const hasFavorites = favorites.length > 0;
   // Edit mode cannot outlive the last favourite.
@@ -92,7 +104,7 @@ export default function StatusScreen() {
             </Pressable>
             <Pressable
               style={styles.iconBtn}
-              onPress={toggleLang}
+              onPress={() => setLang(lang === 'en' ? 'zh' : 'en')}
               accessibilityRole="button"
               accessibilityLabel={t('langToggle')}
             >

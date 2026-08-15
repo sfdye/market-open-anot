@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, radius } from '../lib/theme';
-import { useStore } from '../lib/store';
+import { useT } from '../lib/store';
 
 export default function ReminderCard({
   busy,
@@ -11,7 +11,7 @@ export default function ReminderCard({
   onEnable: () => void;
   onDismiss: () => void;
 }) {
-  const { t } = useStore();
+  const t = useT();
 
   return (
     <View style={styles.card}>

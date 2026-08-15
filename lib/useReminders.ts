@@ -1,18 +1,25 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
-import { useStore } from './store';
 import { cancelAll, requestPermission, rescheduleAll } from './notifications';
-import * as storage from './storage';
+import {
+  dismissReminderCard,
+  setRemindersEnabled,
+  useFavorites,
+  useLang,
+  useMarkets,
+  useReminderCardDismissed,
+  useRemindersEnabled,
+  useT,
+} from './store';
 
 export function useReminders() {
-  const { remindersEnabled, setRemindersEnabled, favorites, markets, lang, t } = useStore();
+  const remindersEnabled = useRemindersEnabled();
+  const cardDismissed = useReminderCardDismissed();
+  const favorites = useFavorites();
+  const markets = useMarkets();
+  const lang = useLang();
+  const t = useT();
   const [busy, setBusy] = useState(false);
-  // Assume dismissed until storage answers, so the card never flashes in.
-  const [cardDismissed, setCardDismissed] = useState(true);
-
-  useEffect(() => {
-    void storage.loadReminderCardDismissed().then(setCardDismissed);
-  }, []);
 
   const toggle = useCallback(async () => {
     if (busy) return;
@@ -32,18 +39,13 @@ export function useReminders() {
     } finally {
       setBusy(false);
     }
-  }, [busy, remindersEnabled, setRemindersEnabled, favorites, markets, lang, t]);
-
-  const dismissCard = useCallback(() => {
-    setCardDismissed(true);
-    void storage.saveReminderCardDismissed();
-  }, []);
+  }, [busy, remindersEnabled, favorites, markets, lang, t]);
 
   return {
     busy,
     enabled: remindersEnabled,
     toggle,
-    dismissCard,
+    dismissCard: dismissReminderCard,
     showCard: !remindersEnabled && !cardDismissed && favorites.length > 0,
   };
 }
