@@ -10,4 +10,3 @@ export {
 } from './tokens';
 export { type Theme, lightTheme, darkTheme, useTheme, useThemedStyles } from './useTheme';
 export { navigationTheme } from './navigation';
-export { colors, shadow } from './legacy';

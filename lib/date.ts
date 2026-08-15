@@ -4,6 +4,9 @@ import type { Lang } from './i18n';
 // cover them without a React Native runtime; this module is only display formatting.
 export { sgToday, sgInstant, civilKey } from './core/reminder-schedule';
 
+// Hand-rolled rather than Intl.DateTimeFormat: Hermes on Android leans on whatever ICU data the
+// device ships, so the same date can come back differently across phones. These 24 lines don't.
+
 const DAYS_SHORT = { en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], zh: ['日', '一', '二', '三', '四', '五', '六'] };
 const DAYS_LONG = { en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], zh: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'] };
 const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
