@@ -8,13 +8,15 @@ export function statusTone(status: MarketStatus): StatusTone {
   return status.status === 'open' ? 'open' : status.status === 'warning' ? 'warning' : 'closed';
 }
 
+const LABELS = { open: 'openToday', warning: 'warningToday', closed: 'closedToday' } as const;
+
 /**
  * The label on a pill or banner: OPEN TODAY / MOST STALLS CLOSED / CLOSED TODAY. Day-scoped
  * rather than "OPEN", because the dataset has closure dates and no opening hours — a bare "OPEN"
  * claims the market is serving right now, which the app has no way to know.
  */
 export function statusLabel(tone: StatusTone, t: Translate): string {
-  return tone === 'open' ? t('openToday') : tone === 'warning' ? t('warningToday') : t('closedToday');
+  return t(LABELS[tone]);
 }
 
 /** Why the market is in this state, one line. Empty when it is simply open. */

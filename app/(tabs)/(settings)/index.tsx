@@ -88,7 +88,7 @@ export default function SettingsScreen() {
           label={t('refreshNow')}
           icon="refresh"
           accessory={refreshing ? <ActivityIndicator size="small" /> : undefined}
-          onPress={refreshing ? undefined : () => void refresh()}
+          onPress={() => void refresh()}
         />
         <Row
           label={t('dataSource')}

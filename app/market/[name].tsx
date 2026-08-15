@@ -5,12 +5,7 @@ import StallCounts, { hasStallCounts } from '../../components/StallCounts';
 import StatusBanner from '../../components/StatusBanner';
 import UpcomingClosures from '../../components/UpcomingClosures';
 import { Card, EmptyState, Icon, Text } from '../../components/ui';
-import {
-  getMarketStatus,
-  getNextOpenDate,
-  marketPhotoUrl,
-  parseMarketName,
-} from '../../lib/core/market-logic';
+import { getMarketStatus, getNextOpenDate, parseMarketName } from '../../lib/core/market-logic';
 import { decodeEntities, getDisplayName, marketCoords } from '../../lib/markets';
 import { statusTone } from '../../lib/status';
 import { toggleFavorite, useIsFavorite, useLang, useMarket, useT, useToday } from '../../lib/store';
@@ -42,7 +37,6 @@ export default function MarketDetailScreen() {
   const nextOpen = tone === 'closed' ? getNextOpenDate(market, today) : null;
   const address = market.address_myenv ? decodeEntities(market.address_myenv) : '';
   const coords = marketCoords(market);
-  const photo = marketPhotoUrl(market);
   const showPlaceCard = !!address || hasStallCounts(market);
 
   const openInMaps = () => {
@@ -78,11 +72,13 @@ export default function MarketDetailScreen() {
         }}
       />
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.content}>
-        {!!photo && <MarketPhoto uri={photo} />}
+        {!!market.photourl && <MarketPhoto uri={market.photourl} />}
 
         <StatusBanner status={status} nextOpen={nextOpen} />
 
-        {/* Only under an open banner: that is the one a reader can mistake for "serving now". */}
+        {/* Detail only, and only under an open banner: that is the claim a reader can mistake for
+            "serving now", and this is the screen they came to to find out. A pill on Today or on a
+            map callout is a glance, and carrying the caveat there would drown it. */}
         {tone !== 'closed' && (
           <Text variant="footnote" tone="faint" style={styles.hoursNote}>
             {t('hoursNote')}
@@ -133,7 +129,7 @@ export default function MarketDetailScreen() {
 
 const styles = StyleSheet.create({
   content: { padding: space.md, gap: space.md },
-  hoursNote: { paddingHorizontal: space.sm, marginTop: -space.xs },
+  hoursNote: { paddingHorizontal: space.sm },
   place: { overflow: 'hidden' },
   addressRow: {
     flexDirection: 'row',
