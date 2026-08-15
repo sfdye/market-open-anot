@@ -13,7 +13,9 @@
     // @types/node and retype setTimeout, console and friends as Node's rather than RN's.
     "types": ["expo/types", "geojson"]
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts"],
+  // No .expo/types entry: typed routes are off, and `expo start` rewrites this file — comments
+  // and all — whenever `include` names something it did not put there.
+  "include": ["**/*.ts", "**/*.tsx"],
   // The tests are a separate program with Node's globals — see tsconfig.test.json.
   "exclude": ["node_modules", "lib/core/**/*.test.ts"]
 }
