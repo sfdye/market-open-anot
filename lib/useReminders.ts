@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Linking } from 'react-native';
 import { cancelAll, requestPermission, rescheduleAll } from './notifications';
 import {
   dismissReminderCard,
@@ -31,7 +31,12 @@ export function useReminders() {
         return;
       }
       if (!(await requestPermission())) {
-        Alert.alert(t('reminderCardTitle'), t('reminderBlocked'));
+        // A dead-end alert is no use once the OS refuses to ask again — the only way out is the
+        // system settings page.
+        Alert.alert(t('reminderCardTitle'), t('reminderBlocked'), [
+          { text: t('cancel'), style: 'cancel' },
+          { text: t('openSettings'), onPress: () => void Linking.openSettings() },
+        ]);
         return;
       }
       await rescheduleAll(favorites, markets, lang);

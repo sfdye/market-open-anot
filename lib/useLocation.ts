@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import * as Location from 'expo-location';
 
 /** Matches the web app's `maximumAge: 300000` — a five-minute-old fix is good enough here. */
@@ -9,43 +9,63 @@ export interface Coords {
   lng: number;
 }
 
-/**
- * Foreground location, requested once. Resolves to null when permission is denied or no fix
- * arrives — callers fall back to alphabetical ordering, exactly as on the web.
- */
-export function useLocation(): Coords | null {
-  const [coords, setCoords] = useState<Coords | null>(null);
+/** Permission, not fix: `granted` with `coords === null` just means no fix arrived yet. */
+export type LocationStatus = 'idle' | 'requesting' | 'granted' | 'denied';
+
+// The fix lives in a module, not in a component: the map tab and the add modal both want it,
+// and mounting either one again must not re-prompt or re-locate.
+let snapshot: { coords: Coords | null; status: LocationStatus } = { coords: null, status: 'idle' };
+let inflight: Promise<void> | null = null;
+const listeners = new Set<() => void>();
+
+function set(next: Partial<typeof snapshot>): void {
+  snapshot = { ...snapshot, ...next };
+  for (const listener of listeners) listener();
+}
+
+function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function acquire(): Promise<void> {
+  if (inflight) return inflight;
+  inflight = (async () => {
+    set({ status: 'requesting' });
+    try {
+      const { granted } = await Location.requestForegroundPermissionsAsync();
+      if (!granted) {
+        set({ status: 'denied' });
+        return;
+      }
+      const last = await Location.getLastKnownPositionAsync({ maxAge: MAX_AGE_MS });
+      const position =
+        last ??
+        (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }));
+      set({
+        status: 'granted',
+        coords: { lat: position.coords.latitude, lng: position.coords.longitude },
+      });
+    } catch {
+      // Permission is granted but no fix is available; callers order alphabetically instead.
+      set({ status: snapshot.status === 'requesting' ? 'granted' : snapshot.status });
+    } finally {
+      inflight = null;
+    }
+  })();
+  return inflight;
+}
+
+export function useLocation(): {
+  coords: Coords | null;
+  status: LocationStatus;
+  request: () => void;
+} {
+  const current = useSyncExternalStore(subscribe, () => snapshot);
 
   useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const { granted } = await Location.requestForegroundPermissionsAsync();
-        if (!granted || cancelled) return;
-
-        const last = await Location.getLastKnownPositionAsync({ maxAge: MAX_AGE_MS });
-        if (cancelled) return;
-        if (last) {
-          setCoords({ lat: last.coords.latitude, lng: last.coords.longitude });
-          return;
-        }
-
-        const current = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
-        if (!cancelled) {
-          setCoords({ lat: current.coords.latitude, lng: current.coords.longitude });
-        }
-      } catch {
-        // No fix available; alphabetical ordering it is.
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+    if (snapshot.status === 'idle') void acquire();
   }, []);
 
-  return coords;
+  return { ...current, request: () => void acquire() };
 }

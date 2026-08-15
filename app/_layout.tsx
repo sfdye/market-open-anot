@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { initStore, useReady } from '../lib/store';
+import { initStore, useReady, useT } from '../lib/store';
 import { configureNotifications } from '../lib/notifications';
 import { registerBackgroundRefresh } from '../lib/background';
-import { colors } from '../lib/theme';
+import { navigationTheme, useTheme } from '../lib/theme';
 
 // Hold the splash until the store has hydrated, so the first frame is the real list
 // rather than an empty screen.
@@ -15,6 +15,9 @@ void SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ fade: true, duration: 200 });
 
 export default function RootLayout() {
+  const theme = useTheme();
+  const t = useT();
+
   useEffect(() => {
     initStore();
     void configureNotifications();
@@ -24,12 +27,19 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <SplashGate />
-        <StatusBar style="dark" />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="picker" options={{ animation: 'slide_from_right' }} />
-        </Stack>
+        {/* One theme for the native chrome — headers, large titles, search bar, tab bar. */}
+        <ThemeProvider value={navigationTheme(theme)}>
+          <SplashGate />
+          <StatusBar style="auto" />
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            {/* Detail and the add modal sit above the tabs, so a notification tap, the map
+                callout and the Today list can all reach them the same way. */}
+            <Stack.Screen name="market/[name]" options={{ title: '' }} />
+            <Stack.Screen name="add" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="+not-found" options={{ title: t('notFound') }} />
+          </Stack>
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

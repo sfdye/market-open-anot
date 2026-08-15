@@ -9,10 +9,18 @@ export interface EmptyStateProps {
   title: string;
   message?: string;
   actionTitle?: string;
+  actionIcon?: IconName;
   onAction?: () => void;
 }
 
-export function EmptyState({ icon, title, message, actionTitle, onAction }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  title,
+  message,
+  actionTitle,
+  actionIcon,
+  onAction,
+}: EmptyStateProps) {
   return (
     <View style={{ alignItems: 'center', gap: space.md, paddingVertical: space.xxxl }}>
       <Icon name={icon} size={44} color="textFaint" />
@@ -25,7 +33,7 @@ export function EmptyState({ icon, title, message, actionTitle, onAction }: Empt
         </Text>
       )}
       {!!actionTitle && !!onAction && (
-        <Button title={actionTitle} icon="add" onPress={onAction} block={false} />
+        <Button title={actionTitle} icon={actionIcon} onPress={onAction} block={false} />
       )}
     </View>
   );
