@@ -1,16 +1,14 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { FlatList, Linking, RefreshControl, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import MarketRow from '../../../components/MarketRow';
 import ReminderPrompt from '../../../components/ReminderPrompt';
-import { Button, EmptyState, Notice, Text } from '../../../components/ui';
-import { AUTHOR_URL, DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
-import { formatDate, formatDateLong } from '../../../lib/date';
+import { EmptyState, Notice, Text } from '../../../components/ui';
+import { formatDateLong } from '../../../lib/date';
 import { findMarket } from '../../../lib/markets';
 import {
   refresh,
   useFavorites,
-  useFetchedAt,
   useLang,
   useMarkets,
   useReady,
@@ -33,7 +31,6 @@ export default function TodayScreen() {
   const t = useT();
   const stale = useStale();
   const refreshing = useRefreshing();
-  const fetchedAt = useFetchedAt();
   const reminders = useReminders();
 
   // First run: open the picker straight away rather than showing an empty list. A push
@@ -96,52 +93,14 @@ export default function TodayScreen() {
           />
         ) : null
       }
+      // Adding lives on the header "+" alone, and attribution on Settings → About; a second Add
+      // button and a repeat of the footer only made the list end look like a web page.
       ListFooterComponent={
-        <View style={styles.footer}>
-          {data.length > 0 && (
-            <>
-              <Text variant="footnote" tone="faint" style={styles.centered}>
-                {t('swipeDelete')}
-              </Text>
-              {/* The header has a "+", but a full-width button is what a first-time user finds. */}
-              <Button title={t('addMarkets')} icon="add" onPress={() => router.push('/add')} />
-            </>
-          )}
-          <View style={styles.attribution}>
-            <Text variant="footnote" tone="faint" style={styles.centered}>
-              {t('dataSourcePrefix')}
-              <Text
-                variant="footnote"
-                tone="accent"
-                onPress={() => void Linking.openURL(DATA_SOURCE_URL)}
-              >
-                {t('dataSourceLink')}
-              </Text>
-              {fetchedAt ? ` · ${t('lastUpdated')} ${formatDate(new Date(fetchedAt), lang)}` : ''}
-            </Text>
-            <Text variant="footnote" tone="faint" style={styles.centered}>
-              <Text
-                variant="footnote"
-                tone="accent"
-                onPress={() => void Linking.openURL(AUTHOR_URL)}
-              >
-                {t('madeBy')}
-              </Text>
-              {' · '}
-              <Text variant="footnote" tone="accent" onPress={() => void Linking.openURL(REPO_URL)}>
-                {t('source')}
-              </Text>
-              {' · '}
-              <Text
-                variant="footnote"
-                tone="accent"
-                onPress={() => void Linking.openURL(FEEDBACK_URL)}
-              >
-                {t('feedback')}
-              </Text>
-            </Text>
-          </View>
-        </View>
+        data.length > 0 ? (
+          <Text variant="footnote" tone="faint" style={styles.hint}>
+            {t('swipeDelete')}
+          </Text>
+        ) : null
       }
     />
   );
@@ -152,7 +111,5 @@ const styles = StyleSheet.create({
   // Inset to the left so it reads as a list, and drawn by hand rather than as a row border so a
   // swiped-open row does not carry it away.
   separator: { height: StyleSheet.hairlineWidth, marginLeft: space.lg },
-  footer: { gap: space.md, padding: space.lg },
-  attribution: { gap: space.xs, paddingTop: space.md },
-  centered: { textAlign: 'center' },
+  hint: { textAlign: 'center', padding: space.lg },
 });
