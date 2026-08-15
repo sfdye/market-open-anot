@@ -8,13 +8,12 @@ export function statusTone(status: MarketStatus): StatusTone {
   return status.status === 'open' ? 'open' : status.status === 'warning' ? 'warning' : 'closed';
 }
 
-/** The short label on the pill: OPEN / MOST STALLS CLOSED / CLOSED. */
+/**
+ * The label on a pill or banner: OPEN TODAY / MOST STALLS CLOSED / CLOSED TODAY. Day-scoped
+ * rather than "OPEN", because the dataset has closure dates and no opening hours — a bare "OPEN"
+ * claims the market is serving right now, which the app has no way to know.
+ */
 export function statusLabel(tone: StatusTone, t: Translate): string {
-  return tone === 'open' ? t('open') : tone === 'warning' ? t('warning') : t('closed');
-}
-
-/** The longer label used on the detail screen's banner. */
-export function statusHeadline(tone: StatusTone, t: Translate): string {
   return tone === 'open' ? t('openToday') : tone === 'warning' ? t('warningToday') : t('closedToday');
 }
 

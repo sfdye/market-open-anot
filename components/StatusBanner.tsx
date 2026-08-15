@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from './ui';
 import type { MarketStatus } from '../lib/core/market-logic';
 import { formatDate } from '../lib/date';
-import { reasonText, statusHeadline, statusTone } from '../lib/status';
+import { reasonText, statusLabel, statusTone } from '../lib/status';
 import { useLang, useT } from '../lib/store';
 import { radius, space, useTheme } from '../lib/theme';
 
@@ -30,7 +30,7 @@ export default function StatusBanner({
   return (
     <View style={[styles.banner, { backgroundColor: theme.colors[FILL[tone]] }]}>
       <Text variant="title" tone="onStatus" style={styles.centered}>
-        {statusHeadline(tone, t)}
+        {statusLabel(tone, t)}
       </Text>
       {!!reason && (
         <Text variant="subhead" tone="onStatus" style={styles.centered}>

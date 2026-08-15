@@ -5,12 +5,12 @@ import type { Lang } from './core/market-logic';
 
 const en = {
   appTitle: 'Market Open Anot?',
-  open: 'OPEN',
-  closed: 'CLOSED',
-  warning: 'MOST STALLS CLOSED',
+  // Every status is scoped to the day on purpose: NEA publishes whole-day closures, not hours,
+  // so a bare "OPEN" would promise something the data cannot say at 2am.
   openToday: 'OPEN TODAY',
   closedToday: 'CLOSED TODAY',
-  warningToday: 'MANY STALLS CLOSED',
+  warningToday: 'MOST STALLS CLOSED',
+  hoursNote: 'Hours are set by each stall and are not in the NEA data — this covers whole-day closures only.',
   reasonMonday: 'Monday — most stalls rest',
   reasonCleaning: 'Quarterly cleaning',
   opensAgain: 'Opens again:',
@@ -21,7 +21,6 @@ const en = {
   otherWorks: 'Maintenance',
   marketStalls: 'market stalls',
   foodStalls: 'food stalls',
-  dataSourcePrefix: 'Data from ',
   dataSourceLink: 'NEA',
   lastUpdated: 'Last updated:',
   addMarkets: 'Add Markets',
@@ -81,12 +80,10 @@ const en = {
 
 const zh: Record<keyof typeof en, string> = {
   appTitle: '巴刹今天开吗？',
-  open: '开门',
-  closed: '关门',
-  warning: '多数摊位休息',
   openToday: '今天开门',
   closedToday: '今天关门',
   warningToday: '多数摊位休息',
+  hoursNote: '各摊位的营业时间由摊主自定，国家环境局的数据中没有 — 这里只显示全天不营业的日期。',
   reasonMonday: '星期一 — 多数摊位休息',
   reasonCleaning: '每季度清洁',
   opensAgain: '下次开门：',
@@ -97,7 +94,6 @@ const zh: Record<keyof typeof en, string> = {
   otherWorks: '维修',
   marketStalls: '个巴刹摊位',
   foodStalls: '个熟食摊位',
-  dataSourcePrefix: '数据来源：',
   dataSourceLink: '国家环境局 (NEA)',
   lastUpdated: '最后更新：',
   addMarkets: '添加巴刹',
