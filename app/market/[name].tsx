@@ -1,23 +1,26 @@
-import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { Linking } from 'react-native';
+import { Linking, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import StatusPill from '../../components/StatusPill';
+import MarketPhoto from '../../components/MarketPhoto';
+import StallCounts, { hasStallCounts } from '../../components/StallCounts';
+import StatusBanner from '../../components/StatusBanner';
+import UpcomingClosures from '../../components/UpcomingClosures';
 import { Card, EmptyState, Icon, Text } from '../../components/ui';
 import { getMarketStatus, getNextOpenDate, parseMarketName } from '../../lib/core/market-logic';
-import { formatDate } from '../../lib/date';
 import { decodeEntities, getDisplayName, marketCoords } from '../../lib/markets';
-import { reasonText, statusHeadline, statusTone } from '../../lib/status';
+import { statusTone } from '../../lib/status';
 import { toggleFavorite, useIsFavorite, useLang, useMarket, useT, useToday } from '../../lib/store';
-import { space } from '../../lib/theme';
+import { space, useTheme } from '../../lib/theme';
 
 export default function MarketDetailScreen() {
   const { name } = useLocalSearchParams<{ name: string }>();
+  const theme = useTheme();
   const market = useMarket(name);
   const favorite = useIsFavorite(name);
   const today = useToday();
   const lang = useLang();
   const t = useT();
 
+  // Reachable by deep link from a notification, so the market may have left the dataset since.
   if (!market) {
     return (
       <>
@@ -30,10 +33,10 @@ export default function MarketDetailScreen() {
   const parsed = parseMarketName(market.name);
   const displayName = getDisplayName(parsed, lang);
   const status = getMarketStatus(market, today);
-  const tone = statusTone(status);
-  const nextOpen = tone === 'closed' ? getNextOpenDate(market, today) : null;
+  const nextOpen = statusTone(status) === 'closed' ? getNextOpenDate(market, today) : null;
   const address = market.address_myenv ? decodeEntities(market.address_myenv) : '';
   const coords = marketCoords(market);
+  const showPlaceCard = !!address || hasStallCounts(market);
 
   const openInMaps = () => {
     if (!coords) return;
@@ -68,38 +71,47 @@ export default function MarketDetailScreen() {
         }}
       />
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.content}>
-        <Card>
-          <View style={styles.banner}>
-            <StatusPill tone={tone} label={statusHeadline(tone, t)} />
-            {!!reasonText(status, t) && (
-              <Text variant="subhead" tone="muted" style={styles.centered}>
-                {reasonText(status, t)}
-              </Text>
-            )}
-            {!!nextOpen && (
-              <Text variant="subhead" style={styles.centered}>
-                {t('opensAgain')} {formatDate(nextOpen, lang)}
-              </Text>
-            )}
-          </View>
-        </Card>
+        {!!market.photourl && <MarketPhoto uri={market.photourl} />}
 
-        {!!address && (
-          <Card>
-            <Pressable
-              onPress={openInMaps}
-              disabled={!coords}
-              accessibilityRole={coords ? 'link' : 'text'}
-              accessibilityLabel={`${t('address')}: ${address}`}
-              style={styles.addressRow}
-            >
-              <Icon name="location" color="textMuted" />
-              <Text variant="subhead" tone="muted" style={styles.address}>
-                {address}
-              </Text>
-            </Pressable>
+        <StatusBanner status={status} nextOpen={nextOpen} />
+
+        {showPlaceCard && (
+          <Card padded={false} style={styles.place}>
+            {!!address && (
+              <Pressable
+                onPress={openInMaps}
+                disabled={!coords}
+                accessibilityRole={coords ? 'link' : 'text'}
+                accessibilityLabel={`${t('address')}: ${address}`}
+                style={({ pressed }) => [
+                  styles.addressRow,
+                  pressed && { backgroundColor: theme.colors.borderLight },
+                ]}
+              >
+                <Icon name="location" color="textMuted" />
+                <Text variant="subhead" tone="muted" style={styles.address}>
+                  {address}
+                </Text>
+                {!!coords && <Icon name="chevron" size={16} color="textFaint" />}
+              </Pressable>
+            )}
+            {hasStallCounts(market) && (
+              <View
+                style={[
+                  styles.stalls,
+                  !!address && {
+                    borderTopWidth: StyleSheet.hairlineWidth,
+                    borderTopColor: theme.colors.borderLight,
+                  },
+                ]}
+              >
+                <StallCounts market={market} />
+              </View>
+            )}
           </Card>
         )}
+
+        <UpcomingClosures market={market} />
       </ScrollView>
     </>
   );
@@ -107,8 +119,13 @@ export default function MarketDetailScreen() {
 
 const styles = StyleSheet.create({
   content: { padding: space.md, gap: space.md },
-  banner: { gap: space.sm, alignItems: 'center' },
-  centered: { textAlign: 'center' },
-  addressRow: { flexDirection: 'row', alignItems: 'flex-start', gap: space.md },
+  place: { overflow: 'hidden' },
+  addressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+    padding: space.lg,
+  },
   address: { flex: 1 },
+  stalls: { padding: space.lg },
 });
