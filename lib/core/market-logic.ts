@@ -141,14 +141,17 @@ export function parseMarketName(rawName: string | null | undefined): ParsedMarke
 }
 
 /**
- * The market's photo, or null when it has none.
+ * Irons out the dataset's quirks in place, once, as it arrives — from the network or from the
+ * cache — so no screen has to remember to do it.
  *
- * NEA stores most of these URLs — 88 of the 123 — as plain `http://`, and App Transport Security
- * blocks those outright, so the image never arrives and the app just shows no photo. The same
- * paths serve fine over TLS, so upgrade the scheme rather than punch a hole in ATS.
+ * Today that means the photo URLs: NEA serves 88 of the 123 over plain `http://`, which App
+ * Transport Security blocks outright, so the image never arrives and the market shows no photo at
+ * all. The same paths serve fine over TLS, so upgrade the scheme rather than punch a hole in ATS.
  */
-export function marketPhotoUrl(market: Market): string | null {
-  const url = (market.photourl || '').trim();
-  if (!url) return null;
-  return url.replace(/^http:\/\//i, 'https://');
+export function normalizeMarkets(markets: Market[]): Market[] {
+  for (const market of markets) {
+    const url = market.photourl?.trim();
+    market.photourl = url ? url.replace(/^http:\/\//i, 'https://') : undefined;
+  }
+  return markets;
 }

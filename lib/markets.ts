@@ -1,4 +1,5 @@
 import {
+  normalizeMarkets,
   parseDateDMY,
   QUARTERS,
   stripTime,
@@ -100,8 +101,9 @@ async function attemptFetch(): Promise<Market[] | null> {
     const json = (await res.json()) as { result?: { records?: Market[] } };
     const records = json.result?.records;
     if (!Array.isArray(records) || records.length === 0) return null;
-    await saveCachedMarkets(records);
-    return records;
+    const markets = normalizeMarkets(records);
+    await saveCachedMarkets(markets);
+    return markets;
   } catch {
     return null;
   } finally {

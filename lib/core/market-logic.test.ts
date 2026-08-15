@@ -7,7 +7,7 @@ import {
   getUpcomingClosures,
   getNextOpenDate,
   parseMarketName,
-  marketPhotoUrl,
+  normalizeMarkets,
 } from './market-logic.ts';
 import type { MarketStatus } from './market-logic.ts';
 
@@ -294,29 +294,33 @@ describe('parseMarketName', () => {
   });
 });
 
-describe('marketPhotoUrl', () => {
+describe('normalizeMarkets', () => {
+  const photoOf = (photourl?: string) => normalizeMarkets([{ name: 'x', photourl }])[0].photourl;
+
   test('upgrades http to https, which is what ATS will actually load', () => {
     assert.equal(
-      marketPhotoUrl({ name: 'x', photourl: 'http://www.nea.gov.sg/img/havelock.jpg' }),
+      photoOf('http://www.nea.gov.sg/img/havelock.jpg'),
       'https://www.nea.gov.sg/img/havelock.jpg'
     );
   });
 
   test('leaves https alone', () => {
-    const url = 'https://www.nea.gov.sg/img/adam.jpg';
-    assert.equal(marketPhotoUrl({ name: 'x', photourl: url }), url);
+    assert.equal(photoOf('https://www.nea.gov.sg/img/adam.jpg'), 'https://www.nea.gov.sg/img/adam.jpg');
   });
 
   test('only rewrites the scheme, not http later in the URL', () => {
-    assert.equal(
-      marketPhotoUrl({ name: 'x', photourl: 'http://a.sg/go?to=http://b.sg' }),
-      'https://a.sg/go?to=http://b.sg'
-    );
+    assert.equal(photoOf('http://a.sg/go?to=http://b.sg'), 'https://a.sg/go?to=http://b.sg');
   });
 
-  test('returns null when there is no photo', () => {
-    assert.equal(marketPhotoUrl({ name: 'x' }), null);
-    assert.equal(marketPhotoUrl({ name: 'x', photourl: '' }), null);
-    assert.equal(marketPhotoUrl({ name: 'x', photourl: '   ' }), null);
+  test('leaves nothing truthy behind when there is no photo', () => {
+    assert.equal(photoOf(undefined), undefined);
+    assert.equal(photoOf(''), undefined);
+    assert.equal(photoOf('   '), undefined);
+  });
+
+  test('normalises in place and hands the same array back', () => {
+    const markets = [{ name: 'x', photourl: 'http://a.sg/1.jpg' }];
+    assert.equal(normalizeMarkets(markets), markets);
+    assert.equal(markets[0].photourl, 'https://a.sg/1.jpg');
   });
 });

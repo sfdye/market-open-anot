@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { Market } from './core/market-logic';
+import { normalizeMarkets, type Market } from './core/market-logic';
 import type { Lang } from './i18n';
 
 // The `moa_` prefix predates the native app; the keys are kept so an install that started
@@ -33,7 +33,10 @@ export async function saveFavorites(favorites: string[]): Promise<void> {
 
 export async function loadCachedMarkets(): Promise<Market[] | null> {
   const data = await readJSON<Market[] | null>(KEYS.data, null);
-  return Array.isArray(data) && data.length > 0 ? data : null;
+  if (!Array.isArray(data) || data.length === 0) return null;
+  // Normalised on the way out as well as in: an install that cached the dataset before this
+  // existed still has the raw records on disk.
+  return normalizeMarkets(data);
 }
 
 export async function saveCachedMarkets(markets: Market[]): Promise<void> {
