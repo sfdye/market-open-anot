@@ -84,6 +84,8 @@ const en = {
   sendTestReminder: 'Send test reminder in 10s',
   notFound: 'Page not found',
   goHome: 'Back to Today',
+  myLocation: 'My location',
+  close: 'Close',
 };
 
 const zh: Record<keyof typeof en, string> = {
@@ -167,6 +169,8 @@ const zh: Record<keyof typeof en, string> = {
   sendTestReminder: '10秒后发送测试提醒',
   notFound: '找不到页面',
   goHome: '返回今天',
+  myLocation: '我的位置',
+  close: '关闭',
 };
 
 export type StringKey = keyof typeof en;
