@@ -1,30 +1,19 @@
 {
-  // Sources live in src/ and compile to the repo root, because GitHub Pages serves
-  // openanot.com straight from main at the root. The emitted .js is committed; CI
-  // re-runs the build and fails on drift.
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-
-    "rootDir": "src",
-    "outDir": ".",
-
-    // Sources import each other as './x.ts' so `node --test src/*.test.ts` can strip
-    // types and run them directly; tsc rewrites those specifiers to './x.js' on emit.
-    "allowImportingTsExtensions": true,
-    "rewriteRelativeImportExtensions": true,
-
     "strict": true,
-    "verbatimModuleSyntax": true,
-    "erasableSyntaxOnly": true,
-    "skipLibCheck": true,
-
-    // Browser code: keep Node's globals out so nothing compiles against APIs the page lacks.
-    "types": []
+    // lib/core/ imports itself with explicit .ts specifiers so `node --test` can strip types
+    // and run those files directly; Metro and tsc both resolve them as-is.
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    // Expo's Metro resolver reads these too, so `@/lib/x` works at runtime as well as here.
+    // Worth it because the route groups nest three deep.
+    "paths": { "@/*": ["./*"] },
+    // Pinned rather than left to the automatic node_modules/@types sweep, which would pull in
+    // @types/node and retype setTimeout, console and friends as Node's rather than RN's.
+    "types": ["expo/types", "geojson"]
   },
-  // The page's entry point, not a directory: the import graph then decides what gets emitted,
-  // so a new file in src/ is not published to the live site until something actually loads it.
-  "files": ["src/app.ts", "src/globals.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts"],
+  // The tests are a separate program with Node's globals — see tsconfig.test.json.
+  "exclude": ["node_modules", "lib/core/**/*.test.ts"]
 }

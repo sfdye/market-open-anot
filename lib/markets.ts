@@ -3,10 +3,10 @@ import {
   QUARTERS,
   stripTime,
   parseMarketName,
-  zhNames,
   type Market,
   type ParsedMarketName,
-} from './shared';
+} from './core/market-logic';
+import { zhNames } from './core/zh-names';
 import { saveCachedMarkets } from './storage';
 import type { Lang } from './i18n';
 

@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { buildSchedule, type Market } from './shared';
+import { buildSchedule } from './core/reminder-schedule';
+import type { Market } from './core/market-logic';
 import type { Lang } from './i18n';
 
 export const ANDROID_CHANNEL_ID = 'closures';

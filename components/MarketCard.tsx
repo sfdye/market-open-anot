@@ -8,7 +8,7 @@ import {
   type ClosureReason,
   type Market,
   type MarketStatus,
-} from '../lib/shared';
+} from '../lib/core/market-logic';
 import { decodeEntities, getDisplayName, getNextCleaningDate } from '../lib/markets';
 import { formatDate } from '../lib/date';
 import { colors, radius, shadow } from '../lib/theme';

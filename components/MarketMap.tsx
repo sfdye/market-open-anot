@@ -7,7 +7,7 @@ import {
   Map,
   type StyleSpecification,
 } from '@maplibre/maplibre-react-native';
-import { parseMarketName, type Market } from '../lib/shared';
+import { parseMarketName, type Market } from '../lib/core/market-logic';
 import { getDisplayName, marketCoords } from '../lib/markets';
 import type { Coords } from '../lib/useLocation';
 import { colors, radius, shadow } from '../lib/theme';

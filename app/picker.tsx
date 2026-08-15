@@ -10,7 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MarketMap from '../components/MarketMap';
-import { parseMarketName, type Market } from '../lib/shared';
+import { parseMarketName, type Market } from '../lib/core/market-logic';
 import {
   formatDistance,
   getDisplayName,

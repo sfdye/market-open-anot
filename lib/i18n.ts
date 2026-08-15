@@ -1,4 +1,7 @@
-export type Lang = 'en' | 'zh';
+// One Lang type for the whole app: core/market-logic.ts owns it because the pure logic and
+// its node tests must not import anything from lib/.
+export type { Lang } from './core/market-logic';
+import type { Lang } from './core/market-logic';
 
 export const DATA_SOURCE_URL = 'https://data.gov.sg/datasets/d_bda4baa634dd1cc7a6c7cad5f19e2d68/view';
 

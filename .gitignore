@@ -1,6 +1,45 @@
+# dependencies
 node_modules/
-.playwright-mcp/
+
+# Expo
+.expo/
+dist/
+expo-env.d.ts
+
+# generated native projects — regenerate from app.json with `expo prebuild`
+/ios
+/android
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
 
 # secrets
 .env
 .env.*
+
+# typescript
+*.tsbuildinfo
+
+# tooling
+.playwright-mcp/
+
+# lib/ here is source, not build output — some global ignore files exclude it by convention
+!/lib/

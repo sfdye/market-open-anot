@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { Market } from './shared';
+import type { Market } from './core/market-logic';
 import type { Lang } from './i18n';
 
-// Same key names as the web app's localStorage, so the shapes stay recognisable.
+// The `moa_` prefix predates the native app; the keys are kept so an install that started
+// life as the web app's home-screen shortcut still finds its favourites.
 const KEYS = {
   favorites: 'moa_favorites',
   data: 'moa_data',
