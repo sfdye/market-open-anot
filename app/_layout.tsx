@@ -8,6 +8,7 @@ import { initStore, useReady, useT } from '../lib/store';
 import { configureNotifications } from '../lib/notifications';
 import { registerBackgroundRefresh } from '../lib/background';
 import { navigationTheme, useTheme } from '../lib/theme';
+import { useNotificationRouting } from '../lib/useNotificationRouting';
 
 // Hold the splash until the store has hydrated, so the first frame is the real list
 // rather than an empty screen.
@@ -17,6 +18,7 @@ SplashScreen.setOptions({ fade: true, duration: 200 });
 export default function RootLayout() {
   const theme = useTheme();
   const t = useT();
+  useNotificationRouting();
 
   useEffect(() => {
     initStore();

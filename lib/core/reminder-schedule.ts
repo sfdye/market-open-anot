@@ -1,13 +1,16 @@
-import { getUpcomingClosures } from './market-logic.ts';
+import { getUpcomingClosures, parseMarketName } from './market-logic.ts';
 import type { ClosureReason, Lang, Market } from './market-logic.ts';
+import { zhNames } from './zh-names.ts';
 
 export type { Lang };
 
 export interface DateGroup {
   /** Civil date of the closure — local Y/M/D match Singapore's. */
   date: Date;
-  /** Display names of every favourite closed on that date. */
+  /** Display names of every favourite closed on that date, in the user's language. */
   names: string[];
+  /** The same markets by their raw NEA name, which is what a lookup needs. */
+  rawNames: string[];
   reasons: ClosureReason[];
 }
 
@@ -18,6 +21,8 @@ export interface ScheduleEntry {
   /** The instant to fire, as a real point in time. */
   at: Date;
   markets: string[];
+  /** Raw NEA names, so a notification tap can open the market it is about. */
+  rawNames: string[];
 }
 
 // Singapore has been a fixed UTC+8 with no DST since 1982, so a constant offset is exact.
@@ -53,10 +58,14 @@ export function civilKey(date: Date): string {
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }
 
-/** A market's name as it reads in a notification — the parenthesised part when present. */
-export function shortName(rawName: string): string {
-  const match = rawName.match(/\((.+)\)/);
-  return match ? match[1] : rawName;
+/**
+ * A market's name as it reads in a notification: the parenthesised part when present, and its
+ * Chinese name when the app is in Chinese. Notifications used to be half-translated — the copy
+ * was Chinese but the names stayed English — because this went through the raw name.
+ */
+export function displayName(rawName: string, lang: Lang): string {
+  const { friendly } = parseMarketName(rawName);
+  return lang === 'zh' ? (zhNames[friendly] ?? friendly) : friendly;
 }
 
 function findMarket(markets: Market[], name: string): Market | null {
@@ -76,7 +85,8 @@ function findMarket(markets: Market[], name: string): Market | null {
 export function groupClosuresByDate(
   favorites: string[],
   markets: Market[],
-  today: Date
+  today: Date,
+  lang: Lang
 ): DateGroup[] {
   const groups = new Map<string, DateGroup>();
 
@@ -90,11 +100,13 @@ export function groupClosuresByDate(
       const key = civilKey(closure.date);
       let group = groups.get(key);
       if (!group) {
-        group = { date: closure.date, names: [], reasons: [] };
+        group = { date: closure.date, names: [], rawNames: [], reasons: [] };
         groups.set(key, group);
       }
-      const name = shortName(favorite);
-      if (!group.names.includes(name)) group.names.push(name);
+      if (!group.rawNames.includes(favorite)) {
+        group.rawNames.push(favorite);
+        group.names.push(displayName(favorite, lang));
+      }
       if (!group.reasons.includes(closure.reason)) group.reasons.push(closure.reason);
     }
   }
@@ -142,7 +154,7 @@ export function buildSchedule(
   now?: Date
 ): ScheduleEntry[] {
   const at = now || new Date();
-  const groups = groupClosuresByDate(favorites, markets, sgToday(at));
+  const groups = groupClosuresByDate(favorites, markets, sgToday(at), lang);
   const entries: ScheduleEntry[] = [];
 
   for (const group of groups) {
@@ -162,6 +174,7 @@ export function buildSchedule(
         body: copy.body,
         at: when,
         markets: group.names.slice(),
+        rawNames: group.rawNames.slice(),
       });
     }
   }

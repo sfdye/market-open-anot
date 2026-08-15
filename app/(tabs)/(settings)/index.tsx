@@ -4,7 +4,7 @@ import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
 import { AUTHOR_URL, DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
 import { formatDate } from '../../../lib/date';
-import { listScheduled } from '../../../lib/notifications';
+import { listScheduled, sendTestReminder } from '../../../lib/notifications';
 import {
   refresh,
   removeAllFavorites,
@@ -12,6 +12,7 @@ import {
   useFavorites,
   useFetchedAt,
   useLang,
+  useMarkets,
   useT,
 } from '../../../lib/store';
 import { space, useTheme } from '../../../lib/theme';
@@ -22,6 +23,7 @@ export default function SettingsScreen() {
   const t = useT();
   const lang = useLang();
   const favorites = useFavorites();
+  const markets = useMarkets();
   const fetchedAt = useFetchedAt();
   const reminders = useReminders();
 
@@ -110,11 +112,20 @@ export default function SettingsScreen() {
           <Row
             label={t('scheduledReminders')}
             icon="bell"
-            last
             onPress={() => {
               void listScheduled().then((requests) => {
                 for (const request of requests) console.log(request.identifier, request.trigger);
                 Alert.alert(t('scheduledReminders'), String(requests.length));
+              });
+            }}
+          />
+          <Row
+            label={t('sendTestReminder')}
+            icon="bell"
+            last
+            onPress={() => {
+              void sendTestReminder(favorites, markets, lang).then((sent) => {
+                if (!sent) Alert.alert(t('sendTestReminder'), t('reminderBlocked'));
               });
             }}
           />

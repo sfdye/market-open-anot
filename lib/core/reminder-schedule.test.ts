@@ -4,7 +4,7 @@ import {
   sgToday,
   sgInstant,
   civilKey,
-  shortName,
+  displayName,
   groupClosuresByDate,
   notificationCopy,
   buildSchedule,
@@ -79,13 +79,21 @@ describe('civilKey', () => {
   });
 });
 
-describe('shortName', () => {
+describe('displayName', () => {
   test('extracts the parenthesised friendly name', () => {
-    assert.equal(shortName('Blk 1 Foo Rd (Bar Market)'), 'Bar Market');
+    assert.equal(displayName('Blk 1 Foo Rd (Bar Market)', 'en'), 'Bar Market');
   });
 
   test('falls back to the whole name', () => {
-    assert.equal(shortName('Tiong Bahru Market'), 'Tiong Bahru Market');
+    assert.equal(displayName('Tiong Bahru Market', 'en'), 'Tiong Bahru Market');
+  });
+
+  test('translates the friendly name in Chinese', () => {
+    assert.equal(displayName('Blk 30 Seng Poh Rd (Tiong Bahru Market)', 'zh'), '中峇鲁巴刹');
+  });
+
+  test('falls back to English when there is no Chinese name', () => {
+    assert.equal(displayName('Blk 1 Foo Rd (Bar Market)', 'zh'), 'Bar Market');
   });
 });
 
@@ -94,7 +102,7 @@ describe('groupClosuresByDate', () => {
 
   test('collapses markets closing the same day into one entry', () => {
     const markets = [market('A (Alpha)', CLEAN_FEB), market('B (Beta)', CLEAN_FEB)];
-    const groups = groupClosuresByDate(['A (Alpha)', 'B (Beta)'], markets, today);
+    const groups = groupClosuresByDate(['A (Alpha)', 'B (Beta)'], markets, today, 'en');
 
     assert.equal(groups.length, 3); // 5, 6, 7 Feb
     for (const group of groups) {
@@ -102,15 +110,28 @@ describe('groupClosuresByDate', () => {
     }
   });
 
+  test('keeps the raw NEA names alongside the display ones', () => {
+    const markets = [market('A (Alpha)', CLEAN_FEB)];
+    const groups = groupClosuresByDate(['A (Alpha)'], markets, today, 'en');
+    assert.deepEqual(groups[0].rawNames, ['A (Alpha)']);
+  });
+
+  test('uses Chinese market names in Chinese', () => {
+    const raw = 'Blk 30 Seng Poh Rd (Tiong Bahru Market)';
+    const groups = groupClosuresByDate([raw], [market(raw, CLEAN_FEB)], today, 'zh');
+    assert.deepEqual(groups[0].names, ['中峇鲁巴刹']);
+    assert.deepEqual(groups[0].rawNames, [raw]);
+  });
+
   test('excludes Mondays', () => {
     const markets = [market('A (Alpha)')];
-    const groups = groupClosuresByDate(['A (Alpha)'], markets, today);
+    const groups = groupClosuresByDate(['A (Alpha)'], markets, today, 'en');
     assert.deepEqual(groups, []);
   });
 
   test('excludes Mondays that fall inside the horizon alongside real closures', () => {
     const markets = [market('A (Alpha)', CLEAN_FEB)];
-    const groups = groupClosuresByDate(['A (Alpha)'], markets, today);
+    const groups = groupClosuresByDate(['A (Alpha)'], markets, today, 'en');
 
     assert.equal(groups.length, 3);
     for (const group of groups) {
@@ -124,13 +145,18 @@ describe('groupClosuresByDate', () => {
       market('A (Alpha)', { q1_cleaningstartdate: '20/3/2026', q1_cleaningenddate: '20/3/2026' }),
       market('B (Beta)', CLEAN_FEB),
     ];
-    const groups = groupClosuresByDate(['A (Alpha)', 'B (Beta)'], markets, today);
+    const groups = groupClosuresByDate(['A (Alpha)', 'B (Beta)'], markets, today, 'en');
     const times = groups.map((g) => g.date.getTime());
     assert.deepEqual(times, [...times].sort((a, b) => a - b));
   });
 
   test('ignores favourites no longer in the dataset', () => {
-    const groups = groupClosuresByDate(['Gone (Ghost)'], [market('A (Alpha)', CLEAN_FEB)], today);
+    const groups = groupClosuresByDate(
+      ['Gone (Ghost)'],
+      [market('A (Alpha)', CLEAN_FEB)],
+      today,
+      'en'
+    );
     assert.deepEqual(groups, []);
   });
 
@@ -138,7 +164,7 @@ describe('groupClosuresByDate', () => {
     const markets = [
       market('A (Alpha)', { other_works_startdate: '5/2/2026', other_works_enddate: '5/2/2026' }),
     ];
-    const groups = groupClosuresByDate(['A (Alpha)'], markets, today);
+    const groups = groupClosuresByDate(['A (Alpha)'], markets, today, 'en');
     assert.equal(groups.length, 1);
     assert.deepEqual(groups[0].reasons, ['other_works']);
   });
@@ -147,7 +173,7 @@ describe('groupClosuresByDate', () => {
     const markets = [
       market('A (Alpha)', { q4_cleaningstartdate: '1/12/2026', q4_cleaningenddate: '3/12/2026' }),
     ];
-    assert.deepEqual(groupClosuresByDate(['A (Alpha)'], markets, today), []);
+    assert.deepEqual(groupClosuresByDate(['A (Alpha)'], markets, today, 'en'), []);
   });
 });
 
@@ -219,6 +245,7 @@ describe('buildSchedule', () => {
     assert.equal(entries.length, 6);
     for (const entry of entries) {
       assert.deepEqual(entry.markets, ['Alpha', 'Beta']);
+      assert.deepEqual(entry.rawNames, ['A (Alpha)', 'B (Beta)']);
       assert.match(entry.body, /^Alpha, Beta /);
     }
   });
@@ -263,5 +290,11 @@ describe('buildSchedule', () => {
   test('respects the language setting', () => {
     const entries = buildSchedule(['A (Alpha)'], markets, 'zh', now);
     assert.match(entries[0].title, /关门/);
+  });
+
+  test('names the market in Chinese too, not just the copy around it', () => {
+    const raw = 'Blk 30 Seng Poh Rd (Tiong Bahru Market)';
+    const entries = buildSchedule([raw], [market(raw, CLEAN_FEB)], 'zh', now);
+    assert.match(entries[0].body, /^中峇鲁巴刹 /);
   });
 });
