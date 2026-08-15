@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  web:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,27 +20,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # Two programs: the app against React Native's globals, lib/core against Node's.
       - run: npm run typecheck
       - run: npm test
-      # GitHub Pages serves openanot.com from the repo root, so the compiled output is
-      # committed. Rebuild it from scratch (the build clears *.js first, so a deleted source
-      # shows up as drift too) and fail if it differs from what is checked in.
-      - run: npm run build
-      - run: git add -A && git diff --cached --exit-code
-
-  worker:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: worker
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: worker/package-lock.json
-      # Typechecking needs no binaries, and wrangler's optional deps are ~150 MB of workerd,
-      # esbuild and sharp builds.
-      - run: npm ci --omit=optional
-      - run: npm run typecheck

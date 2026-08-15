@@ -1,14 +1,25 @@
 {
-  // Type-checks the tests, which run under Node rather than in the browser.
-  "extends": "./tsconfig.json",
+  // lib/core/ is the pure closure and reminder logic, run directly by `node --test`. It gets
+  // its own program with Node's globals and *without* React Native's, so an accidental import
+  // of anything from lib/ or a react-native API fails here rather than at runtime on device.
   "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    // Not "nodenext": an Expo package.json cannot be `"type": "module"`, which would make tsc
+    // read these as CommonJS and reject the ESM syntax Node happily strips and runs.
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+
+    "strict": true,
     "noEmit": true,
-    "types": ["node"]
+    "skipLibCheck": true,
+
+    // Node's type stripping only erases syntax; it cannot compile enums, namespaces or
+    // parameter properties, and it needs type-only imports marked as such.
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true
   },
-  // `files: []` clears the base config's entry point so this program is the tests and what
-  // they import. `exclude: []` is load-bearing: outDir is ".", and the default exclude list
-  // contains outDir, so without this the glob below matches nothing at all.
-  "files": [],
-  "include": ["src/**/*.test.ts"],
-  "exclude": []
+  "include": ["lib/core/**/*.ts"]
 }
