@@ -5,6 +5,7 @@ import {
   GeoJSONSource,
   Layer,
   Map,
+  UserLocation,
   type StyleSpecification,
 } from '@maplibre/maplibre-react-native';
 import { parseMarketName, type Market } from '../lib/core/market-logic';
@@ -53,22 +54,6 @@ export default function MarketMap({ markets, user }: { markets: Market[]; user: 
     }
     return { type: 'FeatureCollection', features };
   }, [markets, favorites]);
-
-  const userCollection = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(
-    () => ({
-      type: 'FeatureCollection',
-      features: user
-        ? [
-            {
-              type: 'Feature',
-              geometry: { type: 'Point', coordinates: [user.lng, user.lat] },
-              properties: {},
-            },
-          ]
-        : [],
-    }),
-    [user]
-  );
 
   return (
     <View style={styles.container}>
@@ -120,21 +105,8 @@ export default function MarketMap({ markets, user }: { markets: Market[]; user: 
           />
         </GeoJSONSource>
 
-        {!!user && (
-          <GeoJSONSource id="user-point" data={userCollection}>
-            <Layer
-              id="user-location"
-              type="circle"
-              paint={{
-                'circle-radius': 8,
-                'circle-color': colors.userDot,
-                'circle-opacity': 0.85,
-                'circle-stroke-width': 2,
-                'circle-stroke-color': colors.surface,
-              }}
-            />
-          </GeoJSONSource>
-        )}
+        {/* Only rendered once a fix exists, which also means permission was granted. */}
+        {!!user && <UserLocation />}
       </Map>
 
       {!!selected && (
