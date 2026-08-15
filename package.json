@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig.sw.json",
-    "watch": "tsc -p tsconfig.json --watch",
-    "typecheck": "tsc -p tsconfig.test.json",
+    "build": "rm -f *.js && tsc -p tsconfig.json && tsc -p tsconfig.sw.json",
+    "watch": "tsc -p tsconfig.json --watch --preserveWatchOutput & tsc -p tsconfig.sw.json --watch --preserveWatchOutput & wait",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.sw.json --noEmit && tsc -p tsconfig.test.json",
     "test": "node --test src/*.test.ts",
     "dev": "npx browser-sync start --server --files '*.html,*.css,*.js'"
   },

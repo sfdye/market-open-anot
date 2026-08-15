@@ -1,7 +1,7 @@
 import { el } from "./dom.js";
 const STORAGE_KEY = 'moa_install_dismissed';
 let deferredPrompt = null;
-function isStandalone() {
+export function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 }
 function isIOS() {

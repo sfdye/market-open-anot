@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
 
+# Superseded runs on a branch are pointless once a newer commit exists.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   web:
     runs-on: ubuntu-latest
@@ -18,7 +23,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       # GitHub Pages serves openanot.com from the repo root, so the compiled output is
-      # committed. Rebuild it and fail if it differs from what is checked in.
+      # committed. Rebuild it from scratch (the build clears *.js first, so a deleted source
+      # shows up as drift too) and fail if it differs from what is checked in.
       - run: npm run build
       - run: git add -A && git diff --cached --exit-code
 
@@ -34,5 +40,7 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: worker/package-lock.json
-      - run: npm ci
+      # Typechecking needs no binaries, and wrangler's optional deps are ~150 MB of workerd,
+      # esbuild and sharp builds.
+      - run: npm ci --omit=optional
       - run: npm run typecheck

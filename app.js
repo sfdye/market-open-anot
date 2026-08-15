@@ -1,8 +1,8 @@
 import { el } from "./dom.js";
-import { getMarketStatus, getNextOpenDate, getUpcomingClosures as upcomingClosures, parseDateDMY, parseMarketName, stripTime, } from "./market-logic.js";
+import { getMarketStatus, getNextOpenDate, getUpcomingClosures as upcomingClosures, parseDateDMY, parseMarketName, QUARTERS, stripTime, } from "./market-logic.js";
 import { zhNames } from "./zh-names.js";
 import { isPushEnabled, isPushSupported, onFavoritesChanged, subscribeToPush, unsubscribeFromPush } from "./push.js";
-import { showInstallPrompt } from "./install-prompt.js";
+import { isStandalone, showInstallPrompt } from "./install-prompt.js";
 const API_URL = 'https://data.gov.sg/api/action/datastore_search?resource_id=d_bda4baa634dd1cc7a6c7cad5f19e2d68&limit=200';
 const STORAGE = {
     favorites: 'moa_favorites',
@@ -115,7 +115,7 @@ function getUpcomingClosures(market, days) {
 function getNextCleaningDate(market, today) {
     const todayStripped = stripTime(today);
     const dates = [];
-    for (const q of ['q1', 'q2', 'q3', 'q4']) {
+    for (const q of QUARTERS) {
         const start = parseDateDMY(market[`${q}_cleaningstartdate`]);
         if (start && start > todayStripped)
             dates.push(start);
@@ -231,7 +231,7 @@ function fetchFromAPI(callback) {
 }
 // ===== Rendering =====
 function t(key) {
-    return strings[lang][key] || strings.en[key] || key;
+    return strings[lang][key];
 }
 function reasonText(result) {
     if (result.status === 'open')
@@ -747,8 +747,7 @@ function init() {
     }
 }
 function remindersAvailable() {
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-    return isPushSupported() && isStandalone;
+    return isPushSupported() && isStandalone();
 }
 let reminderBusy = false;
 async function toggleReminders() {

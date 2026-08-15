@@ -5,14 +5,13 @@ import {
   getUpcomingClosures as upcomingClosures,
   parseDateDMY,
   parseMarketName,
+  QUARTERS,
   stripTime,
 } from './market-logic.ts';
-import type { Closure, ClosureReason, Market, MarketStatus, ParsedMarketName } from './market-logic.ts';
+import type { Closure, ClosureReason, Lang, Market, MarketStatus, ParsedMarketName } from './market-logic.ts';
 import { zhNames } from './zh-names.ts';
 import { isPushEnabled, isPushSupported, onFavoritesChanged, subscribeToPush, unsubscribeFromPush } from './push.ts';
-import { showInstallPrompt } from './install-prompt.ts';
-
-type Lang = 'en' | 'zh';
+import { isStandalone, showInstallPrompt } from './install-prompt.ts';
 
 const API_URL =
   'https://data.gov.sg/api/action/datastore_search?resource_id=d_bda4baa634dd1cc7a6c7cad5f19e2d68&limit=200';
@@ -118,7 +117,7 @@ const strings = {
     remindersOn: '提醒已开启',
     enableReminders: '开启提醒',
   },
-} satisfies Record<Lang, Record<string, string>>;
+};
 
 type StringKey = keyof typeof strings.en;
 
@@ -136,7 +135,7 @@ function getUpcomingClosures(market: Market, days: number): Closure[] {
 function getNextCleaningDate(market: Market, today: Date): Date | null {
   const todayStripped = stripTime(today);
   const dates: Date[] = [];
-  for (const q of ['q1', 'q2', 'q3', 'q4']) {
+  for (const q of QUARTERS) {
     const start = parseDateDMY(market[`${q}_cleaningstartdate`]);
     if (start && start > todayStripped) dates.push(start);
   }
@@ -260,7 +259,7 @@ function fetchFromAPI(callback: () => void): void {
 // ===== Rendering =====
 
 function t(key: StringKey): string {
-  return strings[lang][key] || strings.en[key] || key;
+  return strings[lang][key];
 }
 
 function reasonText(result: MarketStatus): string {
@@ -839,9 +838,7 @@ function init(): void {
 }
 
 function remindersAvailable(): boolean {
-  const isStandalone =
-    window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  return isPushSupported() && isStandalone;
+  return isPushSupported() && isStandalone();
 }
 
 let reminderBusy = false;

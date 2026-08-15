@@ -3,6 +3,7 @@
 // the repo root; Metro sees them via the repo-root watchFolder in metro.config.js.
 export {
   parseDateDMY,
+  QUARTERS,
   stripTime,
   getMarketStatus,
   getUpcomingClosures,

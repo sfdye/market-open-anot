@@ -1,5 +1,6 @@
 import {
   parseDateDMY,
+  QUARTERS,
   stripTime,
   parseMarketName,
   zhNames,
@@ -16,7 +17,7 @@ const API_URL =
 export function getNextCleaningDate(market: Market, today: Date): Date | null {
   const todayStripped = stripTime(today);
   const dates: Date[] = [];
-  for (const q of ['q1', 'q2', 'q3', 'q4']) {
+  for (const q of QUARTERS) {
     const start = parseDateDMY(market[`${q}_cleaningstartdate`]);
     if (start && start > todayStripped) dates.push(start);
   }

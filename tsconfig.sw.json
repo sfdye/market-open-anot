@@ -1,19 +1,17 @@
 {
   // The service worker needs the WebWorker lib, which conflicts with DOM in one program,
-  // so it compiles on its own. It is registered as a classic script, hence no module output.
+  // so it compiles on its own.
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "target": "ES2020",
     "lib": ["ES2020", "WebWorker"],
+
+    // Not nodenext: under "type": "module" that would make sw.ts an ES module, and the
+    // `interface NotificationOptions` global merge in it would become a local declaration.
+    // It is registered as a classic script, so the emit must stay script-shaped anyway.
     "module": "esnext",
-    "moduleResolution": "bundler",
-
-    "rootDir": "src",
-    "outDir": ".",
-
-    "strict": true,
-    "erasableSyntaxOnly": true,
-    "skipLibCheck": true,
-    "types": []
+    "moduleResolution": "bundler"
   },
+  // `include` is inherited alongside `files`, so it has to be cleared.
+  "include": [],
   "files": ["src/sw.ts"]
 }

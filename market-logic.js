@@ -1,4 +1,5 @@
-const QUARTERS = ['q1', 'q2', 'q3', 'q4'];
+/** Exported so callers building `${q}_cleaningstartdate` keys resolve to declared fields. */
+export const QUARTERS = ['q1', 'q2', 'q3', 'q4'];
 /** Parses a `DD/MM/YYYY` string. Returns null for blank or malformed input. */
 export function parseDateDMY(str) {
     if (!str || !str.trim())

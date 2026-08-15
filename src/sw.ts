@@ -43,7 +43,7 @@ sw.addEventListener('push', (event) => {
     body: 'A market you follow has a closure coming up.',
   };
   try {
-    data = event.data?.json() as typeof data;
+    data = event.data?.json();
   } catch {
     // Non-JSON payload — fall back to the generic copy above.
   }

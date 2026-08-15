@@ -1,7 +1,7 @@
 import { getUpcomingClosures } from './market-logic.ts';
-import type { ClosureReason, Market } from './market-logic.ts';
+import type { ClosureReason, Lang, Market } from './market-logic.ts';
 
-export type Lang = 'en' | 'zh';
+export type { Lang };
 
 export interface DateGroup {
   /** Civil date of the closure — local Y/M/D match Singapore's. */

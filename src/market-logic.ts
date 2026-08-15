@@ -18,8 +18,9 @@ export interface Market {
   other_works_startdate?: string;
   other_works_enddate?: string;
   remarks_other_works?: string;
-  [field: string]: string | undefined;
 }
+
+export type Lang = 'en' | 'zh';
 
 export type ClosureReason = 'cleaning' | 'other_works' | 'monday';
 
@@ -42,7 +43,8 @@ export interface ParsedMarketName {
   friendly: string;
 }
 
-const QUARTERS = ['q1', 'q2', 'q3', 'q4'] as const;
+/** Exported so callers building `${q}_cleaningstartdate` keys resolve to declared fields. */
+export const QUARTERS = ['q1', 'q2', 'q3', 'q4'] as const;
 
 /** Parses a `DD/MM/YYYY` string. Returns null for blank or malformed input. */
 export function parseDateDMY(str: string | null | undefined): Date | null {

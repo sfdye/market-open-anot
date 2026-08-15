@@ -48,7 +48,7 @@ Both run automatically on push/PR via GitHub Actions.
 
 ## Deployment
 
-Hosted on GitHub Pages, served straight from the repo root of `main`, so the compiled JS is committed next to its source. Run `npm run build` and commit the output with your change — CI rebuilds and fails if what is checked in is stale.
+Hosted on GitHub Pages, served straight from the repo root of `main`, so the compiled JS is committed next to its source. Run `npm run build` and commit the output with your change — CI rebuilds and fails if what is checked in is stale. The build clears the root `*.js` first, so deleting a source file also removes what it used to emit; only `src/app.ts`'s import graph is published, so a new module reaches the site once something imports it.
 
 ## License
 
