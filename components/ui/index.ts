@@ -4,4 +4,5 @@ export { Button, type ButtonProps } from './Button';
 export { Card, type CardProps } from './Card';
 export { Row, type RowProps } from './Row';
 export { Notice, type NoticeProps } from './Notice';
+export { Segmented, type SegmentedOption, type SegmentedProps } from './Segmented';
 export { EmptyState, type EmptyStateProps } from './EmptyState';

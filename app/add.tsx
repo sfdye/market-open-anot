@@ -1,17 +1,15 @@
-import { useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { useDeferredValue, useMemo, useState } from 'react';
+import { FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import PickerRow from '../components/PickerRow';
-import { EmptyState, Text } from '../components/ui';
+import { EmptyState, Row, Segmented, Text } from '../components/ui';
 import { parseMarketName, type Market } from '../lib/core/market-logic';
-import {
-  getDisplayName,
-  getMarketDistance,
-  searchMarkets,
-} from '../lib/markets';
+import { getDisplayName, getMarketDistance, searchMarkets } from '../lib/markets';
 import { useFavorites, useLang, useMarkets, useT } from '../lib/store';
 import { space, useTheme } from '../lib/theme';
 import { useLocation } from '../lib/useLocation';
+
+type Sort = 'distance' | 'alpha';
 
 export default function AddMarketsScreen() {
   const router = useRouter();
@@ -20,12 +18,19 @@ export default function AddMarketsScreen() {
   const lang = useLang();
   const markets = useMarkets();
   const favorites = useFavorites();
-  const { coords } = useLocation();
+  const { coords, status } = useLocation();
   const [query, setQuery] = useState('');
+  // The search bar stays at the finger's speed; the 123-row list catches up.
+  const deferredQuery = useDeferredValue(query);
+  const [chosenSort, setChosenSort] = useState<Sort | null>(null);
+
+  // Distance until the user says otherwise, and only while there is a fix to measure from — so a
+  // location arriving late reorders the list, and a denied one never leaves the list stuck.
+  const sort: Sort = coords ? (chosenSort ?? 'distance') : 'alpha';
 
   const rows = useMemo(() => {
-    const filtered = searchMarkets(markets, query).slice();
-    if (coords) {
+    const filtered = searchMarkets(markets, deferredQuery).slice();
+    if (sort === 'distance' && coords) {
       filtered.sort((a, b) => {
         const da = getMarketDistance(a, coords.lat, coords.lng);
         const db = getMarketDistance(b, coords.lat, coords.lng);
@@ -42,7 +47,7 @@ export default function AddMarketsScreen() {
       });
     }
     return filtered;
-  }, [markets, query, coords, lang]);
+  }, [markets, deferredQuery, sort, coords, lang]);
 
   return (
     <>
@@ -82,10 +87,31 @@ export default function AddMarketsScreen() {
         keyboardShouldPersistTaps="handled"
         initialNumToRender={12}
         style={{ backgroundColor: theme.colors.bg }}
+        // The sort control stays reachable however far down the list you are.
+        stickyHeaderIndices={[0]}
+        ListHeaderComponent={
+          <View style={[styles.header, { backgroundColor: theme.colors.bg }]}>
+            <Segmented<Sort>
+              options={[
+                { value: 'distance', label: t('sortDistance'), disabled: !coords },
+                { value: 'alpha', label: t('sortAlpha') },
+              ]}
+              value={sort}
+              onChange={setChosenSort}
+            />
+            {status === 'denied' && (
+              <Row
+                label={t('enableLocation')}
+                icon="locate"
+                chevron
+                onPress={() => void Linking.openSettings()}
+                last
+              />
+            )}
+          </View>
+        }
         ListEmptyComponent={
-          markets.length > 0 ? (
-            <EmptyState icon="search" title={t('noResults')} />
-          ) : null
+          markets.length > 0 ? <EmptyState icon="search" title={t('noResults')} /> : null
         }
         contentContainerStyle={styles.content}
       />
@@ -95,4 +121,5 @@ export default function AddMarketsScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingBottom: space.xxl },
+  header: { gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.sm },
 });
