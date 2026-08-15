@@ -1,3 +1,8 @@
 .wrangler/
 node_modules/
 .playwright-mcp/
+
+# secrets — wrangler reads .dev.vars for local runs
+.dev.vars
+.env
+.env.*

@@ -5,12 +5,17 @@
     "version": "1.0.0",
     "scheme": "marketopenanot",
     "orientation": "portrait",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "backgroundColor": "#f5f5f5",
     "primaryColor": "#2e7d32",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "bundleIdentifier": "com.sfdye.marketopenanot",
       "supportsTablet": true,
@@ -25,7 +30,11 @@
         "backgroundColor": "#2e7d32"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -55,6 +64,13 @@
           "isIosBackgroundLocationEnabled": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ce600dd7-472b-4603-b076-0383a9b47f50"
+      }
+    },
+    "owner": "sfdye"
   }
 }
