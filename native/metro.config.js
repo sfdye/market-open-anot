@@ -6,7 +6,7 @@ const repoRoot = path.resolve(projectRoot, '..');
 
 const config = getDefaultConfig(projectRoot);
 
-// market-logic.js and zh-names.js live at the repo root, shared verbatim with the web app.
+// The shared market logic lives in ../src, imported by lib/shared.ts.
 config.watchFolders = [repoRoot];
 // Watching the repo root exposes the Worker's own install; pin resolution here and keep its
 // packages out of the graph so they cannot shadow ours.

@@ -1,6 +1,10 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    // ../src imports itself with explicit .ts specifiers so `node --test` can run those
+    // files directly; Metro resolves them as-is.
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   }
 }

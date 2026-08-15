@@ -1,17 +1,23 @@
-const { test, describe } = require('node:test');
-const assert = require('node:assert/strict');
-const {
+import { test, describe } from 'node:test';
+import assert from 'node:assert/strict';
+import {
   parseDateDMY,
   stripTime,
   getMarketStatus,
   getUpcomingClosures,
   getNextOpenDate,
-  parseMarketName
-} = require('./market-logic.js');
+  parseMarketName,
+} from './market-logic.ts';
+import type { MarketStatus } from './market-logic.ts';
+
+/** `reason` and `remarks` live on only some variants of the status union. */
+const reasonOf = (status: MarketStatus) => ('reason' in status ? status.reason : undefined);
+const remarksOf = (status: MarketStatus) => ('remarks' in status ? status.remarks : undefined);
 
 describe('parseDateDMY', () => {
   test('parses D/M/YYYY correctly', () => {
     const d = parseDateDMY('5/1/2026');
+    assert.ok(d);
     assert.equal(d.getFullYear(), 2026);
     assert.equal(d.getMonth(), 0); // January
     assert.equal(d.getDate(), 5);
@@ -19,6 +25,7 @@ describe('parseDateDMY', () => {
 
   test('parses DD/MM/YYYY correctly', () => {
     const d = parseDateDMY('23/12/2026');
+    assert.ok(d);
     assert.equal(d.getFullYear(), 2026);
     assert.equal(d.getMonth(), 11); // December
     assert.equal(d.getDate(), 23);
@@ -46,6 +53,7 @@ describe('parseDateDMY', () => {
 
   test('handles whitespace around date', () => {
     const d = parseDateDMY(' 5/1/2026 ');
+    assert.ok(d);
     assert.equal(d.getDate(), 5);
     assert.equal(d.getMonth(), 0);
   });
@@ -75,14 +83,14 @@ describe('getMarketStatus', () => {
     q4_cleaningenddate: '17/11/2026',
     other_works_startdate: 'NA',
     other_works_enddate: 'NA',
-    remarks_other_works: 'nil'
+    remarks_other_works: 'nil',
   };
 
   test('returns warning on Monday (stalls may be closed)', () => {
     const monday = new Date(2026, 5, 29); // June 29, 2026 is Monday
     const result = getMarketStatus(market, monday);
     assert.equal(result.status, 'warning');
-    assert.equal(result.reason, 'monday');
+    assert.equal(reasonOf(result), 'monday');
   });
 
   test('returns open on a regular weekday', () => {
@@ -92,24 +100,24 @@ describe('getMarketStatus', () => {
   });
 
   test('returns closed on cleaning start date (non-Monday)', () => {
-    const cleanStart = new Date(2026, 3, 6); // Apr 6 = q2 start, is a Monday — use Apr 7 (Tue)
-    const result = getMarketStatus(market, new Date(2026, 3, 7)); // Apr 7 = Tue, within q2 range
+    // Apr 6 = q2 start but is a Monday — use Apr 7 (Tue), still within the q2 range
+    const result = getMarketStatus(market, new Date(2026, 3, 7));
     assert.equal(result.status, 'closed');
-    assert.equal(result.reason, 'cleaning');
+    assert.equal(reasonOf(result), 'cleaning');
   });
 
   test('returns closed on cleaning end date', () => {
     const cleanEnd = new Date(2026, 0, 7); // Jan 7 = q1 end
     const result = getMarketStatus(market, cleanEnd);
     assert.equal(result.status, 'closed');
-    assert.equal(result.reason, 'cleaning');
+    assert.equal(reasonOf(result), 'cleaning');
   });
 
   test('returns closed on date within cleaning range', () => {
     const midClean = new Date(2026, 0, 6); // Jan 6 = between q1 start and end
     const result = getMarketStatus(market, midClean);
     assert.equal(result.status, 'closed');
-    assert.equal(result.reason, 'cleaning');
+    assert.equal(reasonOf(result), 'cleaning');
   });
 
   test('returns open day before cleaning', () => {
@@ -129,12 +137,12 @@ describe('getMarketStatus', () => {
     const marketMonClean = {
       ...market,
       q1_cleaningstartdate: '29/6/2026', // June 29 is Monday
-      q1_cleaningenddate: '30/6/2026'
+      q1_cleaningenddate: '30/6/2026',
     };
     const monday = new Date(2026, 5, 29);
     const result = getMarketStatus(marketMonClean, monday);
     assert.equal(result.status, 'closed');
-    assert.equal(result.reason, 'cleaning');
+    assert.equal(reasonOf(result), 'cleaning');
   });
 
   test('handles other works closure', () => {
@@ -142,13 +150,13 @@ describe('getMarketStatus', () => {
       ...market,
       other_works_startdate: '10/3/2026',
       other_works_enddate: '20/3/2026',
-      remarks_other_works: 'Renovation'
+      remarks_other_works: 'Renovation',
     };
     const duringWorks = new Date(2026, 2, 15); // March 15
     const result = getMarketStatus(marketWithWorks, duringWorks);
     assert.equal(result.status, 'closed');
-    assert.equal(result.reason, 'other_works');
-    assert.equal(result.remarks, 'Renovation');
+    assert.equal(reasonOf(result), 'other_works');
+    assert.equal(remarksOf(result), 'Renovation');
   });
 
   test('ignores other works with NA dates', () => {
@@ -166,7 +174,7 @@ describe('getMarketStatus', () => {
     const dateWithTime = new Date(2026, 5, 29, 14, 30, 0); // Monday with time
     const result = getMarketStatus(market, dateWithTime);
     assert.equal(result.status, 'warning');
-    assert.equal(result.reason, 'monday');
+    assert.equal(reasonOf(result), 'monday');
   });
 });
 
@@ -183,14 +191,14 @@ describe('getUpcomingClosures', () => {
     q4_cleaningenddate: '',
     other_works_startdate: 'NA',
     other_works_enddate: 'NA',
-    remarks_other_works: 'nil'
+    remarks_other_works: 'nil',
   };
 
   test('finds upcoming Mondays', () => {
     // Starting from a Tuesday
     const tuesday = new Date(2026, 5, 23); // June 23, 2026 = Tuesday
     const closures = getUpcomingClosures(market, 10, tuesday);
-    const mondays = closures.filter(c => c.reason === 'monday');
+    const mondays = closures.filter((c) => c.reason === 'monday');
     assert.ok(mondays.length >= 1);
     assert.equal(mondays[0].date.getDay(), 1);
   });
@@ -198,7 +206,7 @@ describe('getUpcomingClosures', () => {
   test('finds cleaning days in range', () => {
     const beforeCleaning = new Date(2026, 0, 2); // Jan 2, 2026 = Friday
     const closures = getUpcomingClosures(market, 10, beforeCleaning);
-    const cleaning = closures.filter(c => c.reason === 'cleaning');
+    const cleaning = closures.filter((c) => c.reason === 'cleaning');
     // Jan 5-7 are all cleaning (cleaning takes priority over Monday on Jan 5)
     assert.equal(cleaning.length, 3);
   });
@@ -225,7 +233,7 @@ describe('getNextOpenDate', () => {
     q4_cleaningenddate: '',
     other_works_startdate: 'NA',
     other_works_enddate: 'NA',
-    remarks_other_works: ''
+    remarks_other_works: '',
   };
 
   test('returns Tuesday after a Monday (warning counts as open)', () => {
@@ -234,6 +242,7 @@ describe('getNextOpenDate', () => {
     const monday = new Date(2026, 5, 29);
     const next = getNextOpenDate(market, monday);
     // Next day (Tuesday) is open/warning — since Monday is warning, Tuesday is fully open
+    assert.ok(next);
     assert.equal(next.getDay(), 2); // Tuesday
     assert.equal(next.getDate(), 30);
   });
@@ -241,6 +250,7 @@ describe('getNextOpenDate', () => {
   test('returns day after cleaning ends', () => {
     const lastCleanDay = new Date(2026, 0, 7); // Wed Jan 7 = last cleaning day
     const next = getNextOpenDate(market, lastCleanDay);
+    assert.ok(next);
     assert.equal(next.getDate(), 8); // Jan 8
   });
 
@@ -248,11 +258,12 @@ describe('getNextOpenDate', () => {
     const marketSunEnd = {
       ...market,
       q2_cleaningstartdate: '27/6/2026', // Saturday
-      q2_cleaningenddate: '28/6/2026'    // Sunday
+      q2_cleaningenddate: '28/6/2026', // Sunday
     };
     const sunday = new Date(2026, 5, 28);
     const next = getNextOpenDate(marketSunEnd, sunday);
     // Monday June 29 is warning (not hard closed), so it counts as next open
+    assert.ok(next);
     assert.equal(next.getDay(), 1); // Monday
     assert.equal(next.getDate(), 29);
   });

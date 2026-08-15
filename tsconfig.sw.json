@@ -1,0 +1,19 @@
+{
+  // The service worker needs the WebWorker lib, which conflicts with DOM in one program,
+  // so it compiles on its own. It is registered as a classic script, hence no module output.
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "WebWorker"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+    "rootDir": "src",
+    "outDir": ".",
+
+    "strict": true,
+    "erasableSyntaxOnly": true,
+    "skipLibCheck": true,
+    "types": []
+  },
+  "files": ["src/sw.ts"]
+}

@@ -4,14 +4,35 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
-  test:
+  web:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - run: node --test market-logic.test.js
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      # GitHub Pages serves openanot.com from the repo root, so the compiled output is
+      # committed. Rebuild it and fail if it differs from what is checked in.
+      - run: npm run build
+      - run: git add -A && git diff --cached --exit-code
+
+  worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck

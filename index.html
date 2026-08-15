@@ -96,11 +96,8 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="market-logic.js"></script>
-  <script src="zh-names.js"></script>
-  <script src="push.js"></script>
-  <script src="install-prompt.js"></script>
-  <script src="app.js"></script>
+  <!-- app.js is compiled from src/ by `npm run build`; it imports the other modules. -->
+  <script type="module" src="app.js"></script>
 
   <!-- Cloudflare Web Analytics -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "YOUR_CF_BEACON_TOKEN"}'></script>

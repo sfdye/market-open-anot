@@ -1,0 +1,10 @@
+{
+  // Type-checks the tests, which run under Node rather than in the browser.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.test.ts"],
+  "exclude": []
+}

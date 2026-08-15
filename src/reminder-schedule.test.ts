@@ -1,19 +1,21 @@
-const { test, describe } = require('node:test');
-const assert = require('node:assert/strict');
-const {
+import { test, describe } from 'node:test';
+import assert from 'node:assert/strict';
+import {
   sgToday,
   sgInstant,
   civilKey,
   shortName,
   groupClosuresByDate,
   notificationCopy,
-  buildSchedule
-} = require('./reminder-schedule.js');
+  buildSchedule,
+} from './reminder-schedule.ts';
+import type { DateGroup } from './reminder-schedule.ts';
+import type { Market } from './market-logic.ts';
 
 // 5-7 Feb 2026 is a Thursday-Saturday, so no Monday overlaps the cleaning window.
-function market(name, overrides) {
-  return Object.assign({
-    name: name,
+function market(name: string, overrides?: Partial<Market>): Market {
+  return {
+    name,
     q1_cleaningstartdate: 'NA',
     q1_cleaningenddate: 'NA',
     q2_cleaningstartdate: 'NA',
@@ -24,8 +26,9 @@ function market(name, overrides) {
     q4_cleaningenddate: 'NA',
     other_works_startdate: 'NA',
     other_works_enddate: 'NA',
-    remarks_other_works: ''
-  }, overrides);
+    remarks_other_works: '',
+    ...overrides,
+  };
 }
 
 const CLEAN_FEB = { q1_cleaningstartdate: '5/2/2026', q1_cleaningenddate: '7/2/2026' };
@@ -120,7 +123,7 @@ describe('groupClosuresByDate', () => {
   test('is sorted by date ascending', () => {
     const markets = [
       market('A (Alpha)', { q1_cleaningstartdate: '20/3/2026', q1_cleaningenddate: '20/3/2026' }),
-      market('B (Beta)', CLEAN_FEB)
+      market('B (Beta)', CLEAN_FEB),
     ];
     const groups = groupClosuresByDate(['A (Alpha)', 'B (Beta)'], markets, today);
     const times = groups.map((g) => g.date.getTime());
@@ -134,7 +137,7 @@ describe('groupClosuresByDate', () => {
 
   test('tracks other_works separately from cleaning', () => {
     const markets = [
-      market('A (Alpha)', { other_works_startdate: '5/2/2026', other_works_enddate: '5/2/2026' })
+      market('A (Alpha)', { other_works_startdate: '5/2/2026', other_works_enddate: '5/2/2026' }),
     ];
     const groups = groupClosuresByDate(['A (Alpha)'], markets, today);
     assert.equal(groups.length, 1);
@@ -143,14 +146,15 @@ describe('groupClosuresByDate', () => {
 
   test('stays inside the 90-day horizon', () => {
     const markets = [
-      market('A (Alpha)', { q4_cleaningstartdate: '1/12/2026', q4_cleaningenddate: '3/12/2026' })
+      market('A (Alpha)', { q4_cleaningstartdate: '1/12/2026', q4_cleaningenddate: '3/12/2026' }),
     ];
     assert.deepEqual(groupClosuresByDate(['A (Alpha)'], markets, today), []);
   });
 });
 
 describe('notificationCopy', () => {
-  const group = { names: ['Alpha', 'Beta'], reasons: ['cleaning'] };
+  type CopyInput = Pick<DateGroup, 'names' | 'reasons'>;
+  const group: CopyInput = { names: ['Alpha', 'Beta'], reasons: ['cleaning'] };
 
   test('English, day before', () => {
     const copy = notificationCopy(group, false, 'en');
@@ -177,13 +181,13 @@ describe('notificationCopy', () => {
   });
 
   test('says maintenance for other_works', () => {
-    const works = { names: ['Alpha'], reasons: ['other_works'] };
+    const works: CopyInput = { names: ['Alpha'], reasons: ['other_works'] };
     assert.equal(notificationCopy(works, true, 'en').title, '🚫 Closed today for maintenance');
     assert.equal(notificationCopy(works, true, 'zh').title, '🚫 今天关门（维修）');
   });
 
   test('says maintenance when a date mixes both reasons', () => {
-    const mixed = { names: ['Alpha', 'Beta'], reasons: ['cleaning', 'other_works'] };
+    const mixed: CopyInput = { names: ['Alpha', 'Beta'], reasons: ['cleaning', 'other_works'] };
     assert.equal(notificationCopy(mixed, false, 'en').title, '⚠️ Closed tomorrow for maintenance');
   });
 });
@@ -205,6 +209,8 @@ describe('buildSchedule', () => {
     assert.equal(feb5.length, 2);
     const eve = feb5.find((e) => e.identifier.endsWith('-eve'));
     const morn = feb5.find((e) => e.identifier.endsWith('-morn'));
+    assert.ok(eve);
+    assert.ok(morn);
     assert.equal(eve.at.toISOString(), '2026-02-04T11:00:00.000Z');
     assert.equal(morn.at.toISOString(), '2026-02-04T22:00:00.000Z');
   });
@@ -240,14 +246,16 @@ describe('buildSchedule', () => {
   });
 
   test('stays well under the iOS pending-request ceiling for a typical user', () => {
-    const many = [];
-    const names = [];
+    const many: Market[] = [];
+    const names: string[] = [];
     for (let i = 0; i < 5; i++) {
       names.push(`M${i} (Market ${i})`);
-      many.push(market(`M${i} (Market ${i})`, {
-        q1_cleaningstartdate: `${5 + i}/2/2026`,
-        q1_cleaningenddate: `${7 + i}/2/2026`
-      }));
+      many.push(
+        market(`M${i} (Market ${i})`, {
+          q1_cleaningstartdate: `${5 + i}/2/2026`,
+          q1_cleaningenddate: `${7 + i}/2/2026`,
+        })
+      );
     }
     const entries = buildSchedule(names, many, 'en', now);
     assert.ok(entries.length <= 64, `expected <= 64 pending, got ${entries.length}`);

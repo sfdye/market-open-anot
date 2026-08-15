@@ -1,6 +1,6 @@
-// The only place that reaches outside native/. market-logic.js and zh-names.js are
-// the single source of truth shared verbatim with the web app; Metro sees them via
-// the repo-root watchFolder in metro.config.js.
+// The only place that reaches outside native/. The TypeScript in ../../src is the single
+// source of truth shared with the web app, which compiles the same files to plain JS at
+// the repo root; Metro sees them via the repo-root watchFolder in metro.config.js.
 export {
   parseDateDMY,
   stripTime,
@@ -8,7 +8,7 @@ export {
   getUpcomingClosures,
   getNextOpenDate,
   parseMarketName,
-} from '../../market-logic';
+} from '../../src/market-logic';
 
 export type {
   Market,
@@ -16,9 +16,9 @@ export type {
   MarketStatus,
   Closure,
   ParsedMarketName,
-} from '../../market-logic';
+} from '../../src/market-logic';
 
-export { zhNames } from '../../zh-names';
+export { zhNames } from '../../src/zh-names';
 
 export {
   HORIZON_DAYS,
@@ -29,6 +29,6 @@ export {
   groupClosuresByDate,
   notificationCopy,
   buildSchedule,
-} from '../../reminder-schedule';
+} from '../../src/reminder-schedule';
 
-export type { DateGroup, ScheduleEntry } from '../../reminder-schedule';
+export type { DateGroup, ScheduleEntry } from '../../src/reminder-schedule';

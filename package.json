@@ -1,8 +1,17 @@
 {
   "name": "market-open-anot",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "npx browser-sync start --server --files '*.html,*.css,*.js'",
-    "test": "node --test market-logic.test.js reminder-schedule.test.js"
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.sw.json",
+    "watch": "tsc -p tsconfig.json --watch",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "node --test src/*.test.ts",
+    "dev": "npx browser-sync start --server --files '*.html,*.css,*.js'"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.20",
+    "@types/node": "^24.10.1",
+    "typescript": "^6.0.3"
   }
 }

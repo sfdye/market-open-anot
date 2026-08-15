@@ -1,12 +1,12 @@
 # Market Open Anot? — native app
 
-Expo (React Native) app for iOS and Android. The web app at [openanot.com](https://openanot.com) is untouched and keeps running from the repo root.
+Expo (React Native) app for iOS and Android. The web app at [openanot.com](https://openanot.com) keeps running from the repo root.
 
 ## Shared logic
 
-`market-logic.js` and `zh-names.js` stay at the repo root as the single source of truth — the web app loads them as plain scripts, this app imports them through `lib/shared.ts`. Metro reaches them via `watchFolders` in `metro.config.js`; types come from the hand-written `.d.ts` files beside each.
+`../src/market-logic.ts` and `../src/zh-names.ts` are the single source of truth. This app imports them through `lib/shared.ts`; the web app gets the same files compiled to plain JS at the repo root by `npm run build`. Metro reaches them via `watchFolders` in `metro.config.js`.
 
-`reminder-schedule.js` (also at the repo root, also plain JS) turns favourites into a list of notifications to schedule. It lives outside `native/` so `node --test` can cover it without a React Native runtime — run it with `npm test` from the repo root.
+`../src/reminder-schedule.ts` turns favourites into a list of notifications to schedule. It lives outside `native/` so `node --test` can cover it without a React Native runtime — run it with `npm test` from the repo root.
 
 ## Reminders
 

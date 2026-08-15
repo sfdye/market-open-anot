@@ -3,9 +3,16 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260812.1",
+    "@types/web-push": "^3.6.4",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.121.0"
   }
 }
