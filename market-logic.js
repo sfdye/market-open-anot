@@ -47,7 +47,9 @@
     var closures = [];
     var today = stripTime(fromDate);
     for (var i = 1; i <= days; i++) {
-      var date = new Date(today.getTime() + i * 86400000);
+      // Calendar arithmetic, not +86400000: adding fixed milliseconds slips an hour either
+      // way across a DST boundary in the device's timezone, which can shift the calendar day.
+      var date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
       var result = getMarketStatus(market, date);
       if (result.status === 'closed' || result.status === 'warning') {
         closures.push({ date: date, reason: result.reason, remarks: result.remarks });
@@ -57,9 +59,9 @@
   }
 
   function getNextOpenDate(market, fromDate) {
-    var date = stripTime(fromDate);
+    var start = stripTime(fromDate);
     for (var i = 1; i <= 60; i++) {
-      date = new Date(date.getTime() + 86400000);
+      var date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
       var s = getMarketStatus(market, date).status;
       if (s === 'open' || s === 'warning') {
         return date;

@@ -3,6 +3,6 @@
   "private": true,
   "scripts": {
     "dev": "npx browser-sync start --server --files '*.html,*.css,*.js'",
-    "test": "node --test market-logic.test.js"
+    "test": "node --test market-logic.test.js reminder-schedule.test.js"
   }
 }
