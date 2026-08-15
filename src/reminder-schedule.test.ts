@@ -62,8 +62,7 @@ describe('sgInstant', () => {
     assert.equal(sgInstant(civil, 6).toISOString(), '2026-02-05T22:00:00.000Z');
   });
 
-  test('matches the worker cron times', () => {
-    // wrangler.toml fires at 11:00 and 22:00 UTC — 7pm and 6am SGT.
+  test('resolves 7pm and 6am SGT to 11:00 and 22:00 UTC', () => {
     const civil = new Date(2026, 1, 6);
     assert.equal(sgInstant(civil, 19).getUTCHours(), 11);
     assert.equal(sgInstant(civil, 6).getUTCHours(), 22);

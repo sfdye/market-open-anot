@@ -27,7 +27,8 @@ const SGT_OFFSET_MS = 8 * 60 * 60 * 1000;
 // per-date grouping keeps us clear of iOS's ~64 pending-request ceiling.
 export const HORIZON_DAYS = 90;
 
-// The two moments worker/wrangler.toml's crons fire, in SGT.
+// Two reminders per closure date, in SGT: after dinner the evening before, and early enough
+// the next morning to catch someone before they set out.
 const EVENING_BEFORE_HOUR = 19;
 const MORNING_OF_HOUR = 6;
 
@@ -69,8 +70,8 @@ function findMarket(markets: Market[], name: string): Market | null {
  * Closures across all favourites over the next HORIZON_DAYS days, collapsed to one entry
  * per date so five favourites closing the same day become one notification.
  *
- * Mondays are excluded: worker/src/schedule.ts deliberately omits the weekly-rest rule,
- * and including it would be 52+ notifications per market per year.
+ * Mondays are excluded: the weekly rest day is predictable, and reminding about it would be
+ * 52+ notifications per market per year — enough for the user to turn reminders off entirely.
  */
 export function groupClosuresByDate(
   favorites: string[],
@@ -101,7 +102,7 @@ export function groupClosuresByDate(
   return [...groups.values()].sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
-/** Bilingual copy carried over from worker/src/index.ts, with a maintenance variant. */
+/** Bilingual notification copy, with a separate variant for maintenance closures. */
 export function notificationCopy(
   group: Pick<DateGroup, 'names' | 'reasons'>,
   isToday: boolean,
