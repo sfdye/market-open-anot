@@ -5,7 +5,12 @@ import StallCounts, { hasStallCounts } from '../../components/StallCounts';
 import StatusBanner from '../../components/StatusBanner';
 import UpcomingClosures from '../../components/UpcomingClosures';
 import { Card, EmptyState, Icon, Text } from '../../components/ui';
-import { getMarketStatus, getNextOpenDate, parseMarketName } from '../../lib/core/market-logic';
+import {
+  getMarketStatus,
+  getNextOpenDate,
+  marketPhotoUrl,
+  parseMarketName,
+} from '../../lib/core/market-logic';
 import { decodeEntities, getDisplayName, marketCoords } from '../../lib/markets';
 import { statusTone } from '../../lib/status';
 import { toggleFavorite, useIsFavorite, useLang, useMarket, useT, useToday } from '../../lib/store';
@@ -33,9 +38,11 @@ export default function MarketDetailScreen() {
   const parsed = parseMarketName(market.name);
   const displayName = getDisplayName(parsed, lang);
   const status = getMarketStatus(market, today);
-  const nextOpen = statusTone(status) === 'closed' ? getNextOpenDate(market, today) : null;
+  const tone = statusTone(status);
+  const nextOpen = tone === 'closed' ? getNextOpenDate(market, today) : null;
   const address = market.address_myenv ? decodeEntities(market.address_myenv) : '';
   const coords = marketCoords(market);
+  const photo = marketPhotoUrl(market);
   const showPlaceCard = !!address || hasStallCounts(market);
 
   const openInMaps = () => {
@@ -71,9 +78,16 @@ export default function MarketDetailScreen() {
         }}
       />
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.content}>
-        {!!market.photourl && <MarketPhoto uri={market.photourl} />}
+        {!!photo && <MarketPhoto uri={photo} />}
 
         <StatusBanner status={status} nextOpen={nextOpen} />
+
+        {/* Only under an open banner: that is the one a reader can mistake for "serving now". */}
+        {tone !== 'closed' && (
+          <Text variant="footnote" tone="faint" style={styles.hoursNote}>
+            {t('hoursNote')}
+          </Text>
+        )}
 
         {showPlaceCard && (
           <Card padded={false} style={styles.place}>
@@ -119,6 +133,7 @@ export default function MarketDetailScreen() {
 
 const styles = StyleSheet.create({
   content: { padding: space.md, gap: space.md },
+  hoursNote: { paddingHorizontal: space.sm, marginTop: -space.xs },
   place: { overflow: 'hidden' },
   addressRow: {
     flexDirection: 'row',

@@ -7,6 +7,7 @@ import {
   getUpcomingClosures,
   getNextOpenDate,
   parseMarketName,
+  marketPhotoUrl,
 } from './market-logic.ts';
 import type { MarketStatus } from './market-logic.ts';
 
@@ -290,5 +291,32 @@ describe('parseMarketName', () => {
   test('handles null/empty input', () => {
     assert.equal(parseMarketName(null).friendly, '');
     assert.equal(parseMarketName('').friendly, '');
+  });
+});
+
+describe('marketPhotoUrl', () => {
+  test('upgrades http to https, which is what ATS will actually load', () => {
+    assert.equal(
+      marketPhotoUrl({ name: 'x', photourl: 'http://www.nea.gov.sg/img/havelock.jpg' }),
+      'https://www.nea.gov.sg/img/havelock.jpg'
+    );
+  });
+
+  test('leaves https alone', () => {
+    const url = 'https://www.nea.gov.sg/img/adam.jpg';
+    assert.equal(marketPhotoUrl({ name: 'x', photourl: url }), url);
+  });
+
+  test('only rewrites the scheme, not http later in the URL', () => {
+    assert.equal(
+      marketPhotoUrl({ name: 'x', photourl: 'http://a.sg/go?to=http://b.sg' }),
+      'https://a.sg/go?to=http://b.sg'
+    );
+  });
+
+  test('returns null when there is no photo', () => {
+    assert.equal(marketPhotoUrl({ name: 'x' }), null);
+    assert.equal(marketPhotoUrl({ name: 'x', photourl: '' }), null);
+    assert.equal(marketPhotoUrl({ name: 'x', photourl: '   ' }), null);
   });
 });

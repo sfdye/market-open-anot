@@ -139,3 +139,16 @@ export function parseMarketName(rawName: string | null | undefined): ParsedMarke
   }
   return { street: '', friendly: name };
 }
+
+/**
+ * The market's photo, or null when it has none.
+ *
+ * NEA stores most of these URLs — 88 of the 123 — as plain `http://`, and App Transport Security
+ * blocks those outright, so the image never arrives and the app just shows no photo. The same
+ * paths serve fine over TLS, so upgrade the scheme rather than punch a hole in ATS.
+ */
+export function marketPhotoUrl(market: Market): string | null {
+  const url = (market.photourl || '').trim();
+  if (!url) return null;
+  return url.replace(/^http:\/\//i, 'https://');
+}

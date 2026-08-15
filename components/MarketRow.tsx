@@ -5,7 +5,12 @@ import { Image } from 'expo-image';
 import StatusPill from './StatusPill';
 import SwipeToDeleteRow from './SwipeToDeleteRow';
 import { Icon, Text } from './ui';
-import { getMarketStatus, getNextOpenDate, parseMarketName } from '../lib/core/market-logic';
+import {
+  getMarketStatus,
+  getNextOpenDate,
+  marketPhotoUrl,
+  parseMarketName,
+} from '../lib/core/market-logic';
 import { formatDate } from '../lib/date';
 import { getDisplayName, getNextCleaningDate } from '../lib/markets';
 import { statusLabel, statusTone } from '../lib/status';
@@ -47,6 +52,7 @@ function MarketRowInner({ name }: { name: string }) {
   // Past this font scale the pill wins the horizontal squeeze and truncates the name, so the row
   // becomes a column and drops the thumbnail to buy the text its width back.
   const stacked = PixelRatio.getFontScale() > REFLOW_FONT_SCALE;
+  const photo = marketPhotoUrl(market);
   const remove = () => removeFavorite(market.name);
 
   return (
@@ -66,9 +72,9 @@ function MarketRowInner({ name }: { name: string }) {
           { backgroundColor: pressed ? theme.colors.borderLight : theme.colors.surface },
         ]}
       >
-        {!!market.photourl && !stacked && (
+        {!!photo && !stacked && (
           <Image
-            source={{ uri: market.photourl }}
+            source={{ uri: photo }}
             style={[styles.thumb, { backgroundColor: theme.colors.borderLight }]}
             contentFit="cover"
             cachePolicy="memory-disk"
