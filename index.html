@@ -10,6 +10,13 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="style.css">
+  <!-- app.js is a module, so the browser would only discover its imports after parsing it.
+       Preloading them keeps the whole graph on one round trip, as the old script tags were. -->
+  <link rel="modulepreload" href="dom.js">
+  <link rel="modulepreload" href="market-logic.js">
+  <link rel="modulepreload" href="zh-names.js">
+  <link rel="modulepreload" href="push.js">
+  <link rel="modulepreload" href="install-prompt.js">
   <title>Market Open Anot?</title>
 </head>
 <body>
@@ -96,11 +103,8 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="market-logic.js"></script>
-  <script src="zh-names.js"></script>
-  <script src="push.js"></script>
-  <script src="install-prompt.js"></script>
-  <script src="app.js"></script>
+  <!-- app.js is compiled from src/ by `npm run build`; it imports the other modules. -->
+  <script type="module" src="app.js"></script>
 
   <!-- Cloudflare Web Analytics -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "YOUR_CF_BEACON_TOKEN"}'></script>

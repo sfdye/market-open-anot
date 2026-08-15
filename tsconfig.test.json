@@ -1,0 +1,14 @@
+{
+  // Type-checks the tests, which run under Node rather than in the browser.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  // `files: []` clears the base config's entry point so this program is the tests and what
+  // they import. `exclude: []` is load-bearing: outDir is ".", and the default exclude list
+  // contains outDir, so without this the glob below matches nothing at all.
+  "files": [],
+  "include": ["src/**/*.test.ts"],
+  "exclude": []
+}

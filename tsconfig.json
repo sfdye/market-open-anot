@@ -1,0 +1,30 @@
+{
+  // Sources live in src/ and compile to the repo root, because GitHub Pages serves
+  // openanot.com straight from main at the root. The emitted .js is committed; CI
+  // re-runs the build and fails on drift.
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+
+    "rootDir": "src",
+    "outDir": ".",
+
+    // Sources import each other as './x.ts' so `node --test src/*.test.ts` can strip
+    // types and run them directly; tsc rewrites those specifiers to './x.js' on emit.
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "skipLibCheck": true,
+
+    // Browser code: keep Node's globals out so nothing compiles against APIs the page lacks.
+    "types": []
+  },
+  // The page's entry point, not a directory: the import graph then decides what gets emitted,
+  // so a new file in src/ is not published to the live site until something actually loads it.
+  "files": ["src/app.ts", "src/globals.d.ts"]
+}

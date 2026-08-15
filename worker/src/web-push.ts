@@ -1,6 +1,13 @@
 import webpush from 'web-push';
+import type { PushSubscription } from 'web-push';
 
-export async function sendPushNotification(subscription, payload, vapidPublicKey, vapidPrivateKey, vapidSubject) {
+export async function sendPushNotification(
+  subscription: PushSubscription,
+  payload: string,
+  vapidPublicKey: string,
+  vapidPrivateKey: string,
+  vapidSubject: string
+): Promise<boolean> {
   webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
 
   // Use web-push to generate the encrypted request details, then send via fetch
@@ -8,7 +15,7 @@ export async function sendPushNotification(subscription, payload, vapidPublicKey
 
   const response = await fetch(requestDetails.endpoint, {
     method: requestDetails.method,
-    headers: requestDetails.headers,
+    headers: requestDetails.headers as Record<string, string>,
     body: requestDetails.body,
   });
 

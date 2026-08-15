@@ -1,12 +1,25 @@
-export async function getMarketsWithCleaningOn(date, apiUrl) {
+/** One NEA dataset record. Every field arrives as a string, including the dates. */
+export interface MarketRecord {
+  name: string;
+  [field: string]: string | undefined;
+}
+
+interface DatastoreResponse {
+  result?: { records?: MarketRecord[] };
+}
+
+export async function getMarketsWithCleaningOn(
+  date: Date,
+  apiUrl: string
+): Promise<MarketRecord[]> {
   const response = await fetch(apiUrl);
   if (!response.ok) return [];
 
-  const data = await response.json();
+  const data = (await response.json()) as DatastoreResponse;
   const records = data.result?.records || [];
   const target = stripTime(date);
 
-  const closed = [];
+  const closed: MarketRecord[] = [];
   for (const market of records) {
     const quarters = ['q1', 'q2', 'q3', 'q4'];
     let isClosed = false;
@@ -36,7 +49,7 @@ export async function getMarketsWithCleaningOn(date, apiUrl) {
   return closed;
 }
 
-function parseDateDMY(str) {
+function parseDateDMY(str: string | undefined): Date | null {
   if (!str || !str.trim()) return null;
   const parts = str.trim().split('/');
   if (parts.length !== 3) return null;
@@ -47,6 +60,6 @@ function parseDateDMY(str) {
   return new Date(y, m - 1, d);
 }
 
-function stripTime(date) {
+function stripTime(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }

@@ -1,87 +1,90 @@
-(function (exports) {
-  'use strict';
-
-  function parseDateDMY(str) {
-    if (!str || !str.trim()) return null;
-    var parts = str.trim().split('/');
-    if (parts.length !== 3) return null;
-    var d = parseInt(parts[0], 10);
-    var m = parseInt(parts[1], 10);
-    var y = parseInt(parts[2], 10);
-    if (isNaN(d) || isNaN(m) || isNaN(y)) return null;
+/** Exported so callers building `${q}_cleaningstartdate` keys resolve to declared fields. */
+export const QUARTERS = ['q1', 'q2', 'q3', 'q4'];
+/** Parses a `DD/MM/YYYY` string. Returns null for blank or malformed input. */
+export function parseDateDMY(str) {
+    if (!str || !str.trim())
+        return null;
+    const parts = str.trim().split('/');
+    if (parts.length !== 3)
+        return null;
+    const d = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const y = parseInt(parts[2], 10);
+    if (isNaN(d) || isNaN(m) || isNaN(y))
+        return null;
     return new Date(y, m - 1, d);
-  }
-
-  function stripTime(date) {
+}
+/** Midnight of `date` in the local timezone. */
+export function stripTime(date) {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  }
-
-  function getMarketStatus(market, date) {
-    var today = stripTime(date);
-
-    var quarters = ['q1', 'q2', 'q3', 'q4'];
-    for (var i = 0; i < quarters.length; i++) {
-      var q = quarters[i];
-      var start = parseDateDMY(market[q + '_cleaningstartdate']);
-      var end = parseDateDMY(market[q + '_cleaningenddate']);
-      if (start && end && today >= start && today <= end) {
-        return { status: 'closed', reason: 'cleaning', start: start, end: end };
-      }
+}
+export function getMarketStatus(market, date) {
+    const today = stripTime(date);
+    for (const q of QUARTERS) {
+        const start = parseDateDMY(market[`${q}_cleaningstartdate`]);
+        const end = parseDateDMY(market[`${q}_cleaningenddate`]);
+        if (start && end && today >= start && today <= end) {
+            return { status: 'closed', reason: 'cleaning', start, end };
+        }
     }
-
-    var owStart = parseDateDMY(market['other_works_startdate']);
-    var owEnd = parseDateDMY(market['other_works_enddate']);
+    const owStart = parseDateDMY(market.other_works_startdate);
+    const owEnd = parseDateDMY(market.other_works_enddate);
     if (owStart && owEnd && today >= owStart && today <= owEnd) {
-      var remarks = market['remarks_other_works'] || '';
-      return { status: 'closed', reason: 'other_works', remarks: remarks, start: owStart, end: owEnd };
+        return {
+            status: 'closed',
+            reason: 'other_works',
+            remarks: market.remarks_other_works || '',
+            start: owStart,
+            end: owEnd,
+        };
     }
-
     if (today.getDay() === 1) {
-      return { status: 'warning', reason: 'monday' };
+        return { status: 'warning', reason: 'monday' };
     }
-
     return { status: 'open' };
-  }
-
-  function getUpcomingClosures(market, days, fromDate) {
-    var closures = [];
-    var today = stripTime(fromDate);
-    for (var i = 1; i <= days; i++) {
-      var date = new Date(today.getTime() + i * 86400000);
-      var result = getMarketStatus(market, date);
-      if (result.status === 'closed' || result.status === 'warning') {
-        closures.push({ date: date, reason: result.reason, remarks: result.remarks });
-      }
+}
+/** Closures and warnings over the next `days` days, starting the day after `fromDate`. */
+export function getUpcomingClosures(market, days, fromDate) {
+    const closures = [];
+    const today = stripTime(fromDate);
+    for (let i = 1; i <= days; i++) {
+        // Calendar arithmetic, not +86400000: adding fixed milliseconds slips an hour either
+        // way across a DST boundary in the device's timezone, which can shift the calendar day.
+        const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+        const result = getMarketStatus(market, date);
+        if (result.status === 'open')
+            continue;
+        closures.push({
+            date,
+            reason: result.reason,
+            remarks: 'remarks' in result ? result.remarks : undefined,
+        });
     }
     return closures;
-  }
-
-  function getNextOpenDate(market, fromDate) {
-    var date = stripTime(fromDate);
-    for (var i = 1; i <= 60; i++) {
-      date = new Date(date.getTime() + 86400000);
-      var s = getMarketStatus(market, date).status;
-      if (s === 'open' || s === 'warning') {
-        return date;
-      }
+}
+/** Next day the market is open or on weekly rest, searching up to 60 days out. */
+export function getNextOpenDate(market, fromDate) {
+    const start = stripTime(fromDate);
+    for (let i = 1; i <= 60; i++) {
+        const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+        const s = getMarketStatus(market, date).status;
+        if (s === 'open' || s === 'warning') {
+            return date;
+        }
     }
     return null;
-  }
-
-  function parseMarketName(rawName) {
-    var name = (rawName || '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-    var match = name.match(/^(.+?)\s*\((.+)\)\s*$/);
+}
+/** Splits `"Blk 1 Foo Rd (Bar Market)"` into street + friendly name, decoding HTML entities. */
+export function parseMarketName(rawName) {
+    const name = (rawName || '')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+    const match = name.match(/^(.+?)\s*\((.+)\)\s*$/);
     if (match) {
-      return { street: match[1].trim(), friendly: match[2].trim() };
+        return { street: match[1].trim(), friendly: match[2].trim() };
     }
     return { street: '', friendly: name };
-  }
-
-  exports.parseDateDMY = parseDateDMY;
-  exports.stripTime = stripTime;
-  exports.getMarketStatus = getMarketStatus;
-  exports.getUpcomingClosures = getUpcomingClosures;
-  exports.getNextOpenDate = getNextOpenDate;
-  exports.parseMarketName = parseMarketName;
-
-})(typeof module !== 'undefined' ? module.exports : (window.MarketLogic = {}));
+}

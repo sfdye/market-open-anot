@@ -1,5 +1,43 @@
-import { sendPushNotification } from './web-push.js';
-import { getMarketsWithCleaningOn } from './schedule.js';
+import type { PushSubscription } from 'web-push';
+import { sendPushNotification } from './web-push';
+import { getMarketsWithCleaningOn } from './schedule';
+
+export interface Env {
+  SUBSCRIPTIONS: KVNamespace;
+  DATA_GOV_API: string;
+  VAPID_PUBLIC_KEY: string;
+  VAPID_PRIVATE_KEY: string;
+  VAPID_SUBJECT: string;
+}
+
+/** What the page posts to /subscribe and what we keep in KV, keyed by endpoint. */
+interface StoredSubscription {
+  subscription: PushSubscription;
+  markets: string[];
+  lang: string;
+}
+
+interface SendOutcome {
+  endpoint: string;
+  matched: boolean;
+  sent?: boolean;
+  error?: string;
+}
+
+interface Diagnostics {
+  timestamp: string;
+  sgtHour?: number;
+  targetDate?: string;
+  closedMarketsCount?: number;
+  closedMarketNames?: string[];
+  subscriptionCount?: number;
+  staleRemoved?: number;
+  results?: SendOutcome[];
+}
+
+function errorMessage(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
 
 export default {
   async fetch(request, env) {
@@ -31,24 +69,25 @@ export default {
     // Manual trigger for testing with diagnostics
     if (url.pathname === '/__scheduled' && request.method === 'GET') {
       try {
-        var result = await handleScheduled(env);
+        const result = await handleScheduled(env);
         return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       } catch (e) {
-        return new Response(JSON.stringify({ error: e.message, stack: e.stack }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        const stack = e instanceof Error ? e.stack : undefined;
+        return new Response(JSON.stringify({ error: errorMessage(e), stack }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
     }
 
     return new Response('Not found', { status: 404, headers: corsHeaders });
   },
 
-  async scheduled(event, env) {
+  async scheduled(_event, env) {
     await handleScheduled(env);
   },
-};
+} satisfies ExportedHandler<Env>;
 
-async function handleSubscribe(request, env, corsHeaders) {
+async function handleSubscribe(request: Request, env: Env, corsHeaders: Record<string, string>): Promise<Response> {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as Partial<StoredSubscription>;
     const { subscription, markets, lang } = body;
 
     if (!subscription || !subscription.endpoint || !markets || !Array.isArray(markets)) {
@@ -65,16 +104,16 @@ async function handleSubscribe(request, env, corsHeaders) {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), {
+    return new Response(JSON.stringify({ error: errorMessage(e) }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 }
 
-async function handleUnsubscribe(request, env, corsHeaders) {
+async function handleUnsubscribe(request: Request, env: Env, corsHeaders: Record<string, string>): Promise<Response> {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as { endpoint?: string };
     const { endpoint } = body;
 
     if (!endpoint) {
@@ -91,15 +130,15 @@ async function handleUnsubscribe(request, env, corsHeaders) {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), {
+    return new Response(JSON.stringify({ error: errorMessage(e) }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 }
 
-async function handleScheduled(env) {
-  const diag = { timestamp: new Date().toISOString() };
+async function handleScheduled(env: Env): Promise<Diagnostics> {
+  const diag: Diagnostics = { timestamp: new Date().toISOString() };
   const now = new Date();
   // SGT = UTC+8
   const sgt = new Date(now.getTime() + 8 * 60 * 60 * 1000);
@@ -127,11 +166,11 @@ async function handleScheduled(env) {
   const listed = await env.SUBSCRIPTIONS.list();
   diag.subscriptionCount = listed.keys.length;
 
-  const staleKeys = [];
-  const results = [];
+  const staleKeys: string[] = [];
+  const results: SendOutcome[] = [];
 
   for (const key of listed.keys) {
-    const data = await env.SUBSCRIPTIONS.get(key.name, 'json');
+    const data = await env.SUBSCRIPTIONS.get<StoredSubscription>(key.name, 'json');
     if (!data) continue;
 
     const { subscription, markets, lang } = data;
@@ -173,7 +212,7 @@ async function handleScheduled(env) {
         staleKeys.push(key.name);
       }
     } catch (e) {
-      results.push({ endpoint: subscription.endpoint.slice(0, 50), matched: true, error: e.message });
+      results.push({ endpoint: subscription.endpoint.slice(0, 50), matched: true, error: errorMessage(e) });
       staleKeys.push(key.name);
     }
   }

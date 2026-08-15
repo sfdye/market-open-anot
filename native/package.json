@@ -1,0 +1,38 @@
+{
+  "name": "native",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@maplibre/maplibre-react-native": "^11.3.6",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@types/geojson": "^7946.0.16",
+    "expo": "~57.0.12",
+    "expo-background-task": "^57.0.0",
+    "expo-constants": "^57.0.0",
+    "expo-dev-client": "^57.0.11",
+    "expo-linking": "^57.0.0",
+    "expo-localization": "^57.0.0",
+    "expo-location": "^57.0.0",
+    "expo-notifications": "^57.0.0",
+    "expo-router": "^57.0.0",
+    "expo-splash-screen": "^57.0.6",
+    "expo-status-bar": "~57.0.1",
+    "expo-task-manager": "^57.0.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.2",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "typecheck": "tsc --noEmit"
+  },
+  "private": true
+}

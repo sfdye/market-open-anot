@@ -1,7 +1,5 @@
-(function (exports) {
-  'use strict';
-
-  exports.zhNames = {
+/** Maps the friendly English market name to its Chinese name. */
+export const zhNames = {
     'Chinatown Complex Market': '牛车水大厦巴刹',
     'Tekka Centre/Zhu Jiao Market': '竹脚中心',
     'Tiong Bahru Market': '中峇鲁巴刹',
@@ -112,7 +110,5 @@
     '80 Circuit Road Market and Food Centre': '切路80巴刹与熟食中心',
     '84 Marine Parade Central Market and Food Centre': '马林百列中心84巴刹与熟食中心',
     'Jalan Leban Food Centre': '惹兰里万熟食中心',
-    'Sembawang Hills Food Centre': '三巴旺山熟食中心'
-  };
-
-})(typeof module !== 'undefined' ? module.exports : (window.ZhNames = {}));
+    'Sembawang Hills Food Centre': '三巴旺山熟食中心',
+};

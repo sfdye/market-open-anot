@@ -25,29 +25,30 @@ Wet markets in Singapore close every Monday and have quarterly cleaning closures
 
 ## Tech
 
-Plain HTML + CSS + JS. No frameworks, no build step, no dependencies.
+Plain HTML + CSS + TypeScript. No frameworks and no runtime dependencies. Sources live in `src/`; `npm run build` compiles them to plain ES modules at the repo root, which is what the browser loads.
 
 ## Development
 
 ```sh
-npm run dev
+npm install
+npm run watch   # recompile src/ on change
+npm run dev     # browser with live reload (browser-sync), in a second terminal
 ```
-
-Opens a browser with live reload on file changes (uses browser-sync).
 
 ## Testing
 
-Unit tests for the closure logic (date parsing, open/closed detection, boundary conditions). Uses Node's built-in test runner — no dependencies.
+Unit tests for the closure logic (date parsing, open/closed detection, boundary conditions) and for the notification schedule. Node's built-in runner executes the `.ts` files directly by stripping types, so there is nothing to install.
 
 ```sh
 npm test
+npm run typecheck
 ```
 
-Tests run automatically on push/PR via GitHub Actions.
+Both run automatically on push/PR via GitHub Actions.
 
 ## Deployment
 
-Hosted on GitHub Pages. Any push to `main` triggers a deploy.
+Hosted on GitHub Pages, served straight from the repo root of `main`, so the compiled JS is committed next to its source. Run `npm run build` and commit the output with your change — CI rebuilds and fails if what is checked in is stale. The build clears the root `*.js` first, so deleting a source file also removes what it used to emit; only `src/app.ts`'s import graph is published, so a new module reaches the site once something imports it.
 
 ## License
 
