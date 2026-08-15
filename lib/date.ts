@@ -19,6 +19,13 @@ export function formatDate(date: Date, lang: Lang): string {
   return `${DAYS_SHORT.en[date.getDay()]} ${date.getDate()} ${MONTHS_SHORT[date.getMonth()]}`;
 }
 
+/** With the clock, for "Last updated": two refreshes on the same day look identical without it. */
+export function formatDateTime(date: Date, lang: Lang): string {
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${formatDate(date, lang)} ${hours}:${minutes}`;
+}
+
 export function formatDateLong(date: Date, lang: Lang): string {
   if (lang === 'zh') {
     return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${DAYS_LONG.zh[date.getDay()]}`;

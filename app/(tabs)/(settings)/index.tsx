@@ -1,9 +1,9 @@
-import { Alert, Linking, ScrollView, StyleSheet, Switch } from 'react-native';
+import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Switch } from 'react-native';
 import Constants from 'expo-constants';
 import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
 import { AUTHOR_URL, DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
-import { formatDate } from '../../../lib/date';
+import { formatDateTime } from '../../../lib/date';
 import { listScheduled, sendTestReminder } from '../../../lib/notifications';
 import {
   refresh,
@@ -13,6 +13,8 @@ import {
   useFetchedAt,
   useLang,
   useMarkets,
+  useRefreshing,
+  useStale,
   useT,
 } from '../../../lib/store';
 import { space, useTheme } from '../../../lib/theme';
@@ -25,6 +27,8 @@ export default function SettingsScreen() {
   const favorites = useFavorites();
   const markets = useMarkets();
   const fetchedAt = useFetchedAt();
+  const refreshing = useRefreshing();
+  const stale = useStale();
   const reminders = useReminders();
 
   const confirmRemoveAll = () => {
@@ -73,12 +77,19 @@ export default function SettingsScreen() {
         />
       </SettingsSection>
 
-      <SettingsSection title={t('dataSection')}>
+      {/* The clock in "Last updated" is the proof the refresh landed — without it a same-day
+          refresh changes nothing on screen, and the row reads as a dead button. */}
+      <SettingsSection title={t('dataSection')} footer={stale ? t('offline') : undefined}>
         <Row
           label={t('lastUpdated')}
-          detail={fetchedAt ? formatDate(new Date(fetchedAt), lang) : '—'}
+          detail={fetchedAt ? formatDateTime(new Date(fetchedAt), lang) : '—'}
         />
-        <Row label={t('refreshNow')} icon="refresh" onPress={() => void refresh()} />
+        <Row
+          label={t('refreshNow')}
+          icon="refresh"
+          accessory={refreshing ? <ActivityIndicator size="small" /> : undefined}
+          onPress={refreshing ? undefined : () => void refresh()}
+        />
         <Row
           label={t('dataSource')}
           detail={t('dataSourceLink')}
