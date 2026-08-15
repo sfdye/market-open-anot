@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# lib/ here is source, not build output — some global ignore files exclude it by convention
+!/lib/
