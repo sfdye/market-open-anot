@@ -34,8 +34,14 @@ export default function RootLayout() {
           <SplashGate />
           <StatusBar style="auto" />
           {/* The screen under every pushed route is `(tabs)`, which has no header and so no
-              title — without this iOS would label the back button with the route name, "(tabs)". */}
-          <Stack screenOptions={{ headerBackTitle: t('back') }}>
+              title — without this iOS would label the back button with the route name, "(tabs)".
+              Disabling the back-button menu turns off iOS's space-aware shrinking, which otherwise
+              drops the label to a bare chevron whenever the title is long: a long market name would
+              read "<" where a short one read "< Back". The label is worth more than the few points
+              of title width it costs — the audience is seniors. */}
+          <Stack
+            screenOptions={{ headerBackTitle: t('back'), headerBackButtonMenuEnabled: false }}
+          >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             {/* Detail and the add modal sit above the tabs, so a notification tap, the map
                 callout and the Today list can all reach them the same way. */}
