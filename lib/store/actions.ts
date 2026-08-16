@@ -1,11 +1,11 @@
 import { AppState, type AppStateStatus } from 'react-native';
-import { getLocales } from 'expo-localization';
 import { sgInstant, sgToday } from '../core/reminder-schedule';
+import { deviceLang } from '../device-lang';
 import type { Lang } from '../i18n';
 import { fetchMarketsFromAPI, findMarket } from '../markets';
 import { isPermissionGranted, rescheduleAll } from '../notifications';
 import * as storage from '../storage';
-import { getState, setState, subscribe } from './state';
+import { getState, setState, subscribe, type State } from './state';
 
 /**
  * How long cached NEA data is trusted before a background revalidation.
@@ -19,10 +19,6 @@ const REVALIDATE_AFTER_MS = 6 * 60 * 60 * 1000;
 /** Collapses the burst of updates from adding several markets in a row into one reschedule. */
 const RESCHEDULE_DEBOUNCE_MS = 400;
 
-function deviceLang(): Lang {
-  return getLocales()[0]?.languageCode === 'zh' ? 'zh' : 'en';
-}
-
 function isStaleByAge(fetchedAt: number | null): boolean {
   return fetchedAt === null || Date.now() - fetchedAt > REVALIDATE_AFTER_MS;
 }
@@ -31,9 +27,19 @@ function isStaleByAge(fetchedAt: number | null): boolean {
 // Mutations
 // ---------------------------------------------------------------------------
 
-export function setLang(lang: Lang): void {
-  setState({ lang });
-  void storage.saveLang(lang);
+/**
+ * `'system'` hands the choice back to the device. Without it the first tap in Settings was
+ * permanent: `lang` is only read from the device while nothing is stored, so a user who tried
+ * the other language had no way back to following their phone.
+ */
+export function setLang(pref: Lang | 'system'): void {
+  if (pref === 'system') {
+    setState({ lang: deviceLang(), langPinned: false });
+    void storage.clearLang();
+    return;
+  }
+  setState({ lang: pref, langPinned: true });
+  void storage.saveLang(pref);
 }
 
 function persistFavorites(favorites: string[]): void {
@@ -161,7 +167,15 @@ export function initStore(): void {
 
   AppState.addEventListener('change', (next: AppStateStatus) => {
     if (next !== 'active') return;
-    setState({ today: sgToday() });
+    const patch: Partial<State> = { today: sgToday() };
+    // Following the device means following it when the user changes it, not only at first launch.
+    // Android recreates the activity on a locale change but the JS context can survive it.
+    const { lang, langPinned } = getState();
+    if (!langPinned) {
+      const current = deviceLang();
+      if (current !== lang) patch.lang = current;
+    }
+    setState(patch);
     armMidnightTimer();
     void revalidateIfStale();
   });
@@ -180,6 +194,7 @@ export function initStore(): void {
 
     setState({
       lang: lang ?? deviceLang(),
+      langPinned: lang !== null,
       favorites,
       remindersEnabled,
       reminderCardDismissed: cardDismissed,

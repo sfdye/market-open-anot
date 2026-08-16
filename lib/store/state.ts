@@ -9,7 +9,13 @@ export interface State {
   ready: boolean;
   markets: Market[];
   favorites: string[];
+  /** The language in effect, whether the user picked it or the device did. */
   lang: Lang;
+  /**
+   * The user chose `lang` explicitly, so the device is no longer followed. False means Settings
+   * shows the checkmark on "System default" and a phone-language change still moves the app.
+   */
+  langPinned: boolean;
   /** Bound to `lang` so its identity is stable — components memoise on it. */
   t: Translate;
   /** Today in Singapore. Advances on foreground and at SGT midnight. */
@@ -34,6 +40,7 @@ let state: State = {
   markets: [],
   favorites: [],
   lang: 'en',
+  langPinned: false,
   t: translators.en,
   today: sgToday(),
   remindersEnabled: false,

@@ -61,6 +61,14 @@ export async function saveLang(lang: Lang): Promise<void> {
   await AsyncStorage.setItem(KEYS.lang, lang);
 }
 
+/**
+ * Back to following the device. The key's absence is what "no explicit choice" means — the same
+ * state a fresh install is in — so unpinning removes it rather than storing a sentinel.
+ */
+export async function clearLang(): Promise<void> {
+  await AsyncStorage.removeItem(KEYS.lang);
+}
+
 export async function loadRemindersEnabled(): Promise<boolean> {
   return (await AsyncStorage.getItem(KEYS.reminders)) === '1';
 }

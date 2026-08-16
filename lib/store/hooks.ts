@@ -26,6 +26,10 @@ export function useLang(): Lang {
   return useSelector((s) => s.lang);
 }
 
+export function useLangPinned(): boolean {
+  return useSelector((s) => s.langPinned);
+}
+
 export function useT(): Translate {
   return useSelector((s) => s.t);
 }

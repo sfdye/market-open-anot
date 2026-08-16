@@ -73,6 +73,10 @@ iOS silently keeps only the ~64 soonest pending requests, so `rescheduleAll` cap
 
 `lib/i18n.ts` holds two flat objects. `en` is the source of truth (`StringKey = keyof typeof en`) and `zh` is typed `Record<keyof typeof en, string>`, so adding a key without its Chinese translation fails typecheck. Get `t` from `useT()`; interpolate with `{name}` placeholders. Market names have a separate Chinese lookup in `lib/core/zh-names.ts`, keyed by the *friendly* (parenthesised) part of the NEA name — reach it through `getDisplayName`/`displayName` so notifications don't end up half-translated.
 
+Closure reasons are worded in exactly one place, `lib/core/reason-words.ts`, because they surface twice in forms English will not share: `label` stands alone in a status pill (`i18n.ts` reads it for `cleaning`/`otherWorks`) and `phrase` sits mid-sentence in a notification (`notificationCopy` reads it). It lives in core because `notificationCopy` does, and core cannot import `lib/`.
+
+Language resolution has two states, not one. `state.lang` is the language in effect; `state.langPinned` says whether the user chose it. Unpinned means the device decides — `deviceLang()` in `lib/device-lang.ts` scans the whole `getLocales()` preference list for the first supported entry, and the store re-checks it on every foreground. The pinned choice is persisted as the *presence* of `moa_lang`, and unpinning removes the key rather than writing a sentinel, so anything reading the language off storage must fall back to `deviceLang()`, not `'en'` — `background.ts` got that wrong and sent English reminders to phones running the app in Chinese. `deviceLang` is its own module so that headless task can reach it without importing the store.
+
 ## Dataset handling
 
 - Market identity is the raw NEA `name` string, and favourites are stored as those strings. `parseMarketName` splits `"Blk 1 Foo Rd (Bar Market)"` into street plus friendly name and decodes HTML entities.
