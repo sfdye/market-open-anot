@@ -84,13 +84,7 @@ export default function TodayScreen() {
       }
       ListEmptyComponent={
         ready ? (
-          <EmptyState
-            icon="stall"
-            title={t('noFavorites')}
-            actionTitle={t('addMarkets')}
-            actionIcon="add"
-            onAction={() => router.push('/add')}
-          />
+          <EmptyState icon="stall" title={t('noFavorites')} message={t('noFavoritesHint')} />
         ) : null
       }
       // Adding lives on the header "+" alone, and attribution on Settings → About; a second Add
