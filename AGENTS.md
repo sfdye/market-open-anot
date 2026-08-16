@@ -65,6 +65,7 @@ iOS silently keeps only the ~64 soonest pending requests, so `rescheduleAll` cap
 - Colours and spacing come from `lib/theme` (`space`, `radius`, `HIT_SIZE`, `useTheme`). Dark mode is not a colour swap: `theme.shadow` becomes a hairline border, because a shadow is invisible against black.
 - `useThemedStyles(factory)` memoises on the factory, so **declare the factory at module scope** — one created per render rebuilds every StyleSheet on every render.
 - Rows stack instead of truncating past `REFLOW_FONT_SCALE` (1.4); follow that for any new name-plus-pill layout.
+- Anything tappable inside a gesture takes `Pressable` from the gesture wrapper — `SwipeToDeleteRow` re-exports it — never from `react-native`, whose press survives a fast swipe and fires as the row opens.
 - One `ThemeProvider` at the root themes the native chrome — headers, large titles, search bar, tab bar. react-navigation is vendored inside expo-router 57, so import from `expo-router`; there is no `@react-navigation/*` package in the tree.
 
 ## i18n

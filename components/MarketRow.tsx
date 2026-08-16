@@ -1,9 +1,10 @@
 import { memo } from 'react';
-import { PixelRatio, Pressable, StyleSheet, View } from 'react-native';
+import { PixelRatio, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import StatusPill from './StatusPill';
-import SwipeToDeleteRow from './SwipeToDeleteRow';
+// Pressable comes from the wrapper, not react-native — see its export.
+import SwipeToDeleteRow, { Pressable } from './SwipeToDeleteRow';
 import { Icon, Text } from './ui';
 import { getMarketStatus, getNextOpenDate, parseMarketName } from '../lib/core/market-logic';
 import { formatDate } from '../lib/date';
