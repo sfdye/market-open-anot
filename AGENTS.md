@@ -66,6 +66,7 @@ iOS silently keeps only the ~64 soonest pending requests, so `rescheduleAll` cap
 - `useThemedStyles(factory)` memoises on the factory, so **declare the factory at module scope** — one created per render rebuilds every StyleSheet on every render.
 - Rows stack instead of truncating past `REFLOW_FONT_SCALE` (1.4); follow that for any new name-plus-pill layout.
 - Anything tappable inside a gesture takes `Pressable` from the gesture wrapper — `SwipeToDeleteRow` re-exports it — never from `react-native`, whose press survives a fast swipe and fires as the row opens.
+- Back-button labelling lives on the root `<Stack>` in `app/_layout.tsx`: `headerBackTitle` names the label because the screen below has no title, and `headerBackButtonMenuEnabled: false` is what stops iOS shrinking that label to a bare chevron behind a long title. `screenOptions` do not reach a nested navigator, so a new `Stack` that pushes a screen has to repeat both.
 - One `ThemeProvider` at the root themes the native chrome — headers, large titles, search bar, tab bar. react-navigation is vendored inside expo-router 57, so import from `expo-router`; there is no `@react-navigation/*` package in the tree.
 
 ## i18n
