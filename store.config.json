@@ -1,0 +1,33 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "copyright": "2026 Liuyang Wan",
+    "categories": ["UTILITIES", "FOOD_AND_DRINK"],
+    "release": {
+      "automaticRelease": false,
+      "phasedRelease": false
+    },
+    "info": {
+      "en-US": {
+        "title": "Market Open Anot?",
+        "subtitle": "Wet market & hawker closures",
+        "promoText": "Monday rest days, quarterly spring cleaning and every other NEA closure, for all 123 wet markets and hawker centres in Singapore.",
+        "description": "Market Open Anot? tells you at a glance whether your wet market or hawker centre is open today.\n\nSingapore's wet markets close every Monday, on top of quarterly spring cleaning and the occasional maintenance shutdown. NEA publishes the schedule, but checking it means digging through a dataset. This app answers the question in one tap.\n\nWHAT YOU GET\n\n• Open or closed today, for just the markets you follow\n• All 123 NEA-managed wet markets and hawker centres\n• Monday rest days, quarterly spring cleaning and other closures\n• The next date each market reopens, plus a list of upcoming closures\n• A map of every market, and distance-sorted search if you share your location\n• Reminders the evening before and the morning of a closure\n• English and Chinese\n• Works offline once the schedule has been cached\n\nBUILT FOR A QUICK LOOK\n\nLarge, legible type at every Dynamic Type size, high contrast, and light and dark appearance. Nothing to scroll before you get your answer.\n\nNO ACCOUNT, NO TRACKING\n\nThere is no account to create and no server of ours to talk to. The app reads NEA's public closure dataset directly and works everything out on your device. If you share your location it is used only to sort markets by distance, and it never leaves your phone. Reminders are scheduled locally.\n\nData source: \"Dates of Hawker Centre Closure\" from the National Environment Agency, via data.gov.sg. This app is not affiliated with or endorsed by NEA.",
+        "keywords": [
+          "pasar",
+          "NEA",
+          "groceries",
+          "spring cleaning",
+          "rest day",
+          "singapore",
+          "hawker stall",
+          "opening hours",
+          "shopping"
+        ],
+        "marketingUrl": "https://github.com/sfdye/market-open-anot",
+        "supportUrl": "https://github.com/sfdye/market-open-anot/issues",
+        "privacyPolicyUrl": "https://github.com/sfdye/market-open-anot/blob/main/PRIVACY.md"
+      }
+    }
+  }
+}

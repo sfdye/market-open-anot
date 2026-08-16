@@ -84,6 +84,25 @@ EAS builds from committed git state, not the working tree, so commit before buil
 
 TestFlight needs a paid Apple Developer account; the certificate a local `expo run:ios` uses is development-only and expires. EAS stores signing credentials on its servers rather than on disk, so none of it belongs in this repo — and because the repo is public, leave `appleId` out of `eas.json` and let `eas submit` prompt, or pass `EXPO_APPLE_ID`.
 
+## App Store listing
+
+The listing text lives in `store.config.json` and goes up with `eas metadata:push`, which validates locally before it talks to App Store Connect, so a bad field costs a re-run rather than a rejected review. It carries the description, keywords, categories, age rating and release strategy, and — present in the CLI's schema but missing from Expo's published docs — screenshots, as paths keyed by display type under `info.<locale>.screenshots`. Pricing and the App Privacy questionnaire are not in the schema and have to be filled in by hand. EAS Metadata is Apple-only; the Play listing is manual.
+
+The App Review contact block is deliberately not in the config. Apple wants a name, email and phone that only reviewers ever see, and none of that belongs in a public repo, so it is set once by hand in App Store Connect instead — a push with no `review` block logs `Skipped store review details, not configured` and leaves the dashboard untouched. What to paste into App Review Information → Notes, since it is worth having and easy to forget:
+
+```
+No account or sign-in is required. On first launch, tap Add markets and pick one or
+more of the 123 NEA wet markets and hawker centres; the Today tab then shows whether
+each one is open. Location access is optional and only sorts the list by distance.
+All markets are in Singapore, so the map opens over Singapore regardless of where the
+device is. Closure dates come from Singapore NEA's public dataset on data.gov.sg, so
+the first launch needs network access.
+```
+
+`eas metadata:pull` regenerates the config from whatever the store currently holds, so run it first if the listing was edited in the dashboard — otherwise the next push overwrites those edits. Note that it pulls the review block too, phone number included: delete it again before committing. A version must already exist in App Store Connect for a push to attach to, which means the first push comes after the first `eas submit`.
+
+`PRIVACY.md` is the privacy policy Apple requires a URL for; `store.config.json` points at its rendered copy on GitHub, so moving or renaming it breaks the listing.
+
 ## History
 
 This started as a plain HTML/CSS/TypeScript PWA at openanot.com, with a Cloudflare Worker for web push. The native app replaced it: reminders are scheduled on-device, so there is nothing left to host. The web app, its service worker and the Worker were removed — `git log` has them if you want to look.
