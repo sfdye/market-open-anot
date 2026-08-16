@@ -33,7 +33,9 @@ export default function RootLayout() {
         <ThemeProvider value={navigationTheme(theme)}>
           <SplashGate />
           <StatusBar style="auto" />
-          <Stack>
+          {/* The screen under every pushed route is `(tabs)`, which has no header and so no
+              title — without this iOS would label the back button with the route name, "(tabs)". */}
+          <Stack screenOptions={{ headerBackTitle: t('back') }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             {/* Detail and the add modal sit above the tabs, so a notification tap, the map
                 callout and the Today list can all reach them the same way. */}
