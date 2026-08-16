@@ -57,11 +57,13 @@ npm run android
 npm start         # Metro alone, once the app is already installed
 ```
 
+Those install a separate app called "Market Dev": `app.config.ts` gives the dev build its own name and bundle identifier when `APP_VARIANT=development` is set, which the scripts above do, so it sits alongside a TestFlight build instead of replacing it. Build it once and leave it there — a JS change only needs `npm start` and a reload, and only a change to `app.json`, a native dependency or a config plugin needs another build. With no Metro running the dev app has nothing to load, because a debug build fetches its JS at launch rather than embedding it.
+
 Expo Go cannot run this app. `@maplibre/maplibre-react-native` is a third-party native module and is not compiled into Expo Go, so the map fails there no matter which Expo Go version is installed — the error is usually a misleading "download the latest version of Expo Go". Use a dev build, which the commands above produce. A local iOS build also needs CocoaPods once (`brew install cocoapods`) and a device on an iOS version Xcode supports.
 
 ## Native project
 
-`ios/` and `android/` are generated from `app.json` and gitignored, so nothing in them is a source of truth — edit `app.json`, never the native folders. `npm run ios` and EAS both regenerate them, so there is no prebuild step to run by hand.
+`ios/` and `android/` are generated from `app.json` (through `app.config.ts`) and gitignored, so nothing in them is a source of truth — edit `app.json`, never the native folders. `npm run ios` and EAS both regenerate them, so there is no prebuild step to run by hand.
 
 Install native dependencies with `npx expo install expo-foo` rather than npm, so the version matches the SDK.
 
@@ -74,7 +76,7 @@ eas build --profile production -p android             # .aab for Play
 eas build:list                                        # recent builds and their status
 ```
 
-`eas submit -p ios --latest` submits a build that was made without `--auto-submit`. `eas.json` also carries an `apk` profile for a standalone Android `.apk` and a `development` profile for installing a dev client over the air, neither of which a release needs.
+`production` is the TestFlight profile too — TestFlight and the App Store take the same binary. `eas submit -p ios --latest` submits a build that was made without `--auto-submit`. `eas.json` also carries an `apk` profile for a standalone Android `.apk` and a `development` profile for installing a dev client over the air, neither of which a release needs.
 
 EAS builds from committed git state, not the working tree, so commit before building — uncommitted files are silently absent in the cloud. That also means the gitignored `ios/` is never uploaded and EAS prebuilds from `app.json` instead, which is what you want.
 

@@ -22,6 +22,16 @@ Those two are the whole of CI (`.github/workflows/test.yml`); there is no lint s
 - New logic worth unit-testing belongs in `lib/core/`; anything touching a device API cannot go there.
 - Do not add an `include` entry to `tsconfig.json` — `expo start` rewrites that file, comments and all, when `include` names something it did not put there.
 
+## Builds
+
+Two profiles, two variants, and both numbers are deliberate:
+
+- `app.json` is the base config and the only place plugin config belongs. `app.config.ts` layers the dev variant over it (`.dev` ids, "Market Dev") when `APP_VARIANT=development`, which the `npm run` scripts and the EAS `development` profile set — so a release build is the one that sets nothing. Keep `slug` and `extra.eas.projectId` out of the override.
+- `production` is the TestFlight profile; TestFlight and the App Store take the same binary. Do not add a `testflight` profile, and do not add the `preview` variant from Expo's tutorial — TestFlight internal testing and the existing `apk` profile already cover what it would do.
+- Branch the config on `APP_VARIANT`, never on `EAS_BUILD_PROFILE`: EAS sets that one itself but a local `expo run:ios` does not, so the local build would silently take the production branch and install over the release app.
+- A Debug build embeds no JS — the generated bundling phase exports `SKIP_BUNDLING=1` for it — so it fetches from Metro at launch and is a dead app without one. `--configuration` (passed through to `xcodebuild`, Debug by default) is what changes that, orthogonally to the variant: `APP_VARIANT=development npx expo run:ios --configuration Release` is a standalone dev app, no EAS and no new profile, replacing the Debug install until `npm run ios` puts it back. On EAS the same axis is `ios.buildConfiguration`, which outranks `developmentClient: true`.
+- Judge performance only on Release: Debug is `-O0` with an unoptimized bundle, so a list that stutters there may be fine shipped.
+
 ## State: an external store, not context
 
 `lib/store/` is a hand-rolled external store read through `useSyncExternalStore`. Import from the barrel `lib/store`, which re-exports state, actions and hooks.
