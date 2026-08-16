@@ -52,45 +52,29 @@ The screens are not unit-tested; verifying them means a device build. Notificati
 
 ```sh
 npm install
-npx expo start                  # Metro, then open the app on a device
-npx expo start --clear          # same, ignoring the Metro cache
-npm run ios                     # expo run:ios: build and install, then start Metro
+npm run ios       # build, install on a device, then start Metro
 npm run android
-npx expo run:ios --device       # pick from connected devices interactively
-npx expo run:ios --no-bundler   # build and install only, leaving Metro alone
+npm start         # Metro alone, once the app is already installed
 ```
 
 Expo Go cannot run this app. `@maplibre/maplibre-react-native` is a third-party native module and is not compiled into Expo Go, so the map fails there no matter which Expo Go version is installed — the error is usually a misleading "download the latest version of Expo Go". Use a dev build, which the commands above produce. A local iOS build also needs CocoaPods once (`brew install cocoapods`) and a device on an iOS version Xcode supports.
 
 ## Native project
 
-`ios/` and `android/` are generated from `app.json` and gitignored, so nothing in them is a source of truth — edit `app.json` and regenerate.
+`ios/` and `android/` are generated from `app.json` and gitignored, so nothing in them is a source of truth — edit `app.json`, never the native folders. `npm run ios` and EAS both regenerate them, so there is no prebuild step to run by hand.
 
-```sh
-npx expo prebuild -p ios        # regenerate ios/ from scratch; pods install automatically
-npx expo prebuild --no-clean    # apply changes to the existing folders instead
-npx expo install expo-foo       # install at the version matching the SDK
-npx expo install --check        # list dependencies that do not match the SDK (--fix to correct)
-npx expo-doctor                 # check the project for known problems
-npx expo config --type public   # print the resolved config, plugins applied
-xcrun xctrace list devices      # device UDIDs, and whether a device is offline
-```
+Install native dependencies with `npx expo install expo-foo` rather than npm, so the version matches the SDK.
 
 ## Build and release
 
 ```sh
 npm i -g eas-cli
-eas whoami
-eas init                                              # one-time, writes extra.eas.projectId
-eas build --profile development -p ios                # dev client, installs over the air
 eas build --profile production -p ios --auto-submit   # .ipa straight to TestFlight
-eas submit -p ios --latest                            # or submit an existing build
 eas build --profile production -p android             # .aab for Play
-eas build --profile apk -p android                    # standalone universal .apk
 eas build:list                                        # recent builds and their status
-eas device:create                                     # register an iPhone for internal builds
-eas credentials                                       # inspect or rotate signing credentials
 ```
+
+`eas submit -p ios --latest` submits a build that was made without `--auto-submit`. `eas.json` also carries an `apk` profile for a standalone Android `.apk` and a `development` profile for installing a dev client over the air, neither of which a release needs.
 
 EAS builds from committed git state, not the working tree, so commit before building — uncommitted files are silently absent in the cloud. That also means the gitignored `ios/` is never uploaded and EAS prebuilds from `app.json` instead, which is what you want.
 
