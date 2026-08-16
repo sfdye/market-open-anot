@@ -20,7 +20,7 @@ const en = {
   weeklyRest: 'Most stalls closed',
   // Shared with the notification copy so the pill and the reminder cannot drift apart.
   cleaning: REASON_WORDS.en.cleaning.label,
-  otherWorks: REASON_WORDS.en.other.label,
+  otherWorks: REASON_WORDS.en.other_works.label,
   marketStalls: 'market stalls',
   foodStalls: 'food stalls',
   dataSourceLink: 'NEA',
@@ -96,7 +96,7 @@ const zh: Record<keyof typeof en, string> = {
   upcoming: '近期不营业',
   weeklyRest: '多数摊位休息',
   cleaning: REASON_WORDS.zh.cleaning.label,
-  otherWorks: REASON_WORDS.zh.other.label,
+  otherWorks: REASON_WORDS.zh.other_works.label,
   marketStalls: '个巴刹摊位',
   foodStalls: '个熟食摊位',
   dataSourceLink: '国家环境局 (NEA)',
@@ -167,8 +167,7 @@ export function translate(lang: Lang, key: StringKey, vars?: Record<string, stri
   let out: string = strings[lang][key] || en[key] || key;
   if (vars) {
     for (const name of Object.keys(vars)) {
-      // replaceAll, not replace: a string using the same placeholder twice would otherwise
-      // substitute the first and leave the second reading literally "{n}".
+      // replaceAll so a string may use the same placeholder twice.
       out = out.replaceAll(`{${name}}`, String(vars[name]));
     }
   }

@@ -1,6 +1,6 @@
 import * as BackgroundTask from 'expo-background-task';
 import * as TaskManager from 'expo-task-manager';
-import { deviceLang } from './device-lang';
+import { resolveLang } from './lang';
 import { fetchMarketsFromAPI } from './markets';
 import { isPermissionGranted, rescheduleAll } from './notifications';
 import * as storage from './storage';
@@ -16,15 +16,16 @@ TaskManager.defineTask(TASK_NAME, async () => {
       return BackgroundTask.BackgroundTaskResult.Success;
     }
 
-    const [favorites, lang] = await Promise.all([storage.loadFavorites(), storage.loadLang()]);
+    const [favorites, langPref] = await Promise.all([
+      storage.loadFavorites(),
+      storage.loadLangPref(),
+    ]);
     if (favorites.length === 0) return BackgroundTask.BackgroundTaskResult.Success;
 
     const markets = (await fetchMarketsFromAPI()) ?? (await storage.loadCachedMarkets());
     if (!markets) return BackgroundTask.BackgroundTaskResult.Failed;
 
-    // No stored language means the app is following the device, so ask the device — defaulting
-    // to English here sent English reminders to a phone running the app in Chinese.
-    await rescheduleAll(favorites, markets, lang ?? deviceLang());
+    await rescheduleAll(favorites, markets, resolveLang(langPref));
     return BackgroundTask.BackgroundTaskResult.Success;
   } catch {
     return BackgroundTask.BackgroundTaskResult.Failed;

@@ -1,6 +1,7 @@
 import { sgToday } from '../core/reminder-schedule';
 import type { Market } from '../core/market-logic';
 import { translate, type Lang, type StringKey } from '../i18n';
+import { resolveLang, type LangPref } from '../lang';
 
 export type Translate = (key: StringKey, vars?: Record<string, string | number>) => string;
 
@@ -9,13 +10,10 @@ export interface State {
   ready: boolean;
   markets: Market[];
   favorites: string[];
-  /** The language in effect, whether the user picked it or the device did. */
+  /** What the user chose. `'system'` means the device decides, and keeps deciding. */
+  langPref: LangPref;
+  /** Derived from `langPref`: the language actually in effect. */
   lang: Lang;
-  /**
-   * The user chose `lang` explicitly, so the device is no longer followed. False means Settings
-   * shows the checkmark on "System default" and a phone-language change still moves the app.
-   */
-  langPinned: boolean;
   /** Bound to `lang` so its identity is stable — components memoise on it. */
   t: Translate;
   /** Today in Singapore. Advances on foreground and at SGT midnight. */
@@ -39,8 +37,8 @@ let state: State = {
   ready: false,
   markets: [],
   favorites: [],
+  langPref: 'system',
   lang: 'en',
-  langPinned: false,
   t: translators.en,
   today: sgToday(),
   remindersEnabled: false,
@@ -64,11 +62,13 @@ export function subscribe(listener: () => void): () => void {
   };
 }
 
-export function setState(patch: Partial<State>): void {
-  // `t` is derived, never passed in: keeping that here makes it impossible for a caller to
-  // change the language and leave the translator behind.
-  state = patch.lang && patch.lang !== state.lang
-    ? { ...state, ...patch, t: translators[patch.lang] }
-    : { ...state, ...patch };
+/**
+ * `lang` and `t` are derived here and are not in the patch type, so no caller can change the
+ * preference and leave the language — or the translator — behind. Passing `langPref` re-resolves
+ * even when it has not changed, which is how a foreground picks up a new device language.
+ */
+export function setState(patch: Partial<Omit<State, 'lang' | 't'>>): void {
+  const lang = patch.langPref ? resolveLang(patch.langPref) : state.lang;
+  state = { ...state, ...patch, lang, t: lang === state.lang ? state.t : translators[lang] };
   for (const listener of listeners) listener();
 }

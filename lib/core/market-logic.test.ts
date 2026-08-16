@@ -8,12 +8,29 @@ import {
   getNextOpenDate,
   parseMarketName,
   normalizeMarkets,
+  isLang,
+  LANGS,
 } from './market-logic.ts';
 import type { MarketStatus } from './market-logic.ts';
 
 /** `reason` and `remarks` live on only some variants of the status union. */
 const reasonOf = (status: MarketStatus) => ('reason' in status ? status.reason : undefined);
 const remarksOf = (status: MarketStatus) => ('remarks' in status ? status.remarks : undefined);
+
+describe('isLang', () => {
+  test('accepts every supported language', () => {
+    for (const lang of LANGS) assert.equal(isLang(lang), true);
+  });
+
+  test('rejects an unsupported code, a region tag and a non-string', () => {
+    // 'zh-Hans' matters: getLocales() reports a bare languageCode, but a stored value or a
+    // future caller could hand over the full tag, and treating it as unsupported is correct
+    // here — mapping variants to a base language is deviceLang's job, not this predicate's.
+    for (const value of ['ms', 'ta', 'zh-Hans', '', 'EN', null, undefined, 0, {}]) {
+      assert.equal(isLang(value), false);
+    }
+  });
+});
 
 describe('parseDateDMY', () => {
   test('parses D/M/YYYY correctly', () => {

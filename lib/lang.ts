@@ -1,5 +1,11 @@
 import { getLocales } from 'expo-localization';
-import type { Lang } from './i18n';
+import { isLang, type Lang } from './core/market-logic';
+
+/**
+ * What the user chose, which is not the same as the language in effect. `'system'` means they
+ * made no choice and the device keeps deciding — including when they change it later.
+ */
+export type LangPref = Lang | 'system';
 
 /**
  * The device's preferred language: the first *supported* entry in its ordered preference list.
@@ -13,12 +19,20 @@ import type { Lang } from './i18n';
 export function deviceLang(): Lang {
   try {
     for (const locale of getLocales()) {
-      if (locale.languageCode === 'zh') return 'zh';
-      if (locale.languageCode === 'en') return 'en';
+      if (isLang(locale.languageCode)) return locale.languageCode;
     }
   } catch {
     // The background task calls this from a headless launch, where a failure would be invisible
     // and would cost that day's reminder top-up. English is the safer of two bad answers.
   }
   return 'en';
+}
+
+/**
+ * The single place a preference becomes a language. Every reader used to do this itself, and the
+ * one that got it wrong — `?? 'en'` in the background task — sent English reminders to phones
+ * running the app in Chinese.
+ */
+export function resolveLang(pref: LangPref): Lang {
+  return pref === 'system' ? deviceLang() : pref;
 }

@@ -123,7 +123,7 @@ export function notificationCopy(
 ): { title: string; body: string } {
   const names = group.names.join(', ');
   const cleaningOnly = group.reasons.length === 1 && group.reasons[0] === 'cleaning';
-  const why = REASON_WORDS[lang][cleaningOnly ? 'cleaning' : 'other'].phrase;
+  const why = REASON_WORDS[lang][cleaningOnly ? 'cleaning' : 'other_works'].phrase;
 
   if (lang === 'zh') {
     return {

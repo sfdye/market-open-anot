@@ -14,7 +14,7 @@ export {
   useMarkets,
   useFavorites,
   useLang,
-  useLangPinned,
+  useLangPref,
   useT,
   useToday,
   useRemindersEnabled,

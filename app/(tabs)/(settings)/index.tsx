@@ -12,7 +12,7 @@ import {
   useFavorites,
   useFetchedAt,
   useLang,
-  useLangPinned,
+  useLangPref,
   useMarkets,
   useRefreshing,
   useStale,
@@ -25,7 +25,7 @@ export default function SettingsScreen() {
   const theme = useTheme();
   const t = useT();
   const lang = useLang();
-  const langPinned = useLangPinned();
+  const langPref = useLangPref();
   const favorites = useFavorites();
   const markets = useMarkets();
   const fetchedAt = useFetchedAt();
@@ -53,17 +53,17 @@ export default function SettingsScreen() {
       <SettingsSection title={t('language')}>
         <Row
           label={t('langSystem')}
-          accessory={!langPinned ? check : undefined}
+          accessory={langPref === 'system' ? check : undefined}
           onPress={() => setLang('system')}
         />
         <Row
           label="English"
-          accessory={langPinned && lang === 'en' ? check : undefined}
+          accessory={langPref === 'en' ? check : undefined}
           onPress={() => setLang('en')}
         />
         <Row
           label="中文"
-          accessory={langPinned && lang === 'zh' ? check : undefined}
+          accessory={langPref === 'zh' ? check : undefined}
           onPress={() => setLang('zh')}
           last
         />
