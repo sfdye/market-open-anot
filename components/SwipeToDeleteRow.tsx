@@ -1,12 +1,18 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { Pressable } from 'react-native-gesture-handler';
 import ReanimatedSwipeable, {
   type SwipeableMethods,
 } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Animated, { useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
 import { Icon, Text } from './ui';
 import { space, useTheme } from '../lib/theme';
+
+// Re-exported so a tappable child reaches it through the wrapper that requires it: react-native's
+// Pressable runs in its own touch system and survives a fast swipe, firing onPress as the row opens.
+// Only a handler in the same gesture arena is cancelled when the pan takes over.
+export { Pressable } from 'react-native-gesture-handler';
 
 const ACTION_WIDTH = 92;
 

@@ -77,6 +77,7 @@ const en = {
   goHome: 'Back to Today',
   myLocation: 'My location',
   close: 'Close',
+  back: 'Back',
 };
 
 const zh: Record<keyof typeof en, string> = {
@@ -151,6 +152,7 @@ const zh: Record<keyof typeof en, string> = {
   goHome: '返回今天',
   myLocation: '我的位置',
   close: '关闭',
+  back: '返回',
 };
 
 export type StringKey = keyof typeof en;
