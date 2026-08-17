@@ -4,7 +4,7 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
  * `app.json` stays the base and the only place plugin config lives; this file exists solely to give
  * the dev build its own identity.
  *
- * A dev client sharing `com.sfdye.pasaropenanot` overwrites the TestFlight app — same bundle
+ * A dev client sharing `com.sfdye.openanot` overwrites the TestFlight app — same bundle
  * identifier, same slot on the device — so installing one used to mean losing the other. Under
  * `APP_VARIANT=development` the ids, name and scheme all change, and the two apps sit side by side.
  *
@@ -18,9 +18,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   return {
     ...config,
-    name: 'Pasar Dev',
+    name: 'Anot? Dev',
     // Dropped so the dev build keeps that name on a Chinese phone: `app.json`'s localised label
-    // would otherwise make both apps read 巴刹开吗？ on the home screen.
+    // would otherwise make both apps read 今天开吗？ on the home screen.
     locales: undefined,
     // Derived, so it cannot drift from `app.json`. A scheme of its own matters: sharing the release
     // one would leave iOS to pick whichever app it liked for a deep link.

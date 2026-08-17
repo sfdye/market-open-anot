@@ -5,7 +5,7 @@ import type { Lang } from './core/market-logic';
 import { REASON_WORDS } from './core/reason-words';
 
 const en = {
-  appTitle: 'Pasar Open Anot?',
+  appTitle: 'Open Anot?',
   // Every status is scoped to the day on purpose: NEA publishes whole-day closures, not hours,
   // so a bare "OPEN" would promise something the data cannot say at 2am.
   openToday: 'OPEN TODAY',
@@ -84,7 +84,7 @@ const en = {
 };
 
 const zh: Record<keyof typeof en, string> = {
-  appTitle: '巴刹今天开吗？',
+  appTitle: '今天开吗？',
   openToday: '今天开门',
   closedToday: '今天关门',
   warningToday: '多数摊位休息',

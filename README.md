@@ -1,6 +1,6 @@
-# Pasar Open Anot?
+# Open Anot?
 
-Check if your Singapore wet market / hawker centre is open or closed today. *Pasar* is Malay for market, and the word the app's Chinese side already used — 巴刹. iOS and Android, built with Expo.
+Check if your Singapore hawker centre or wet market is open or closed today. iOS and Android, built with Expo.
 
 ## Why
 
@@ -57,7 +57,7 @@ npm run android
 npm start         # Metro alone, once the app is already installed
 ```
 
-Those install a separate app called "Pasar Dev": `app.config.ts` gives the dev build its own name and bundle identifier when `APP_VARIANT=development` is set, which the scripts above do, so it sits alongside a TestFlight build instead of replacing it. Build it once and leave it there — a JS change only needs `npm start` and a reload, and only a change to `app.json`, a native dependency or a config plugin needs another build. With no Metro running the dev app has nothing to load, because a debug build fetches its JS at launch rather than embedding it.
+Those install a separate app called "Anot? Dev": `app.config.ts` gives the dev build its own name and bundle identifier when `APP_VARIANT=development` is set, which the scripts above do, so it sits alongside a TestFlight build instead of replacing it. Build it once and leave it there — a JS change only needs `npm start` and a reload, and only a change to `app.json`, a native dependency or a config plugin needs another build. With no Metro running the dev app has nothing to load, because a debug build fetches its JS at launch rather than embedding it.
 
 Expo Go cannot run this app. `@maplibre/maplibre-react-native` is a third-party native module and is not compiled into Expo Go, so the map fails there no matter which Expo Go version is installed — the error is usually a misleading "download the latest version of Expo Go". Use a dev build, which the commands above produce. A local iOS build also needs CocoaPods once (`brew install cocoapods`) and a device on an iOS version Xcode supports.
 
