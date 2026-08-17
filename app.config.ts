@@ -18,7 +18,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   return {
     ...config,
-    name: 'Anot? Dev',
+    // Truncates to "Open Anot? D…" on the home screen, which still reads as distinct from the
+    // release app; every other surface that shows an app name has room for it in full.
+    name: 'Open Anot? Dev',
     // Dropped so the dev build keeps that name on a Chinese phone: `app.json`'s localised label
     // would otherwise make both apps read 今天开吗？ on the home screen.
     locales: undefined,
