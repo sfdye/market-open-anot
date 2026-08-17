@@ -2,15 +2,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isLang, normalizeMarkets, type Market } from './core/market-logic';
 import type { LangPref } from './lang';
 
-// The `moa_` prefix predates the native app; the keys are kept so an install that started
-// life as the web app's home-screen shortcut still finds its favourites.
+// Namespaced `poa_`. Nothing migrates the `moa_` keys these were renamed from at the rebrand: the
+// bundle identifier changed with them, so an install holding the old keys is a different app with
+// a container this one cannot see.
 const KEYS = {
-  favorites: 'moa_favorites',
-  data: 'moa_data',
-  fetched: 'moa_fetched',
-  lang: 'moa_lang',
-  reminders: 'moa_reminders_enabled',
-  reminderCardDismissed: 'moa_reminder_card_dismissed',
+  favorites: 'poa_favorites',
+  data: 'poa_data',
+  fetched: 'poa_fetched',
+  lang: 'poa_lang',
+  reminders: 'poa_reminders_enabled',
+  reminderCardDismissed: 'poa_reminder_card_dismissed',
 } as const;
 
 async function readJSON<T>(key: string, fallback: T): Promise<T> {
