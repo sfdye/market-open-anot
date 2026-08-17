@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Market Open Anot?**
+**Open Anot?**
 Last updated: 16 August 2026
 
 ## Summary
@@ -43,4 +43,4 @@ Any change to this policy will be published in this file, and its history is vis
 
 ## Contact
 
-Questions or requests: open an issue at <https://github.com/sfdye/market-open-anot/issues> or email tsfdye@gmail.com.
+Questions or requests: open an issue at <https://github.com/sfdye/open-anot/issues> or email tsfdye@gmail.com.

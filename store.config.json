@@ -8,25 +8,59 @@
       "phasedRelease": false
     },
     "info": {
-      "en-US": {
-        "title": "Market Open Anot?",
-        "subtitle": "Wet market & hawker closures",
-        "promoText": "Monday rest days, quarterly spring cleaning and every other NEA closure, for all 123 wet markets and hawker centres in Singapore.",
-        "description": "Market Open Anot? tells you at a glance whether your wet market or hawker centre is open today.\n\nSingapore's wet markets close every Monday, on top of quarterly spring cleaning and the occasional maintenance shutdown. NEA publishes the schedule, but checking it means digging through a dataset. This app answers the question in one tap.\n\nWHAT YOU GET\n\n• Open or closed today, for just the markets you follow\n• All 123 NEA-managed wet markets and hawker centres\n• Monday rest days, quarterly spring cleaning and other closures\n• The next date each market reopens, plus a list of upcoming closures\n• A map of every market, and distance-sorted search if you share your location\n• Reminders the evening before and the morning of a closure\n• English and Chinese\n• Works offline once the schedule has been cached\n\nBUILT FOR A QUICK LOOK\n\nLarge, legible type at every Dynamic Type size, high contrast, and light and dark appearance. Nothing to scroll before you get your answer.\n\nNO ACCOUNT, NO TRACKING\n\nThere is no account to create and no server of ours to talk to. The app reads NEA's public closure dataset directly and works everything out on your device. If you share your location it is used only to sort markets by distance, and it never leaves your phone. Reminders are scheduled locally.\n\nData source: \"Dates of Hawker Centre Closure\" from the National Environment Agency, via data.gov.sg. This app is not affiliated with or endorsed by NEA.",
+      "en-GB": {
+        "title": "Open Anot? Hawker & Market",
+        "subtitle": "Get reminders before closures",
+        "promoText": "Follow the hawker centres and wet markets you use and get a reminder the evening before and the morning of every closure. All 123 NEA sites, no account.",
+        "description": "Open Anot? tells you at a glance whether your hawker centre or wet market is open today.\n\nSingapore's hawker centres and wet markets shut for quarterly spring cleaning, and most stalls rest on Mondays. NEA publishes the schedule, but checking it means digging through a dataset. This app answers the question in one tap.\n\nWHAT YOU GET\n\n• Open or closed today, for just the places you follow\n• Reminders the evening before and the morning of a closure\n• All 123 NEA-managed hawker centres and wet markets\n• Quarterly spring cleaning, Monday rest days and other maintenance closures\n• The next date each one reopens, plus a list of upcoming closures\n• A map of every location, and distance-sorted search if you share your location\n• English and Chinese\n• Works offline once the schedule has been cached\n\nBUILT FOR A QUICK LOOK\n\nLarge, legible type at every Dynamic Type size, high contrast, and light and dark appearance. Nothing to scroll before you get your answer.\n\nNO ACCOUNT, NO TRACKING\n\nThere is no account to create and no server of ours to talk to. The app reads NEA's public closure dataset directly and works everything out on your device. If you share your location it is used only to sort by distance, and it never leaves your phone. Reminders are scheduled locally.\n\nData source: \"Dates of Hawker Centre Closure\" from the National Environment Agency, via data.gov.sg. This app is not affiliated with or endorsed by NEA.",
         "keywords": [
           "pasar",
-          "NEA",
-          "groceries",
-          "spring cleaning",
-          "rest day",
+          "wet",
+          "food",
+          "centre",
+          "kopitiam",
+          "makan",
+          "nea",
+          "stall",
+          "spring",
+          "cleaning",
+          "rest",
+          "day",
+          "schedule",
           "singapore",
-          "hawker stall",
-          "opening hours",
-          "shopping"
+          "holiday"
         ],
-        "marketingUrl": "https://github.com/sfdye/market-open-anot",
-        "supportUrl": "https://github.com/sfdye/market-open-anot/issues",
-        "privacyPolicyUrl": "https://github.com/sfdye/market-open-anot/blob/main/PRIVACY.md"
+        "marketingUrl": "https://github.com/sfdye/open-anot",
+        "supportUrl": "https://github.com/sfdye/open-anot/issues",
+        "privacyPolicyUrl": "https://github.com/sfdye/open-anot/blob/main/PRIVACY.md"
+      },
+      "zh-Hans": {
+        "title": "今天开吗？巴刹与小贩中心",
+        "subtitle": "休市日期提前提醒",
+        "promoText": "关注你常去的小贩中心与巴刹，关闭前一天傍晚和当天早上各提醒一次。收录全国 123 个环境局管辖的地点，无需注册。",
+        "description": "「今天开吗？」让你一眼看出常去的小贩中心或巴刹今天是否营业。\n\n新加坡的小贩中心与巴刹每季都有大扫除，星期一多数摊位也休息，偶尔还有维修关闭。这些日期环境局都已公布，但要查就得翻数据表。这个应用一按就有答案。\n\n功能\n\n• 只看你关注的地点，今天开或关一目了然\n• 关闭前一天傍晚和当天早上各提醒一次\n• 收录全国 123 个环境局管辖的小贩中心与巴刹\n• 季度大扫除、星期一休息，以及其他维修关闭\n• 每个地点下次重开的日期，以及未来的关闭日一览\n• 全部地点的地图；开启定位后可按距离排序搜索\n• 中文与英文\n• 数据缓存后可离线使用\n\n看一眼就够\n\n支持所有动态字体大小，字大清楚、对比鲜明，浅色与深色模式都有。答案就在第一屏，不必滚动。\n\n不需注册，不做追踪\n\n没有账号，也没有我们自己的服务器。应用直接读取环境局公开的关闭日期数据，其余全在你的手机上算好。若你开启定位，位置仅用于按距离排序，绝不离开手机。提醒也是在本机排定的。\n\n数据来源：新加坡国家环境局「小贩中心关闭日期」，经 data.gov.sg 发布。本应用与环境局无关联，也未获其认可。",
+        "keywords": [
+          "熟食中心",
+          "菜市场",
+          "湿市场",
+          "咖啡店",
+          "摊位",
+          "关闭",
+          "休息日",
+          "假期",
+          "新加坡",
+          "美食",
+          "大扫除",
+          "清洗",
+          "季度",
+          "提醒",
+          "营业时间",
+          "环境局",
+          "买菜"
+        ],
+        "marketingUrl": "https://github.com/sfdye/open-anot",
+        "supportUrl": "https://github.com/sfdye/open-anot/issues",
+        "privacyPolicyUrl": "https://github.com/sfdye/open-anot/blob/main/PRIVACY.md"
       }
     }
   }

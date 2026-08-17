@@ -88,15 +88,19 @@ TestFlight needs a paid Apple Developer account; the certificate a local `expo r
 
 The listing text lives in `store.config.json` and goes up with `eas metadata:push`, which validates locally before it talks to App Store Connect, so a bad field costs a re-run rather than a rejected review. It carries the description, keywords, categories, age rating and release strategy, and — present in the CLI's schema but missing from Expo's published docs — screenshots, as paths keyed by display type under `info.<locale>.screenshots`. Pricing and the App Privacy questionnaire are not in the schema and have to be filled in by hand. EAS Metadata is Apple-only; the Play listing is manual.
 
+Two locales, `en-GB` and `zh-Hans`, matching the two the app itself ships. **The App Store Connect record has to be created with English (U.K.) as its primary language**, because the primary localisation is the one every storefront falls back to and `en-GB` is the only English block here — a record created as English (U.S.) would leave its primary localisation empty and take `en-GB` as a secondary. The spelling in the copy follows from that too (`centre`, not `center`).
+
+The store title is `Open Anot? Hawker & Market` while the app installs as `Open Anot?`. That divergence is deliberate and allowed — guideline 2.3.7 asks the two to be related, not identical — and it is what buys the taxonomy nouns a place in the indexed title without putting them on a home-screen label that has room for about twelve characters. Which is also why neither `hawker` nor `market` is a keyword: Apple indexes the title and subtitle already, so a keyword repeating either buys nothing.
+
 The App Review contact block is deliberately not in the config. Apple wants a name, email and phone that only reviewers ever see, and none of that belongs in a public repo, so it is set once by hand in App Store Connect instead — a push with no `review` block logs `Skipped store review details, not configured` and leaves the dashboard untouched. What to paste into App Review Information → Notes, since it is worth having and easy to forget:
 
 ```
 No account or sign-in is required. On first launch, tap Add markets and pick one or
-more of the 123 NEA wet markets and hawker centres; the Today tab then shows whether
+more of the 123 NEA hawker centres and wet markets; the Today tab then shows whether
 each one is open. Location access is optional and only sorts the list by distance.
-All markets are in Singapore, so the map opens over Singapore regardless of where the
-device is. Closure dates come from Singapore NEA's public dataset on data.gov.sg, so
-the first launch needs network access.
+Every location is in Singapore, so the map opens over Singapore regardless of where
+the device is. Closure dates come from Singapore NEA's public dataset on data.gov.sg,
+so the first launch needs network access.
 ```
 
 `eas metadata:pull` regenerates the config from whatever the store currently holds, so run it first if the listing was edited in the dashboard — otherwise the next push overwrites those edits. Note that it pulls the review block too, phone number included: delete it again before committing. A version must already exist in App Store Connect for a push to attach to, which means the first push comes after the first `eas submit`.
