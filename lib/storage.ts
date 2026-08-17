@@ -2,16 +2,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isLang, normalizeMarkets, type Market } from './core/market-logic';
 import type { LangPref } from './lang';
 
-// Namespaced `poa_`. Nothing migrates the `moa_` keys these were renamed from at the rebrand: the
-// bundle identifier changed with them, so an install holding the old keys is a different app with
-// a container this one cannot see.
+// Namespaced `oa_`. Nothing migrates the `moa_`/`poa_` keys these were renamed from across two
+// rebrands: the bundle identifier changed with them each time, so an install holding the old keys
+// is a different app with a container this one cannot see.
 const KEYS = {
-  favorites: 'poa_favorites',
-  data: 'poa_data',
-  fetched: 'poa_fetched',
-  lang: 'poa_lang',
-  reminders: 'poa_reminders_enabled',
-  reminderCardDismissed: 'poa_reminder_card_dismissed',
+  favorites: 'oa_favorites',
+  data: 'oa_data',
+  fetched: 'oa_fetched',
+  lang: 'oa_lang',
+  reminders: 'oa_reminders_enabled',
+  reminderCardDismissed: 'oa_reminder_card_dismissed',
 } as const;
 
 async function readJSON<T>(key: string, fallback: T): Promise<T> {

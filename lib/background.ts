@@ -5,7 +5,7 @@ import { fetchMarketsFromAPI } from './markets';
 import { isPermissionGranted, rescheduleAll } from './notifications';
 import * as storage from './storage';
 
-const TASK_NAME = 'poa-refresh-reminders';
+const TASK_NAME = 'oa-refresh-reminders';
 
 /** Once a day is plenty — closure dates are published months ahead. */
 const MINIMUM_INTERVAL_MINUTES = 24 * 60;

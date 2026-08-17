@@ -1,9 +1,9 @@
 {
   "expo": {
     "name": "Open Anot?",
-    "slug": "pasar-open-anot",
+    "slug": "open-anot",
     "version": "1.0.0",
-    "scheme": "pasaropenanot",
+    "scheme": "openanot",
     "orientation": "portrait",
     "platforms": [
       "ios",
@@ -20,14 +20,14 @@
       "zh-Hans": "./locales/zh-Hans.json"
     },
     "ios": {
-      "bundleIdentifier": "com.sfdye.pasaropenanot",
+      "bundleIdentifier": "com.sfdye.openanot",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.sfdye.pasaropenanot",
+      "package": "com.sfdye.openanot",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2e7d32"
@@ -70,7 +70,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "c5c4cdb8-e46b-4da2-a1de-ae32bbe5993d"
+        "projectId": "d5839351-432f-4eb1-980d-c5497d98f7dc"
       }
     },
     "owner": "sfdye"
