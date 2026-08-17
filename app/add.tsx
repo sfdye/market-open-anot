@@ -1,5 +1,5 @@
 import { useDeferredValue, useMemo, useState } from 'react';
-import { FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import PickerRow from '../components/PickerRow';
 import { EmptyState, Row, Segmented, Text } from '../components/ui';
@@ -64,7 +64,12 @@ export default function AddMarketsScreen() {
             headerIconColor: theme.colors.textMuted,
           },
           headerRight: () => (
-            <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button">
+            <Pressable
+              onPress={() => router.back()}
+              hitSlop={12}
+              accessibilityRole="button"
+              style={Platform.OS === 'ios' ? styles.done : undefined}
+            >
               <Text variant="bodyStrong" tone="accent">
                 {favorites.length > 0 ? t('doneCount', { n: favorites.length }) : t('done')}
               </Text>
@@ -122,4 +127,7 @@ export default function AddMarketsScreen() {
 const styles = StyleSheet.create({
   content: { paddingBottom: space.xxl },
   header: { gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.sm },
+  // iOS gives a custom right bar button no padding of its own, so "Done (3)" sits flush against
+  // the edge of the header; the Android toolbar already insets it.
+  done: { paddingHorizontal: space.sm, paddingVertical: space.xs },
 });
