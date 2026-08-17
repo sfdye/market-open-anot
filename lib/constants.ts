@@ -1,4 +1,4 @@
-export const REPO_URL = 'https://github.com/sfdye/market-open-anot';
+export const REPO_URL = 'https://github.com/sfdye/pasar-open-anot';
 export const AUTHOR_URL = 'https://github.com/sfdye';
 export const FEEDBACK_URL = 'mailto:t@sfdye.com';
 export const DATA_SOURCE_URL =

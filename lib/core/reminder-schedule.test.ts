@@ -229,7 +229,7 @@ describe('buildSchedule', () => {
 
   test('fires at 7pm the evening before and 6am the morning of, SGT', () => {
     const entries = buildSchedule(['A (Alpha)'], markets, 'en', now);
-    const feb5 = entries.filter((e) => e.identifier.startsWith('moa-2026-2-5-'));
+    const feb5 = entries.filter((e) => e.identifier.startsWith('poa-2026-2-5-'));
 
     assert.equal(feb5.length, 2);
     const eve = feb5.find((e) => e.identifier.endsWith('-eve'));

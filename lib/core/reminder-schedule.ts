@@ -169,7 +169,7 @@ export function buildSchedule(
       if (when.getTime() <= at.getTime()) continue;
       const copy = notificationCopy(group, isToday, lang);
       entries.push({
-        identifier: `moa-${civilKey(d)}-${slot}`,
+        identifier: `poa-${civilKey(d)}-${slot}`,
         title: copy.title,
         body: copy.body,
         at: when,

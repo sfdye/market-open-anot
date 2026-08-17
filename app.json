@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "Market Open Anot?",
-    "slug": "market-open-anot",
+    "name": "Open Anot?",
+    "slug": "pasar-open-anot",
     "version": "1.0.0",
-    "scheme": "marketopenanot",
+    "scheme": "pasaropenanot",
     "orientation": "portrait",
     "platforms": [
       "ios",
@@ -16,15 +16,18 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "locales": {
+      "zh-Hans": "./locales/zh-Hans.json"
+    },
     "ios": {
-      "bundleIdentifier": "com.sfdye.marketopenanot",
+      "bundleIdentifier": "com.sfdye.pasaropenanot",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.sfdye.marketopenanot",
+      "package": "com.sfdye.pasaropenanot",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2e7d32"
