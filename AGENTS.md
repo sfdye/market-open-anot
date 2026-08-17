@@ -60,7 +60,8 @@ iOS silently keeps only the ~64 soonest pending requests, so `rescheduleAll` cap
 
 ## UI conventions
 
-- `components/ui/` is the primitive layer (`Text`, `Button`, `Card`, `Row`, `Notice`, `Segmented`, `EmptyState`, `Icon`), imported from `components/ui`.
+- `components/ui/` is the primitive layer (`Text`, `Button`, `Card`, `Row`, `Notice`, `Segmented`, `EmptyState`, `Fab`, `Icon`), imported from `components/ui`.
+- `Fab` is the one primitive that places itself, and it places itself against the *tab bar*: mount it as the last child of a `flex: 1` container on a tab screen, and add `FAB_CLEARANCE` to the scrolling child's `contentContainerStyle` so the last row can be read clear of it. The tab bar is in the layout flow — `expo-router/js-tabs` positions it absolutely only while a keyboard hides it — so the screen box ends at its top edge and the bottom safe-area inset is already spent there. `useSafeAreaInsets` or `useBottomTabBarHeight` would double-count it, and a root-Stack screen outside `(tabs)` would float the button over the home indicator. `MarketMap`'s locate control is deliberately not this: squarer, on a surface fill, and placed by the animated wrapper it fades in with.
 - Use `Text` from `components/ui`, never `react-native`'s. Pick a `variant` from `typeScale` and a `tone`, not raw `fontSize`/`color`. **Never cap `maxFontSizeMultiplier` on body copy** — the audience is seniors and Dynamic Type must work at every size. Only text in a fixed-height native container passes a cap, and it comes from `fontCap`.
 - Colours and spacing come from `lib/theme` (`space`, `radius`, `HIT_SIZE`, `useTheme`). Dark mode is not a colour swap: `theme.shadow` becomes a hairline border, because a shadow is invisible against black.
 - `useThemedStyles(factory)` memoises on the factory, so **declare the factory at module scope** — one created per render rebuilds every StyleSheet on every render.

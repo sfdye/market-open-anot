@@ -161,13 +161,13 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
       </Map>
 
       {!selected && (
-        <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.fabWrap}>
+        <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.controlWrap}>
           <Pressable
             onPress={locate}
             accessibilityRole="button"
             accessibilityLabel={t('myLocation')}
             style={({ pressed }) => [
-              styles.fab,
+              styles.control,
               {
                 backgroundColor: theme.colors.surface,
                 borderColor: theme.colors.border,
@@ -194,8 +194,10 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
-  fabWrap: { position: 'absolute', right: space.md, bottom: space.md },
-  fab: {
+  // Not the ui/Fab: a map control, squarer and on a surface fill, and placed by the animated
+  // wrapper it fades in with rather than by itself.
+  controlWrap: { position: 'absolute', right: space.md, bottom: space.md },
+  control: {
     width: 48,
     height: 48,
     borderRadius: radius.card,

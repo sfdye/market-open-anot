@@ -3,7 +3,7 @@ import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import MarketRow from '../../../components/MarketRow';
 import ReminderPrompt from '../../../components/ReminderPrompt';
-import { EmptyState, Notice, Text } from '../../../components/ui';
+import { EmptyState, Fab, FAB_CLEARANCE, Notice, Text } from '../../../components/ui';
 import { formatDateLong } from '../../../lib/date';
 import { findMarket } from '../../../lib/markets';
 import {
@@ -50,57 +50,63 @@ export default function TodayScreen() {
   );
 
   return (
-    <FlatList
-      data={data}
-      keyExtractor={(name) => name}
-      renderItem={({ item }) => <MarketRow name={item} />}
-      // Required for the large title to collapse on scroll.
-      contentInsetAdjustmentBehavior="automatic"
-      initialNumToRender={8}
-      ItemSeparatorComponent={() => (
-        <View style={[styles.separator, { backgroundColor: theme.colors.borderLight }]} />
-      )}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={() => void refresh()}
-          tintColor={theme.colors.textMuted}
-        />
-      }
-      ListHeaderComponent={
-        <View style={styles.header}>
-          <Text variant="subhead" tone="muted">
-            {formatDateLong(today, lang)}
-          </Text>
-          {stale && <Notice>{t('offline')}</Notice>}
-          {reminders.showCard && (
-            <ReminderPrompt
-              busy={reminders.busy}
-              onEnable={() => void reminders.toggle()}
-              onDismiss={reminders.dismissCard}
-            />
-          )}
-        </View>
-      }
-      ListEmptyComponent={
-        ready ? (
-          <EmptyState icon="stall" title={t('noFavorites')} message={t('noFavoritesHint')} />
-        ) : null
-      }
-      // Adding lives on the header "+" alone, and attribution on Settings → About; a second Add
-      // button and a repeat of the footer only made the list end look like a web page.
-      ListFooterComponent={
-        data.length > 0 ? (
-          <Text variant="footnote" tone="faint" style={styles.hint}>
-            {t('swipeDelete')}
-          </Text>
-        ) : null
-      }
-    />
+    <View style={styles.screen}>
+      <FlatList
+        data={data}
+        keyExtractor={(name) => name}
+        renderItem={({ item }) => <MarketRow name={item} />}
+        // Required for the large title to collapse on scroll.
+        contentInsetAdjustmentBehavior="automatic"
+        initialNumToRender={8}
+        contentContainerStyle={styles.content}
+        ItemSeparatorComponent={() => (
+          <View style={[styles.separator, { backgroundColor: theme.colors.borderLight }]} />
+        )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => void refresh()}
+            tintColor={theme.colors.textMuted}
+          />
+        }
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Text variant="subhead" tone="muted">
+              {formatDateLong(today, lang)}
+            </Text>
+            {stale && <Notice>{t('offline')}</Notice>}
+            {reminders.showCard && (
+              <ReminderPrompt
+                busy={reminders.busy}
+                onEnable={() => void reminders.toggle()}
+                onDismiss={reminders.dismissCard}
+              />
+            )}
+          </View>
+        }
+        ListEmptyComponent={
+          ready ? (
+            <EmptyState icon="stall" title={t('noFavorites')} message={t('noFavoritesHint')} />
+          ) : null
+        }
+        // Adding lives on the Fab alone, and attribution on Settings → About; a second Add
+        // button and a repeat of the footer only made the list end look like a web page.
+        ListFooterComponent={
+          data.length > 0 ? (
+            <Text variant="footnote" tone="faint" style={styles.hint}>
+              {t('swipeDelete')}
+            </Text>
+          ) : null
+        }
+      />
+      <Fab icon="add" onPress={() => router.push('/add')} accessibilityLabel={t('addMarkets')} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: { flex: 1 },
+  content: { paddingBottom: FAB_CLEARANCE },
   header: { gap: space.md, padding: space.lg },
   // Inset to the left so it reads as a list, and drawn by hand rather than as a row border so a
   // swiped-open row does not carry it away.
