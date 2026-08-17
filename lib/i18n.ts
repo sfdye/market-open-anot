@@ -2,6 +2,7 @@
 // its node tests must not import anything from lib/.
 export type { Lang } from './core/market-logic';
 import type { Lang } from './core/market-logic';
+import { REASON_WORDS } from './core/reason-words';
 
 const en = {
   appTitle: 'Market Open Anot?',
@@ -17,8 +18,9 @@ const en = {
   nextClosure: 'Next closure:',
   upcoming: 'Upcoming Closures',
   weeklyRest: 'Most stalls closed',
-  cleaning: 'Cleaning',
-  otherWorks: 'Maintenance',
+  // Shared with the notification copy so the pill and the reminder cannot drift apart.
+  cleaning: REASON_WORDS.en.cleaning.label,
+  otherWorks: REASON_WORDS.en.other_works.label,
   marketStalls: 'market stalls',
   foodStalls: 'food stalls',
   dataSourceLink: 'NEA',
@@ -52,6 +54,7 @@ const en = {
   tabMap: 'Map',
   tabSettings: 'Settings',
   language: 'Language',
+  langSystem: 'System default',
   reminders: 'Reminders',
   reminderSchedule: 'A reminder at 7pm the day before, and at 6am on the day.',
   dataSection: 'Data',
@@ -92,8 +95,8 @@ const zh: Record<keyof typeof en, string> = {
   nextClosure: '下次关：',
   upcoming: '近期不营业',
   weeklyRest: '多数摊位休息',
-  cleaning: '清洁',
-  otherWorks: '维修',
+  cleaning: REASON_WORDS.zh.cleaning.label,
+  otherWorks: REASON_WORDS.zh.other_works.label,
   marketStalls: '个巴刹摊位',
   foodStalls: '个熟食摊位',
   dataSourceLink: '国家环境局 (NEA)',
@@ -127,6 +130,7 @@ const zh: Record<keyof typeof en, string> = {
   tabMap: '地图',
   tabSettings: '设置',
   language: '语言',
+  langSystem: '系统默认',
   reminders: '提醒',
   reminderSchedule: '休市前一天晚上7点，以及当天早上6点各提醒一次。',
   dataSection: '数据',
@@ -163,7 +167,8 @@ export function translate(lang: Lang, key: StringKey, vars?: Record<string, stri
   let out: string = strings[lang][key] || en[key] || key;
   if (vars) {
     for (const name of Object.keys(vars)) {
-      out = out.replace(`{${name}}`, String(vars[name]));
+      // replaceAll so a string may use the same placeholder twice.
+      out = out.replaceAll(`{${name}}`, String(vars[name]));
     }
   }
   return out;

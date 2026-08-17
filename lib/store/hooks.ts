@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import type { Market } from '../core/market-logic';
 import type { Lang } from '../i18n';
+import type { LangPref } from '../lang';
 import { getState, subscribe, type State, type Translate } from './state';
 
 // Every hook returns either a primitive or a reference that only changes when that slice does,
@@ -24,6 +25,11 @@ export function useFavorites(): string[] {
 
 export function useLang(): Lang {
   return useSelector((s) => s.lang);
+}
+
+/** The *choice*, for Settings. Symmetric with `setLang`, so a row compares one value. */
+export function useLangPref(): LangPref {
+  return useSelector((s) => s.langPref);
 }
 
 export function useT(): Translate {

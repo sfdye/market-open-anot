@@ -1,5 +1,6 @@
 import * as BackgroundTask from 'expo-background-task';
 import * as TaskManager from 'expo-task-manager';
+import { resolveLang } from './lang';
 import { fetchMarketsFromAPI } from './markets';
 import { isPermissionGranted, rescheduleAll } from './notifications';
 import * as storage from './storage';
@@ -15,13 +16,16 @@ TaskManager.defineTask(TASK_NAME, async () => {
       return BackgroundTask.BackgroundTaskResult.Success;
     }
 
-    const [favorites, lang] = await Promise.all([storage.loadFavorites(), storage.loadLang()]);
+    const [favorites, langPref] = await Promise.all([
+      storage.loadFavorites(),
+      storage.loadLangPref(),
+    ]);
     if (favorites.length === 0) return BackgroundTask.BackgroundTaskResult.Success;
 
     const markets = (await fetchMarketsFromAPI()) ?? (await storage.loadCachedMarkets());
     if (!markets) return BackgroundTask.BackgroundTaskResult.Failed;
 
-    await rescheduleAll(favorites, markets, lang ?? 'en');
+    await rescheduleAll(favorites, markets, resolveLang(langPref));
     return BackgroundTask.BackgroundTaskResult.Success;
   } catch {
     return BackgroundTask.BackgroundTaskResult.Failed;

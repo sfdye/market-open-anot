@@ -36,7 +36,7 @@ Two profiles, two variants, and both numbers are deliberate:
 
 `lib/store/` is a hand-rolled external store read through `useSyncExternalStore`. Import from the barrel `lib/store`, which re-exports state, actions and hooks.
 
-- `state.ts` owns the single `State` object plus `getState`/`subscribe`/`setState`. `setState` derives `t` from `lang` itself, so a caller cannot change language and leave the translator behind; `t` is a stable per-language reference that components memoise on.
+- `state.ts` owns the single `State` object plus `getState`/`subscribe`/`setState`. `setState` derives `lang` from `langPref` and `t` from `lang`, and excludes both from its patch type, so an inconsistent patch does not typecheck; `t` is a stable per-language reference that components memoise on.
 - `hooks.ts` exposes one hook per slice. Subscribe to the narrowest one — `useIsFavorite(name)` exists so a star tap re-renders one row instead of all 123.
 - `actions.ts` owns every side effect: persistence, the NEA fetch, the SGT-midnight timer, the `AppState` foreground listener, and `watchSchedule()`. `initStore()` is called once from `app/_layout.tsx` and is idempotent — Fast Refresh and StrictMode both call it twice.
 - Rescheduling notifications is a **store subscriber**, not a React effect, so it still runs when no screen is mounted. It debounces and dedupes on a key of `lang|favorites|markets.length|remindersEnabled`.
@@ -72,6 +72,10 @@ iOS silently keeps only the ~64 soonest pending requests, so `rescheduleAll` cap
 ## i18n
 
 `lib/i18n.ts` holds two flat objects. `en` is the source of truth (`StringKey = keyof typeof en`) and `zh` is typed `Record<keyof typeof en, string>`, so adding a key without its Chinese translation fails typecheck. Get `t` from `useT()`; interpolate with `{name}` placeholders. Market names have a separate Chinese lookup in `lib/core/zh-names.ts`, keyed by the *friendly* (parenthesised) part of the NEA name — reach it through `getDisplayName`/`displayName` so notifications don't end up half-translated.
+
+Closure reasons are worded once, in `lib/core/reason-words.ts` — in core because `notificationCopy` is there and core cannot import `lib/`, and read back by `i18n.ts` for the status pill. Word a new reason there, not at the call site that needs it.
+
+Language resolution separates the choice from the result: `state.langPref` (`Lang | 'system'`) is what the user picked, and `lang` follows from it. `'system'` resolves through `lib/lang.ts`, a separate module so the headless `background.ts` can reach it without importing the store. Three things a caller must not re-derive for itself: a missing `moa_lang` means `'system'`, which is why `loadLangPref` returns that rather than `null` — `background.ts` used `?? 'en'` and sent English reminders to phones running the app in Chinese; membership of the supported set is `isLang()` in core, never `=== 'en' || === 'zh'`, which no typecheck would catch when the set grows; and re-passing an unchanged `langPref` to `setState` re-resolves deliberately, which is how the foreground picks up a device-language change.
 
 ## Dataset handling
 

@@ -12,6 +12,7 @@ import {
   useFavorites,
   useFetchedAt,
   useLang,
+  useLangPref,
   useMarkets,
   useRefreshing,
   useStale,
@@ -24,6 +25,7 @@ export default function SettingsScreen() {
   const theme = useTheme();
   const t = useT();
   const lang = useLang();
+  const langPref = useLangPref();
   const favorites = useFavorites();
   const markets = useMarkets();
   const fetchedAt = useFetchedAt();
@@ -46,9 +48,25 @@ export default function SettingsScreen() {
       contentInsetAdjustmentBehavior="automatic"
       contentContainerStyle={styles.content}
     >
+      {/* The two languages stay in their own script — a reader looking for 中文 should not have
+          to find it behind an English label. "System default" is the one row that translates. */}
       <SettingsSection title={t('language')}>
-        <Row label="English" accessory={lang === 'en' ? check : undefined} onPress={() => setLang('en')} />
-        <Row label="中文" accessory={lang === 'zh' ? check : undefined} onPress={() => setLang('zh')} last />
+        <Row
+          label={t('langSystem')}
+          accessory={langPref === 'system' ? check : undefined}
+          onPress={() => setLang('system')}
+        />
+        <Row
+          label="English"
+          accessory={langPref === 'en' ? check : undefined}
+          onPress={() => setLang('en')}
+        />
+        <Row
+          label="中文"
+          accessory={langPref === 'zh' ? check : undefined}
+          onPress={() => setLang('zh')}
+          last
+        />
       </SettingsSection>
 
       <SettingsSection title={t('reminders')} footer={t('reminderSchedule')}>

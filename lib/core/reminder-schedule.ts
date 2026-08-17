@@ -1,5 +1,6 @@
 import { getUpcomingClosures, parseMarketName } from './market-logic.ts';
 import type { ClosureReason, Lang, Market } from './market-logic.ts';
+import { REASON_WORDS } from './reason-words.ts';
 import { zhNames } from './zh-names.ts';
 
 export type { Lang };
@@ -122,18 +123,17 @@ export function notificationCopy(
 ): { title: string; body: string } {
   const names = group.names.join(', ');
   const cleaningOnly = group.reasons.length === 1 && group.reasons[0] === 'cleaning';
+  const why = REASON_WORDS[lang][cleaningOnly ? 'cleaning' : 'other_works'].phrase;
 
   if (lang === 'zh') {
-    const zhWhy = cleaningOnly ? '清洁' : '维修';
     return {
-      title: isToday ? `🚫 今天关门（${zhWhy}）` : `⚠️ 明天关门（${zhWhy}）`,
+      title: isToday ? `🚫 今天关门（${why}）` : `⚠️ 明天关门（${why}）`,
       body: isToday
-        ? `${names} 今天关闭${zhWhy} — 别白跑一趟！`
-        : `${names} 明天关闭${zhWhy} — 请改天再去。`,
+        ? `${names} 今天关闭${why} — 别白跑一趟！`
+        : `${names} 明天关闭${why} — 请改天再去。`,
     };
   }
 
-  const why = cleaningOnly ? 'for cleaning' : 'for maintenance';
   return {
     title: isToday ? `🚫 Closed today ${why}` : `⚠️ Closed tomorrow ${why}`,
     body: isToday

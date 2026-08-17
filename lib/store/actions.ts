@@ -1,7 +1,6 @@
 import { AppState, type AppStateStatus } from 'react-native';
-import { getLocales } from 'expo-localization';
 import { sgInstant, sgToday } from '../core/reminder-schedule';
-import type { Lang } from '../i18n';
+import type { LangPref } from '../lang';
 import { fetchMarketsFromAPI, findMarket } from '../markets';
 import { isPermissionGranted, rescheduleAll } from '../notifications';
 import * as storage from '../storage';
@@ -19,10 +18,6 @@ const REVALIDATE_AFTER_MS = 6 * 60 * 60 * 1000;
 /** Collapses the burst of updates from adding several markets in a row into one reschedule. */
 const RESCHEDULE_DEBOUNCE_MS = 400;
 
-function deviceLang(): Lang {
-  return getLocales()[0]?.languageCode === 'zh' ? 'zh' : 'en';
-}
-
 function isStaleByAge(fetchedAt: number | null): boolean {
   return fetchedAt === null || Date.now() - fetchedAt > REVALIDATE_AFTER_MS;
 }
@@ -31,9 +26,14 @@ function isStaleByAge(fetchedAt: number | null): boolean {
 // Mutations
 // ---------------------------------------------------------------------------
 
-export function setLang(lang: Lang): void {
-  setState({ lang });
-  void storage.saveLang(lang);
+/**
+ * `'system'` hands the choice back to the device. Without it the first tap in Settings was
+ * permanent: `lang` is only read from the device while nothing is stored, so a user who tried
+ * the other language had no way back to following their phone.
+ */
+export function setLang(langPref: LangPref): void {
+  setState({ langPref });
+  void storage.saveLangPref(langPref);
 }
 
 function persistFavorites(favorites: string[]): void {
@@ -161,25 +161,27 @@ export function initStore(): void {
 
   AppState.addEventListener('change', (next: AppStateStatus) => {
     if (next !== 'active') return;
-    setState({ today: sgToday() });
+    // Re-passing the preference re-resolves it: following the device means following it when the
+    // user changes it, not only at first launch. Android recreates the activity on a locale
+    // change but the JS context can survive it.
+    setState({ today: sgToday(), langPref: getState().langPref });
     armMidnightTimer();
     void revalidateIfStale();
   });
 
   void (async () => {
-    const [lang, favorites, remindersEnabled, cached, fetchedAt, cardDismissed] = await Promise.all(
-      [
-        storage.loadLang(),
+    const [langPref, favorites, remindersEnabled, cached, fetchedAt, cardDismissed] =
+      await Promise.all([
+        storage.loadLangPref(),
         storage.loadFavorites(),
         storage.loadRemindersEnabled(),
         storage.loadCachedMarkets(),
         storage.loadFetchedAt(),
         storage.loadReminderCardDismissed(),
-      ]
-    );
+      ]);
 
     setState({
-      lang: lang ?? deviceLang(),
+      langPref,
       favorites,
       remindersEnabled,
       reminderCardDismissed: cardDismissed,

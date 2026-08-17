@@ -20,9 +20,23 @@ export interface Market {
   remarks_other_works?: string;
 }
 
-export type Lang = 'en' | 'zh';
+export const LANGS = ['en', 'zh'] as const;
+
+export type Lang = (typeof LANGS)[number];
+
+/**
+ * The one membership test for a supported language, so adding a third has a single place to fail.
+ * Both callers used to spell the set out themselves — an if-chain in `deviceLang()` and a
+ * comparison in `loadLangPref` — and neither would have failed typecheck when `LANGS` grew.
+ */
+export function isLang(value: unknown): value is Lang {
+  return typeof value === 'string' && (LANGS as readonly string[]).includes(value);
+}
 
 export type ClosureReason = 'cleaning' | 'other_works' | 'monday';
+
+/** Every reason a notification can be about: Mondays are deliberately never notified. */
+export type NotifiableReason = Exclude<ClosureReason, 'monday'>;
 
 export type MarketStatus =
   | { status: 'open' }

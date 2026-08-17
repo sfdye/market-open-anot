@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { normalizeMarkets, type Market } from './core/market-logic';
-import type { Lang } from './i18n';
+import { isLang, normalizeMarkets, type Market } from './core/market-logic';
+import type { LangPref } from './lang';
 
 // The `moa_` prefix predates the native app; the keys are kept so an install that started
 // life as the web app's home-screen shortcut still finds its favourites.
@@ -52,13 +52,22 @@ export async function loadFetchedAt(): Promise<number | null> {
   return Number.isFinite(n) ? n : null;
 }
 
-export async function loadLang(): Promise<Lang | null> {
+/**
+ * Reads the preference, never a bare `null`: the key's absence *is* `'system'`, and returning it
+ * that way is what stops a caller inventing its own default. One did, with `?? 'en'`.
+ */
+export async function loadLangPref(): Promise<LangPref> {
   const raw = await AsyncStorage.getItem(KEYS.lang);
-  return raw === 'en' || raw === 'zh' ? raw : null;
+  return isLang(raw) ? raw : 'system';
 }
 
-export async function saveLang(lang: Lang): Promise<void> {
-  await AsyncStorage.setItem(KEYS.lang, lang);
+/**
+ * Following the device again is stored as the *absence* of the key — the same state a fresh
+ * install is in — rather than as a sentinel value.
+ */
+export async function saveLangPref(pref: LangPref): Promise<void> {
+  if (pref === 'system') await AsyncStorage.removeItem(KEYS.lang);
+  else await AsyncStorage.setItem(KEYS.lang, pref);
 }
 
 export async function loadRemindersEnabled(): Promise<boolean> {
