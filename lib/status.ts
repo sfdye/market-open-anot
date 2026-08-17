@@ -19,6 +19,16 @@ export function statusLabel(tone: StatusTone, t: Translate): string {
   return t(LABELS[tone]);
 }
 
+const SHORT_LABELS = { ...LABELS, warning: 'warningTodayShort' } as const;
+
+/**
+ * The same label where the pill shares ~130pt with a market name: the full warning wording wraps
+ * to three lines there and pushes the row past its thumbnail. Screen readers get the full one.
+ */
+export function statusLabelShort(tone: StatusTone, t: Translate): string {
+  return t(SHORT_LABELS[tone]);
+}
+
 /** Why the market is in this state, one line. Empty when it is simply open. */
 export function reasonText(status: MarketStatus, t: Translate): string {
   if (status.status === 'warning') return t('reasonMonday');

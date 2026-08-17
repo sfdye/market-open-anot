@@ -9,7 +9,7 @@ import { Icon, Text } from './ui';
 import { getMarketStatus, getNextOpenDate, parseMarketName } from '../lib/core/market-logic';
 import { formatDate } from '../lib/date';
 import { getDisplayName, getNextCleaningDate } from '../lib/markets';
-import { statusLabel, statusTone } from '../lib/status';
+import { statusLabel, statusLabelShort, statusTone } from '../lib/status';
 import { removeFavorite, useLang, useMarket, useT, useToday } from '../lib/store';
 import { radius, REFLOW_FONT_SCALE, space, useTheme } from '../lib/theme';
 
@@ -35,7 +35,8 @@ function MarketRowInner({ name }: { name: string }) {
   const displayName = getDisplayName(parsed, lang);
   const status = getMarketStatus(market, today);
   const tone = statusTone(status);
-  const label = statusLabel(tone, t);
+  const fullLabel = statusLabel(tone, t);
+  const pillLabel = statusLabelShort(tone, t);
 
   const nextOpen = tone === 'closed' ? getNextOpenDate(market, today) : null;
   const nextCleaning = tone === 'closed' ? null : getNextCleaningDate(market, today);
@@ -55,7 +56,7 @@ function MarketRowInner({ name }: { name: string }) {
       <Pressable
         onPress={() => router.push({ pathname: '/market/[name]', params: { name: market.name } })}
         accessibilityRole="button"
-        accessibilityLabel={[displayName, label, next].filter(Boolean).join('. ')}
+        accessibilityLabel={[displayName, fullLabel, next].filter(Boolean).join('. ')}
         accessibilityHint={t('details')}
         accessibilityActions={[{ name: 'delete', label: t('removeFav') }]}
         onAccessibilityAction={(event) => {
@@ -86,7 +87,7 @@ function MarketRowInner({ name }: { name: string }) {
           )}
         </View>
         <View style={[styles.trailing, stacked && styles.trailingStacked]}>
-          <StatusPill tone={tone} label={label} />
+          <StatusPill tone={tone} label={pillLabel} />
           {!stacked && <Icon name="chevron" size={18} color="textFaint" />}
         </View>
       </Pressable>
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
   thumb: { width: THUMB_SIZE, height: THUMB_SIZE, borderRadius: radius.thumb },
   info: { flex: 1, gap: 2 },
   infoStacked: { flex: 0, alignSelf: 'stretch' },
-  // Bounded so "MOST STALLS CLOSED" wraps inside the pill rather than eating the name's width.
+  // Bounded so the short label wraps inside the pill rather than eating the name's width.
   trailing: { flexDirection: 'row', alignItems: 'center', gap: space.sm, maxWidth: 132 },
   trailingStacked: { maxWidth: undefined },
 });
