@@ -66,6 +66,8 @@ export interface MapPlace {
   lng: number;
   /** The market's friendly name, for the pin label on the schemes that take one. */
   label: string;
+  /** The postal address, for map apps that search by text rather than dropping a pin by coordinate. */
+  address?: string;
 }
 
 /**
@@ -77,8 +79,8 @@ export interface MapPlace {
  *   as a latitude.
  * - Google's own scheme is used when its app is there, and its documented `https` search URL when
  *   it is not: a user who picked Google Maps and then deleted it lands in a browser showing the
- *   right place, not on an error. Both search the *coordinates* — a name search can match a
- *   different stall of the same name, and every market here has coordinates.
+ *   right place, not on an error. Both use the address string when available — searching by text
+ *   shows a readable label, while coordinates appear as a pin with no name.
  * - Where there is no choice to make, `geo:` hands the place to the platform's own default.
  */
 export function mapUrl(
@@ -88,12 +90,13 @@ export function mapUrl(
   const { lat, lng } = place;
   const label = encodeURIComponent(place.label);
   const at = `${lat},${lng}`;
+  const googleQuery = encodeURIComponent(place.address ?? at);
 
   if (!supportsMapChoice(env.platform)) return `geo:0,0?q=${at}(${label})`;
   if (env.provider === 'google') {
     return env.googleAppInstalled
-      ? `${MAP_SCHEMES.google}://?q=${at}&center=${at}`
-      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(at)}`;
+      ? `${MAP_SCHEMES.google}://?q=${googleQuery}&center=${at}`
+      : `https://www.google.com/maps/search/?api=1&query=${googleQuery}`;
   }
   return `${MAP_SCHEMES.apple}:0,0?q=${label}@${at}`;
 }

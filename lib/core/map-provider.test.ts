@@ -2,7 +2,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { isMapProvider, mapUrl, resolveMapProvider } from './map-provider.ts';
 
-const PLACE = { lat: 1.3521, lng: 103.8198, label: 'Tekka Market' };
+const PLACE = { lat: 1.3521, lng: 103.8198, label: 'Tekka Market', address: 'Blk 665 Buffalo Rd' };
 
 describe('resolveMapProvider', () => {
   test('defaults to Apple Maps when both are installed', () => {
@@ -30,14 +30,20 @@ describe('mapUrl', () => {
     assert.equal(url, 'maps:0,0?q=Tekka%20Market@1.3521,103.8198');
   });
 
-  test('Google Maps uses its own scheme when the app is installed', () => {
+  test('Google Maps uses the address string so the pin has a readable label', () => {
     const url = mapUrl(PLACE, { provider: 'google', platform: 'ios', googleAppInstalled: true });
-    assert.equal(url, 'comgooglemaps://?q=1.3521,103.8198&center=1.3521,103.8198');
+    assert.equal(url, 'comgooglemaps://?q=Blk%20665%20Buffalo%20Rd&center=1.3521,103.8198');
   });
 
-  test('Google Maps falls back to the web URL rather than a dead tap', () => {
+  test('Google Maps web fallback also uses the address string', () => {
     const url = mapUrl(PLACE, { provider: 'google', platform: 'ios', googleAppInstalled: false });
-    assert.equal(url, 'https://www.google.com/maps/search/?api=1&query=1.3521%2C103.8198');
+    assert.equal(url, 'https://www.google.com/maps/search/?api=1&query=Blk%20665%20Buffalo%20Rd');
+  });
+
+  test('Google Maps falls back to coordinates when no address is supplied', () => {
+    const noAddr = { lat: 1.3521, lng: 103.8198, label: 'Tekka Market' };
+    const url = mapUrl(noAddr, { provider: 'google', platform: 'ios', googleAppInstalled: true });
+    assert.equal(url, 'comgooglemaps://?q=1.3521%2C103.8198&center=1.3521,103.8198');
   });
 
   test('Android hands off to the default map app whatever the provider says', () => {

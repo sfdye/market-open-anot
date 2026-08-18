@@ -49,11 +49,10 @@ export default function MarketDetailScreen() {
   const coords = marketCoords(market);
   const showPlaceCard = !!address || hasStallCounts(market);
 
-  // The friendly name, not the display name: a Chinese pin label is a search term the map app's own
-  // data will not match.
   const openAddress = () => {
     if (!coords) return;
-    void openInMaps({ ...coords, label: parsed.friendly }, mapPref);
+    // label: friendly name, not display name — a Chinese pin label won't match the map app's data.
+    void openInMaps({ ...coords, label: parsed.friendly, address }, mapPref);
   };
 
   return (
