@@ -37,7 +37,9 @@ const en = {
   addFav: 'Add to favorites',
   removeFav: 'Remove from favorites',
   noFavorites: 'No markets yet',
-  noFavoritesHint: 'Tap + at the top right to add your markets or hawker centres.',
+  // No "tap + at the …": the button has moved corners once already, and the empty state sits
+  // right beside it.
+  noFavoritesHint: 'Tap + to add your markets or hawker centres.',
   reminderCardTitle: 'Get closure reminders',
   reminderCardDesc: 'Get a heads-up the day before a market you follow closes.',
   reminderEnable: 'Enable',
@@ -112,7 +114,7 @@ const zh: Record<keyof typeof en, string> = {
   addFav: '添加至收藏',
   removeFav: '从收藏移除',
   noFavorites: '还没有添加巴刹',
-  noFavoritesHint: '点击右上角的 + 添加您的巴刹或小贩中心。',
+  noFavoritesHint: '点击 + 添加您的巴刹或小贩中心。',
   reminderCardTitle: '开启休市提醒',
   reminderCardDesc: '您收藏的巴刹休市前一天，我们会提前通知您。',
   reminderEnable: '开启',
