@@ -75,6 +75,8 @@ Install native dependencies with `npx expo install expo-foo` rather than npm, so
 
 ```sh
 npm i -g eas-cli
+npm run release                                       # bump the build number, commit and tag it
+eas build --profile production -p all                 # both stores on one build number
 eas build --profile production -p ios --auto-submit   # .ipa straight to TestFlight
 eas build --profile production -p android             # .aab for Play
 eas build:list                                        # recent builds and their status
@@ -84,7 +86,9 @@ eas build:list                                        # recent builds and their 
 
 EAS builds from committed git state, not the working tree, so commit before building — uncommitted files are silently absent in the cloud. That also means the gitignored `ios/` is never uploaded and EAS prebuilds from `app.json` instead, which is what you want.
 
-`appVersionSource` is `remote`, so EAS owns the build number and `production` auto-increments it. Bump the user-facing `version` in `app.json` by hand per release — it is the only version string a user ever sees.
+`appVersionSource` is `local`, so the build number lives in the repo rather than on EAS: the `BUILD` constant in `app.config.ts` is the single source of both iOS's `buildNumber` and Android's `versionCode`. `npm run release` runs typecheck and tests, bumps it, commits, and tags `v<version>+<build>`; it deliberately neither pushes nor builds. Because EAS builds committed state, a build made without that commit re-sends the previous number and the store rejects the upload.
+
+One constant instead of `autoIncrement` because EAS keeps a counter *per platform*, and they drifted — Android sat a number ahead of iOS for a while, and the `apk` profile inheriting `autoIncrement` through `extends` would have kept widening the gap with every internal APK. A build number only ever goes up: both stores refuse one they have already seen for a version, so a number is spent even if the build that used it failed. Bump the user-facing `version` in `app.json` by hand per release — it is the only version string a user ever sees.
 
 TestFlight needs a paid Apple Developer account; the certificate a local `expo run:ios` uses is development-only and expires. EAS stores signing credentials on its servers rather than on disk, so none of it belongs in this repo — and because the repo is public, leave `appleId` out of `eas.json` and let `eas submit` prompt, or pass `EXPO_APPLE_ID`.
 
