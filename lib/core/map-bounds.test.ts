@@ -8,10 +8,9 @@ function viewport(lng: number, lat: number): Bounds {
   return [lng - 0.05, lat - 0.1, lng + 0.05, lat + 0.1];
 }
 
-// Every corner is a sum or midpoint of decimal degrees, so binary floats leave dust.
-function assertClose(actual: number[] | null, expected: number[]): void {
-  assert.ok(actual, 'expected coordinates, got null');
-  assert.equal(actual.length, expected.length);
+// Every corner `centerLimit` returns is a sum or midpoint of decimal degrees, so floats leave dust.
+// `clampCenter` needs no tolerance: min/max hand back one of their inputs unchanged.
+function assertClose(actual: number[], expected: number[]): void {
   actual.forEach((value, i) =>
     assert.ok(
       Math.abs(value - expected[i]!) < 1e-9,
@@ -44,7 +43,6 @@ describe('centerLimit', () => {
     const [west, south, east, north] = centerLimit(tall, [103.6, 1.16, 104.1, 1.56]);
     assert.notEqual(west, east, 'longitude still has room to move');
     assert.equal(south, north, 'latitude is pinned to the middle');
-    assertClose([south], [1.36]);
   });
 
   test('a viewport exactly the size of the limit pins the centre', () => {
@@ -65,12 +63,12 @@ describe('clampCenter', () => {
   });
 
   test('pulls a centre north of the limit back to the edge, keeping its longitude', () => {
-    assertClose(clampCenter([103.8, 1.6], limit), [103.8, 1.46]);
+    assert.deepEqual(clampCenter([103.8, 1.6], limit), [103.8, 1.46]);
   });
 
   test('corrects both axes at once', () => {
     // Roughly Cupertino: what an iOS simulator reports before you set a location.
-    assertClose(clampCenter([-122.03, 37.33], limit), [103.65, 1.46]);
+    assert.deepEqual(clampCenter([-122.03, 37.33], limit), [103.65, 1.46]);
   });
 });
 
@@ -82,5 +80,10 @@ describe('sameBounds', () => {
   test('is false when any corner differs', () => {
     const [west, south, east, north] = SG_BOUNDS;
     assert.equal(sameBounds(SG_BOUNDS, [west, south, east, north + 0.001]), false);
+  });
+
+  test('ignores a difference too small to see, which is what a pan produces', () => {
+    const [west, south, east, north] = SG_BOUNDS;
+    assert.equal(sameBounds(SG_BOUNDS, [west, south + 1e-9, east, north - 1e-9]), true);
   });
 });

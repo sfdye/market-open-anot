@@ -1,16 +1,15 @@
 import { LogManager } from '@maplibre/maplibre-react-native';
 
 /**
- * Silence the tile failures the coastline produces. Off the edge of its coverage OneMap answers a
- * tile request with a body that is not a PNG, so MapLibre logs a decode failure per tile and the
- * bridge turns each one into a `console.error` — a LogBox red box for a gap the map's background
- * colour already covers. The camera clamp keeps those tiles off screen, but a fling still asks for
- * a few at the moment it overshoots.
+ * Silence the tile failures the coastline produces — each one is a LogBox red box for a gap the
+ * map's background colour already covers. Restricting the source to `SG_BOUNDS` is not enough by
+ * itself: a tile straddling the boundary still intersects the box, so it is still requested, and
+ * the one in the original report (13/6457/4060, spanning 1.538°N to 1.582°N) is exactly that case.
  *
  * Dev-only, because the red box is: a release build has nothing listening to `console.error`. Worth
  * knowing while debugging a blank map — this also swallows what a dead network or a OneMap outage
- * would log, so comment it out before concluding the tiles are fine. `LogManager` keeps one handler,
- * so a second caller anywhere would replace this one rather than add to it.
+ * would log, so comment it out before concluding the tiles are fine. `LogManager` keeps one
+ * handler, so a second caller anywhere would replace this one rather than add to it.
  */
 export function configureMapLogging(): void {
   if (!__DEV__) return;
