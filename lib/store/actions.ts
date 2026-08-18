@@ -1,4 +1,6 @@
-import { AppState, type AppStateStatus } from 'react-native';
+import { Alert, AppState, type AppStateStatus } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { MAX_FAVORITES, toggledFavorites } from '../core/favorites';
 import { sgInstant, sgToday } from '../core/reminder-schedule';
 import type { LangPref } from '../lang';
 import { fetchMarketsFromAPI, findMarket } from '../markets';
@@ -41,11 +43,22 @@ function persistFavorites(favorites: string[]): void {
   void storage.saveFavorites(favorites);
 }
 
+/**
+ * The one door for a star tap, refusal included: an add past `MAX_FAVORITES` explains itself here
+ * rather than at the call site, so a new star cannot forget to. A dead tap is the outcome to avoid
+ * — the audience is seniors, and a star that stays hollow with no explanation reads as a broken app
+ * rather than a limit.
+ */
 export function toggleFavorite(name: string): void {
-  const { favorites } = getState();
-  persistFavorites(
-    favorites.includes(name) ? favorites.filter((f) => f !== name) : [...favorites, name]
-  );
+  const next = toggledFavorites(getState().favorites, name);
+  if (next) {
+    void Haptics.selectionAsync();
+    persistFavorites(next);
+    return;
+  }
+  const { t } = getState();
+  void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+  Alert.alert(t('favLimitTitle'), t('favLimitBody', { max: MAX_FAVORITES }));
 }
 
 export function removeFavorite(name: string): void {

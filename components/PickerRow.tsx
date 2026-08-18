@@ -1,6 +1,5 @@
 import { memo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import * as Haptics from 'expo-haptics';
 import { Icon, Text } from './ui';
 import { parseMarketName, type Market } from '../lib/core/market-logic';
 import type { Lang } from '../lib/i18n';
@@ -37,10 +36,7 @@ function PickerRowInner({
 
   return (
     <Pressable
-      onPress={() => {
-        void Haptics.selectionAsync();
-        toggleFavorite(market.name);
-      }}
+      onPress={() => toggleFavorite(market.name)}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: favorite }}
       accessibilityLabel={getDisplayName(parsed, lang)}

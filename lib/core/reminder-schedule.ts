@@ -36,6 +36,18 @@ const SGT_OFFSET_MS = 8 * 60 * 60 * 1000;
 // per-date grouping keeps us clear of iOS's ~64 pending-request ceiling.
 export const HORIZON_DAYS = 90;
 
+/**
+ * How many pending requests `rescheduleAll` will hand to the OS. iOS silently keeps only the ~64
+ * soonest per app and drops the rest, and the limit is undocumented, so we stay a few short of it.
+ * Nothing is lost by truncating: the daily background task reschedules from scratch, topping the
+ * queue back up as the near ones fire.
+ *
+ * Here rather than in `lib/notifications.ts` so it sits with the other two numbers that share the
+ * budget — `HORIZON_DAYS` and `MAX_FAVORITES` — and so the schedule tests can assert against the
+ * bound the app really applies instead of the raw ceiling.
+ */
+export const MAX_SCHEDULED_REMINDERS = 56;
+
 // Two reminders per closure date, in SGT: after dinner the evening before, and early enough
 // the next morning to catch someone before they set out.
 const EVENING_BEFORE_HOUR = 19;
