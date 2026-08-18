@@ -6,6 +6,7 @@ import { Icon, Row } from '../../../components/ui';
 import { AUTHOR_URL, DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
 import { MAX_FAVORITES } from '../../../lib/core/favorites';
 import { formatDate, formatDateTime } from '../../../lib/date';
+import { MAP_CHOICE_SUPPORTED, useMapProvider } from '../../../lib/maps';
 import { listScheduled, sendTestReminder } from '../../../lib/notifications';
 import type { ScheduledReminder } from '../../../lib/notifications';
 import type { Lang } from '../../../lib/i18n';
@@ -13,10 +14,12 @@ import {
   refresh,
   removeAllFavorites,
   setLang,
+  setMapProvider,
   useFavorites,
   useFetchedAt,
   useLang,
   useLangPref,
+  useMapProviderPref,
   useMarkets,
   useRefreshing,
   useStale,
@@ -30,6 +33,9 @@ export default function SettingsScreen() {
   const t = useT();
   const lang = useLang();
   const langPref = useLangPref();
+  const mapPref = useMapProviderPref();
+  // The app that would actually open, so the tick sits on it: null only until the probe lands.
+  const mapProvider = useMapProvider(mapPref);
   const favorites = useFavorites();
   const markets = useMarkets();
   const fetchedAt = useFetchedAt();
@@ -88,6 +94,23 @@ export default function SettingsScreen() {
           }
         />
       </SettingsSection>
+
+      {/* iOS only: Android's `geo:` hand-off already goes to whichever map app is default there. */}
+      {MAP_CHOICE_SUPPORTED && (
+        <SettingsSection title={t('mapsSection')} footer={t('addressOpensIn')}>
+          <Row
+            label={t('appleMaps')}
+            accessory={mapProvider === 'apple' ? check : undefined}
+            onPress={() => setMapProvider('apple')}
+          />
+          <Row
+            label={t('googleMaps')}
+            accessory={mapProvider === 'google' ? check : undefined}
+            onPress={() => setMapProvider('google')}
+            last
+          />
+        </SettingsSection>
+      )}
 
       <SettingsSection title={t('myMarkets')} footer={t('swipeDelete')}>
         <Row

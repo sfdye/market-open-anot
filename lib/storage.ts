@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isLang, normalizeMarkets, type Market } from './core/market-logic';
+import { isMapProvider, type MapProvider, type MapProviderPref } from './core/map-provider';
 import type { LangPref } from './lang';
 
 // Namespaced `oa_`. Nothing migrates the `moa_`/`poa_` keys these were renamed from across two
@@ -10,6 +11,7 @@ const KEYS = {
   data: 'oa_data',
   fetched: 'oa_fetched',
   lang: 'oa_lang',
+  mapProvider: 'oa_map_provider',
   reminders: 'oa_reminders_enabled',
   reminderCardDismissed: 'oa_reminder_card_dismissed',
 } as const;
@@ -69,6 +71,16 @@ export async function loadLangPref(): Promise<LangPref> {
 export async function saveLangPref(pref: LangPref): Promise<void> {
   if (pref === 'system') await AsyncStorage.removeItem(KEYS.lang);
   else await AsyncStorage.setItem(KEYS.lang, pref);
+}
+
+/** A missing key is `'auto'` — the installed apps decide — as `loadLangPref` returns `'system'`. */
+export async function loadMapProvider(): Promise<MapProviderPref> {
+  const raw = await AsyncStorage.getItem(KEYS.mapProvider);
+  return isMapProvider(raw) ? raw : 'auto';
+}
+
+export async function saveMapProvider(provider: MapProvider): Promise<void> {
+  await AsyncStorage.setItem(KEYS.mapProvider, provider);
 }
 
 export async function loadRemindersEnabled(): Promise<boolean> {

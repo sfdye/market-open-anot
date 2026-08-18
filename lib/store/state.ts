@@ -1,5 +1,6 @@
 import { sgToday } from '../core/reminder-schedule';
 import type { Market } from '../core/market-logic';
+import type { MapProviderPref } from '../core/map-provider';
 import { translate, type Lang, type StringKey } from '../i18n';
 import { resolveLang, type LangPref } from '../lang';
 
@@ -16,6 +17,11 @@ export interface State {
   lang: Lang;
   /** Bound to `lang` so its identity is stable — components memoise on it. */
   t: Translate;
+  /**
+   * Which map app an address opens in. The *choice*, like `langPref`: `'auto'` leaves it to the
+   * installed apps, and `lib/maps.ts` resolves that where it can measure them.
+   */
+  mapProviderPref: MapProviderPref;
   /** Today in Singapore. Advances on foreground and at SGT midnight. */
   today: Date;
   remindersEnabled: boolean;
@@ -40,6 +46,7 @@ let state: State = {
   langPref: 'system',
   lang: 'en',
   t: translators.en,
+  mapProviderPref: 'auto',
   today: sgToday(),
   remindersEnabled: false,
   // Assume dismissed until storage says otherwise, so the prompt never flashes in.

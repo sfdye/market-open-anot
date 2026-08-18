@@ -1,6 +1,7 @@
 import { Alert, AppState, type AppStateStatus } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { MAX_FAVORITES, toggledFavorites } from '../core/favorites';
+import type { MapProvider } from '../core/map-provider';
 import { sgInstant, sgToday } from '../core/reminder-schedule';
 import type { LangPref } from '../lang';
 import { fetchMarketsFromAPI, findMarket } from '../markets';
@@ -36,6 +37,14 @@ function isStaleByAge(fetchedAt: number | null): boolean {
 export function setLang(langPref: LangPref): void {
   setState({ langPref });
   void storage.saveLangPref(langPref);
+}
+
+/**
+ * Leaves `'auto'` for good: a user whose phone has both apps has no other way to say "not that one".
+ */
+export function setMapProvider(mapProviderPref: MapProvider): void {
+  setState({ mapProviderPref });
+  void storage.saveMapProvider(mapProviderPref);
 }
 
 function persistFavorites(favorites: string[]): void {
@@ -183,18 +192,27 @@ export function initStore(): void {
   });
 
   void (async () => {
-    const [langPref, favorites, remindersEnabled, cached, fetchedAt, cardDismissed] =
-      await Promise.all([
-        storage.loadLangPref(),
-        storage.loadFavorites(),
-        storage.loadRemindersEnabled(),
-        storage.loadCachedMarkets(),
-        storage.loadFetchedAt(),
-        storage.loadReminderCardDismissed(),
-      ]);
+    const [
+      langPref,
+      mapProviderPref,
+      favorites,
+      remindersEnabled,
+      cached,
+      fetchedAt,
+      cardDismissed,
+    ] = await Promise.all([
+      storage.loadLangPref(),
+      storage.loadMapProvider(),
+      storage.loadFavorites(),
+      storage.loadRemindersEnabled(),
+      storage.loadCachedMarkets(),
+      storage.loadFetchedAt(),
+      storage.loadReminderCardDismissed(),
+    ]);
 
     setState({
       langPref,
+      mapProviderPref,
       favorites,
       remindersEnabled,
       reminderCardDismissed: cardDismissed,
