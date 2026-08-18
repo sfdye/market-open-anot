@@ -31,9 +31,13 @@ lib/core/     pure closure + reminder logic, no React and no React Native — se
 lib/theme/    light and dark tokens, and the matching react-navigation theme
 lib/store/    app state as an external store read through useSyncExternalStore
 lib/          storage, the NEA fetch, i18n, date formatting, notifications, background refresh
+assets/       fonts, and the icon and splash masters the native build reads — all generated
+brand/        the icon's design sources, and the script that derives assets/ from them
 ```
 
 `lib/core/` is the one directory with no dependency on React Native. Its files import each other with explicit `.ts` specifiers so Node can run them directly; everything outside imports without the extension.
+
+Every icon in `assets/` is derived, so edit `brand/`, never `assets/` — the same rule as `app.json` over the native folders. `npm run icons` regenerates them; `brand/README.md` covers the prerequisites and why each master looks the way it does.
 
 ## Testing
 
