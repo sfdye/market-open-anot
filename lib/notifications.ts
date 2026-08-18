@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { buildSchedule, displayName, notificationCopy } from './core/reminder-schedule';
+import type { ScheduleEntry } from './core/reminder-schedule';
 import type { Market } from './core/market-logic';
 import type { Lang } from './i18n';
 
@@ -122,7 +123,38 @@ export async function cancelAll(): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
 
-/** Verification aid — what is actually queued on the device right now. */
-export async function listScheduled(): Promise<Notifications.NotificationRequest[]> {
-  return Notifications.getAllScheduledNotificationsAsync();
+export interface ScheduledReminder {
+  identifier: string;
+  title: string;
+  body: string;
+  /** The entry the request was built from, rebuilt now. Null once it has left the schedule. */
+  entry: ScheduleEntry | null;
+}
+
+/**
+ * Verification aid — what is actually queued on the device right now, paired with the market names,
+ * closure date and reasons behind each one. The detail has to come from rebuilding the schedule and
+ * matching identifiers, because the pending request itself is nearly opaque: iOS turns our date
+ * trigger into a `UNTimeIntervalNotificationTrigger` counted from the moment it was scheduled, so
+ * not even the fire time survives the round trip. A request with no entry is a stale one that the
+ * last `rescheduleAll` should have cleared — worth seeing rather than hiding.
+ */
+export async function listScheduled(
+  favorites: string[],
+  markets: Market[],
+  lang: Lang
+): Promise<ScheduledReminder[]> {
+  const requests = await Notifications.getAllScheduledNotificationsAsync();
+  const entries = new Map(
+    buildSchedule(favorites, markets, lang).map((entry) => [entry.identifier, entry])
+  );
+
+  return requests
+    .map((request) => ({
+      identifier: request.identifier,
+      title: request.content.title ?? '',
+      body: request.content.body ?? '',
+      entry: entries.get(request.identifier) ?? null,
+    }))
+    .sort((a, b) => (a.entry?.at.getTime() ?? Infinity) - (b.entry?.at.getTime() ?? Infinity));
 }
