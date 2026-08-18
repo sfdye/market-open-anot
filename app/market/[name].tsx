@@ -1,4 +1,4 @@
-import { Linking, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import MarketPhoto from '../../components/MarketPhoto';
 import StallCounts, { hasStallCounts } from '../../components/StallCounts';
@@ -6,12 +6,14 @@ import StatusBanner from '../../components/StatusBanner';
 import UpcomingClosures from '../../components/UpcomingClosures';
 import { Card, EmptyState, Icon, Text } from '../../components/ui';
 import { getMarketStatus, getNextOpenDate, parseMarketName } from '../../lib/core/market-logic';
+import { openInMaps } from '../../lib/maps';
 import { decodeEntities, getDisplayName, marketCoords } from '../../lib/markets';
 import { statusTone } from '../../lib/status';
 import {
   toggleFavorite,
   useIsFavorite,
   useLang,
+  useMapProviderPref,
   useMarket,
   useT,
   useToday,
@@ -25,6 +27,7 @@ export default function MarketDetailScreen() {
   const favorite = useIsFavorite(name);
   const today = useToday();
   const lang = useLang();
+  const mapPref = useMapProviderPref();
   const t = useT();
 
   // Reachable by deep link from a notification, so the market may have left the dataset since.
@@ -46,14 +49,10 @@ export default function MarketDetailScreen() {
   const coords = marketCoords(market);
   const showPlaceCard = !!address || hasStallCounts(market);
 
-  const openInMaps = () => {
+  const openAddress = () => {
     if (!coords) return;
-    const label = encodeURIComponent(parsed.friendly);
-    const url =
-      Platform.OS === 'ios'
-        ? `maps:0,0?q=${label}@${coords.lat},${coords.lng}`
-        : `geo:0,0?q=${coords.lat},${coords.lng}(${label})`;
-    void Linking.openURL(url);
+    // label: friendly name, not display name — a Chinese pin label won't match the map app's data.
+    void openInMaps({ ...coords, label: parsed.friendly, address }, mapPref);
   };
 
   return (
@@ -96,7 +95,7 @@ export default function MarketDetailScreen() {
           <Card padded={false} style={styles.place}>
             {!!address && (
               <Pressable
-                onPress={openInMaps}
+                onPress={openAddress}
                 disabled={!coords}
                 accessibilityRole={coords ? 'link' : 'text'}
                 accessibilityLabel={`${t('address')}: ${address}`}

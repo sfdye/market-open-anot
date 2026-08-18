@@ -14,6 +14,7 @@ Wet markets in Singapore close every Monday and have quarterly cleaning closures
 - Upcoming closures list, and the next date each market reopens
 - Map of every market, sorted-by-distance search when you allow location
 - Local closure reminders: 7pm the evening before and 6am the morning of
+- Tap an address to open it in Apple Maps or Google Maps — whichever you pick in Settings
 - Bilingual: English and Chinese
 - Works offline — the dataset is cached and revalidated in the background
 - Senior-friendly: honours Dynamic Type at every size, high contrast, light and dark

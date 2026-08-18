@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import type { Market } from '../core/market-logic';
+import type { MapProviderPref } from '../core/map-provider';
 import type { Lang } from '../i18n';
 import type { LangPref } from '../lang';
 import { getState, subscribe, type State, type Translate } from './state';
@@ -30,6 +31,11 @@ export function useLang(): Lang {
 /** The *choice*, for Settings. Symmetric with `setLang`, so a row compares one value. */
 export function useLangPref(): LangPref {
   return useSelector((s) => s.langPref);
+}
+
+/** The map app *choice*, symmetric with `useLangPref`. `lib/maps.ts` turns it into an app. */
+export function useMapProviderPref(): MapProviderPref {
+  return useSelector((s) => s.mapProviderPref);
 }
 
 export function useT(): Translate {
