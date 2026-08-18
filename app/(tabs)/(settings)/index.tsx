@@ -34,8 +34,7 @@ export default function SettingsScreen() {
   const lang = useLang();
   const langPref = useLangPref();
   const mapPref = useMapProviderPref();
-  // The app that would actually open, so the tick sits on it: null only until the probe lands.
-  const mapProvider = useMapProvider(mapPref);
+  const { provider: mapProvider, installed: mapsInstalled } = useMapProvider(mapPref);
   const favorites = useFavorites();
   const markets = useMarkets();
   const fetchedAt = useFetchedAt();
@@ -95,20 +94,26 @@ export default function SettingsScreen() {
         />
       </SettingsSection>
 
-      {/* iOS only: Android's `geo:` hand-off already goes to whichever map app is default there. */}
-      {MAP_CHOICE_SUPPORTED && (
+      {/* iOS only: Android's `geo:` hand-off already goes to whichever map app is default there.
+          Rows are shown optimistically before the probe lands, then filtered to installed apps. */}
+      {MAP_CHOICE_SUPPORTED && (mapsInstalled === null || mapsInstalled.apple || mapsInstalled.google) && (
         <SettingsSection title={t('mapsSection')} footer={t('addressOpensIn')}>
-          <Row
-            label={t('appleMaps')}
-            accessory={mapProvider === 'apple' ? check : undefined}
-            onPress={() => setMapProvider('apple')}
-          />
-          <Row
-            label={t('googleMaps')}
-            accessory={mapProvider === 'google' ? check : undefined}
-            onPress={() => setMapProvider('google')}
-            last
-          />
+          {(mapsInstalled === null || mapsInstalled.apple) && (
+            <Row
+              label={t('appleMaps')}
+              accessory={mapProvider === 'apple' ? check : undefined}
+              onPress={() => setMapProvider('apple')}
+              last={mapsInstalled !== null && !mapsInstalled.google}
+            />
+          )}
+          {(mapsInstalled === null || mapsInstalled.google) && (
+            <Row
+              label={t('googleMaps')}
+              accessory={mapProvider === 'google' ? check : undefined}
+              onPress={() => setMapProvider('google')}
+              last
+            />
+          )}
         </SettingsSection>
       )}
 

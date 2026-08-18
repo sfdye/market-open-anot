@@ -31,19 +31,21 @@ export async function probeInstalledMaps(): Promise<InstalledMaps> {
 }
 
 /**
- * The provider in effect, for the one caller that needs it *before* a tap: the Settings tick, which
- * has to sit on the app that would actually open. `null` until the probe lands, so a stale guess is
- * never drawn — an explicit choice needs no probe and answers in the first frame.
+ * Which apps are installed and which would open for the current preference.
  *
- * Probing on mount rather than in the store keeps the answer fresher than a foreground listener
- * could, and keeps a device capability out of app state: nothing else needs it, because
- * `openInMaps` measures at the moment it matters.
+ * `installed` is null until the probe lands — rows for uninstalled apps should be hidden once it
+ * resolves, but shown optimistically before it does so the section doesn't flicker. `provider` is
+ * null while auto is still resolving; an explicit choice answers immediately.
+ *
+ * Always probes on mount so the caller has `installed` to filter rows regardless of `pref`.
  */
-export function useMapProvider(pref: MapProviderPref): MapProvider | null {
+export function useMapProvider(pref: MapProviderPref): {
+  provider: MapProvider | null;
+  installed: InstalledMaps | null;
+} {
   const [installed, setInstalled] = useState<InstalledMaps | null>(null);
 
   useEffect(() => {
-    if (pref !== 'auto') return;
     let alive = true;
     void probeInstalledMaps().then((next) => {
       if (alive) setInstalled(next);
@@ -51,10 +53,10 @@ export function useMapProvider(pref: MapProviderPref): MapProvider | null {
     return () => {
       alive = false;
     };
-  }, [pref]);
+  }, []);
 
-  if (pref !== 'auto') return pref;
-  return installed && resolveMapProvider(pref, installed);
+  const provider = pref !== 'auto' ? pref : installed && resolveMapProvider(pref, installed);
+  return { provider, installed };
 }
 
 /**
