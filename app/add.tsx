@@ -3,6 +3,7 @@ import { FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import PickerRow from '../components/PickerRow';
 import { EmptyState, Row, Segmented, Text } from '../components/ui';
+import { MAX_FAVORITES } from '../lib/core/favorites';
 import { parseMarketName, type Market } from '../lib/core/market-logic';
 import { getDisplayName, getMarketDistance, searchMarkets } from '../lib/markets';
 import { useFavorites, useLang, useMarkets, useT } from '../lib/store';
@@ -66,7 +67,9 @@ export default function AddMarketsScreen() {
           headerRight: () => (
             <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button">
               <Text variant="bodyStrong" tone="accent">
-                {favorites.length > 0 ? t('doneCount', { n: favorites.length }) : t('done')}
+                {favorites.length > 0
+                  ? t('doneCount', { n: favorites.length, max: MAX_FAVORITES })
+                  : t('done')}
               </Text>
             </Pressable>
           ),

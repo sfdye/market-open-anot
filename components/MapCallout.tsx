@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import StatusPill from './StatusPill';
 import { Button, Icon, Text } from './ui';
@@ -63,10 +62,7 @@ export default function MapCallout({
         <StatusPill tone={tone} label={statusLabel(tone, t)} />
         <View style={styles.spacer} />
         <Pressable
-          onPress={() => {
-            void Haptics.selectionAsync();
-            toggleFavorite(market.name);
-          }}
+          onPress={() => toggleFavorite(market.name)}
           style={styles.star}
           accessibilityRole="checkbox"
           accessibilityState={{ checked: favorite }}

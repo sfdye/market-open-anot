@@ -1,18 +1,16 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { buildSchedule, displayName, notificationCopy } from './core/reminder-schedule';
+import {
+  buildSchedule,
+  displayName,
+  notificationCopy,
+  MAX_SCHEDULED_REMINDERS,
+} from './core/reminder-schedule';
 import type { ScheduleEntry } from './core/reminder-schedule';
 import type { Market } from './core/market-logic';
 import type { Lang } from './i18n';
 
 export const ANDROID_CHANNEL_ID = 'closures';
-
-/**
- * iOS silently keeps only the ~64 soonest pending requests per app and drops the rest, and the
- * limit is undocumented, so we stay a few short of it. Nothing is lost by truncating: the daily
- * background task reschedules from scratch, topping the queue back up as the near ones fire.
- */
-const MAX_SCHEDULED_REMINDERS = 56;
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

@@ -8,7 +8,9 @@ import {
   groupClosuresByDate,
   notificationCopy,
   buildSchedule,
+  MAX_SCHEDULED_REMINDERS,
 } from './reminder-schedule.ts';
+import { MAX_FAVORITES } from './favorites.ts';
 import type { DateGroup } from './reminder-schedule.ts';
 import type { Market } from './market-logic.ts';
 
@@ -281,10 +283,12 @@ describe('buildSchedule', () => {
     assert.deepEqual(entries, []);
   });
 
-  test('stays well under the iOS pending-request ceiling for a typical user', () => {
+  // A full list is the worst a user can do, so that is what the queue budget is checked against —
+  // and against the cap `rescheduleAll` really applies, which is what would truncate it.
+  test('a full favourites list fits the reminder queue without truncation', () => {
     const many: Market[] = [];
     const names: string[] = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < MAX_FAVORITES; i++) {
       names.push(`M${i} (Market ${i})`);
       many.push(
         market(`M${i} (Market ${i})`, {
@@ -294,7 +298,10 @@ describe('buildSchedule', () => {
       );
     }
     const entries = buildSchedule(names, many, 'en', now);
-    assert.ok(entries.length <= 64, `expected <= 64 pending, got ${entries.length}`);
+    assert.ok(
+      entries.length <= MAX_SCHEDULED_REMINDERS,
+      `expected <= ${MAX_SCHEDULED_REMINDERS} pending, got ${entries.length}`
+    );
   });
 
   test('respects the language setting', () => {

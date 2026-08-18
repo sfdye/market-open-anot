@@ -8,7 +8,14 @@ import { Card, EmptyState, Icon, Text } from '../../components/ui';
 import { getMarketStatus, getNextOpenDate, parseMarketName } from '../../lib/core/market-logic';
 import { decodeEntities, getDisplayName, marketCoords } from '../../lib/markets';
 import { statusTone } from '../../lib/status';
-import { toggleFavorite, useIsFavorite, useLang, useMarket, useT, useToday } from '../../lib/store';
+import {
+  toggleFavorite,
+  useIsFavorite,
+  useLang,
+  useMarket,
+  useT,
+  useToday,
+} from '../../lib/store';
 import { space, useTheme } from '../../lib/theme';
 
 export default function MarketDetailScreen() {

@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
 import { AUTHOR_URL, DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
+import { MAX_FAVORITES } from '../../../lib/core/favorites';
 import { formatDate, formatDateTime } from '../../../lib/date';
 import { listScheduled, sendTestReminder } from '../../../lib/notifications';
 import type { ScheduledReminder } from '../../../lib/notifications';
@@ -91,7 +92,7 @@ export default function SettingsScreen() {
       <SettingsSection title={t('myMarkets')} footer={t('swipeDelete')}>
         <Row
           label={t('removeAll')}
-          detail={String(favorites.length)}
+          detail={`${favorites.length}/${MAX_FAVORITES}`}
           icon="trash"
           destructive
           onPress={favorites.length > 0 ? confirmRemoveAll : undefined}
