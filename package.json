@@ -42,7 +42,7 @@
     "ios": "APP_VARIANT=development expo run:ios",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
     "test": "node --test lib/core/*.test.ts",
-    "icons": "python3 brand/make_icons.py brand/icon-master-1024.png assets && rsvg-convert brand/notification-icon.svg -o assets/notification-icon.png"
+    "icons": "python3 brand/make_icons.py"
   },
   "private": true
 }
