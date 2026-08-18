@@ -1,6 +1,6 @@
 /** `[west, south, east, north]` — the order MapLibre's own `LngLatBounds` uses. */
 export type Bounds = [west: number, south: number, east: number, north: number];
-/** `[longitude, latitude]`, matching MapLibre's `LngLat`. */
+/** Matching MapLibre's `LngLat`. */
 export type Center = [lng: number, lat: number];
 
 /**
@@ -41,7 +41,16 @@ export function clampCenter(center: Center, limit: Bounds): Center | null {
   return clampedLng === lng && clampedLat === lat ? null : [clampedLng, clampedLat];
 }
 
-/** Bounds change only when the zoom does, so the camera can skip a re-render on every pan. */
+/** About 0.1m — under the precision a viewport is reported to, let alone a visible difference. */
+const SAME_BOUNDS_EPSILON = 1e-6;
+
+/**
+ * Equal to within `SAME_BOUNDS_EPSILON`, so an unchanged limit can skip pushing a camera update.
+ *
+ * The tolerance is what makes the check worth having. Exact equality would almost never hold across
+ * a pan at one zoom: the reported box comes from pixel positions, and its latitude span widens with
+ * `cos(lat)` on the way north, so `===` would call every gesture a change.
+ */
 export function sameBounds(a: Bounds, b: Bounds): boolean {
-  return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
+  return a.every((value, i) => Math.abs(value - b[i]!) < SAME_BOUNDS_EPSILON);
 }

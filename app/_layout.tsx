@@ -7,7 +7,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initStore, useReady, useT } from '../lib/store';
 import { configureNotifications } from '../lib/notifications';
 import { registerBackgroundRefresh } from '../lib/background';
-import { configureMapLogging } from '../lib/maplibre';
 import { navigationTheme, useTheme } from '../lib/theme';
 import { useNotificationRouting } from '../lib/useNotificationRouting';
 
@@ -27,7 +26,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     initStore();
-    configureMapLogging();
     void configureNotifications();
     void registerBackgroundRefresh();
   }, []);
