@@ -125,8 +125,8 @@ export async function cancelAll(): Promise<void> {
 
 export interface ScheduledReminder {
   identifier: string;
+  /** Only needed when `entry` is null: with no entry to describe, this is all there is to show. */
   title: string;
-  body: string;
   /** The entry the request was built from, rebuilt now. Null once it has left the schedule. */
   entry: ScheduleEntry | null;
 }
@@ -153,7 +153,6 @@ export async function listScheduled(
     .map((request) => ({
       identifier: request.identifier,
       title: request.content.title ?? '',
-      body: request.content.body ?? '',
       entry: entries.get(request.identifier) ?? null,
     }))
     .sort((a, b) => (a.entry?.at.getTime() ?? Infinity) - (b.entry?.at.getTime() ?? Infinity));
