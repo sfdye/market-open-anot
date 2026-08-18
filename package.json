@@ -42,7 +42,9 @@
     "ios": "APP_VARIANT=development expo run:ios",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
     "test": "node --test lib/core/*.test.ts",
-    "icons": "python3 brand/make_icons.py"
+    "ci": "npm run typecheck && npm test",
+    "icons": "python3 brand/make_icons.py",
+    "release": "node scripts/release.mjs"
   },
   "private": true
 }
