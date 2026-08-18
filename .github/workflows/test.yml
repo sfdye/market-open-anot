@@ -20,6 +20,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      # Two programs: the app against React Native's globals, lib/core against Node's.
-      - run: npm run typecheck
-      - run: npm test
+      # Typecheck (two programs: the app against React Native's globals, lib/core against Node's)
+      # then the unit tests. One script so `npm run release` runs exactly this set before tagging.
+      - run: npm run ci

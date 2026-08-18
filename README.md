@@ -77,18 +77,20 @@ Install native dependencies with `npx expo install expo-foo` rather than npm, so
 npm i -g eas-cli
 npm run release                                       # bump the build number, commit and tag it
 eas build --profile production -p all                 # both stores on one build number
+eas build:list                                        # recent builds and their status
+
+# instead of -p all, one platform at a time on that same number:
 eas build --profile production -p ios --auto-submit   # .ipa straight to TestFlight
 eas build --profile production -p android             # .aab for Play
-eas build:list                                        # recent builds and their status
 ```
 
 `production` is the TestFlight profile too — TestFlight and the App Store take the same binary. `eas submit -p ios --latest` submits a build that was made without `--auto-submit`. `eas.json` also carries an `apk` profile for a standalone Android `.apk` and a `development` profile for installing a dev client over the air, neither of which a release needs.
 
 EAS builds from committed git state, not the working tree, so commit before building — uncommitted files are silently absent in the cloud. That also means the gitignored `ios/` is never uploaded and EAS prebuilds from `app.json` instead, which is what you want.
 
-`appVersionSource` is `local`, so the build number lives in the repo rather than on EAS: the `BUILD` constant in `app.config.ts` is the single source of both iOS's `buildNumber` and Android's `versionCode`. `npm run release` runs typecheck and tests, bumps it, commits, and tags `v<version>+<build>`; it deliberately neither pushes nor builds. Because EAS builds committed state, a build made without that commit re-sends the previous number and the store rejects the upload.
+`appVersionSource` is `local`, so the build number lives in the repo rather than on EAS: `app.json` carries it as `ios.buildNumber` and `android.versionCode`, right beside `version`. `npm run release` runs typecheck and tests, sets both keys from one number, commits, and tags `v<version>+<build>`; it deliberately neither pushes nor builds, and it refuses to run if it finds the two keys already disagreeing. Because EAS builds committed state, a build made without that commit re-sends the previous number and the store rejects the upload.
 
-One constant instead of `autoIncrement` because EAS keeps a counter *per platform*, and they drifted — Android sat a number ahead of iOS for a while, and the `apk` profile inheriting `autoIncrement` through `extends` would have kept widening the gap with every internal APK. A build number only ever goes up: both stores refuse one they have already seen for a version, so a number is spent even if the build that used it failed. Bump the user-facing `version` in `app.json` by hand per release — it is the only version string a user ever sees.
+One number set by hand instead of `autoIncrement`, which bumps each platform in its own step and so counts per platform on *either* version source — that is how Android ended up a number ahead of iOS, with the `apk` profile inheriting the flag through `extends` and widening the gap on every internal APK. A build number only ever goes up: both stores refuse one they have already seen for a version, so a number is spent even if the build that used it failed. Bump the user-facing `version` by hand per release — it is the only version string a user ever sees.
 
 TestFlight needs a paid Apple Developer account; the certificate a local `expo run:ios` uses is development-only and expires. EAS stores signing credentials on its servers rather than on disk, so none of it belongs in this repo — and because the repo is public, leave `appleId` out of `eas.json` and let `eas submit` prompt, or pass `EXPO_APPLE_ID`.
 
