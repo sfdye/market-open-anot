@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Switch } from 'react-native';
 import Constants from 'expo-constants';
 import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
 import { AUTHOR_URL, DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
-import { formatDateTime } from '../../../lib/date';
+import { formatDate, formatDateTime } from '../../../lib/date';
 import { listScheduled, sendTestReminder } from '../../../lib/notifications';
+import type { ScheduledReminder } from '../../../lib/notifications';
+import type { Lang } from '../../../lib/i18n';
 import {
   refresh,
   removeAllFavorites,
@@ -32,6 +35,7 @@ export default function SettingsScreen() {
   const refreshing = useRefreshing();
   const stale = useStale();
   const reminders = useReminders();
+  const [scheduled, setScheduled] = useState<ScheduledReminder[] | null>(null);
 
   const confirmRemoveAll = () => {
     Alert.alert(t('removeAllTitle'), t('removeAllConfirm'), [
@@ -141,13 +145,20 @@ export default function SettingsScreen() {
           <Row
             label={t('scheduledReminders')}
             icon="bell"
+            detail={scheduled ? `${scheduled.length} armed — tap to hide` : undefined}
             onPress={() => {
-              void listScheduled().then((requests) => {
-                for (const request of requests) console.log(request.identifier, request.trigger);
-                Alert.alert(t('scheduledReminders'), String(requests.length));
-              });
+              if (scheduled) {
+                setScheduled(null);
+                return;
+              }
+              void listScheduled(favorites, markets, lang).then(setScheduled);
             }}
           />
+          {scheduled?.length === 0 && <Row label="Nothing armed" />}
+          {scheduled?.map((reminder) => {
+            const { label, detail } = describeScheduled(reminder, lang);
+            return <Row key={reminder.identifier} label={label} detail={detail} />;
+          })}
           <Row
             label={t('sendTestReminder')}
             icon="bell"
@@ -162,6 +173,28 @@ export default function SettingsScreen() {
       )}
     </ScrollView>
   );
+}
+
+/**
+ * One armed reminder, as the two things a count cannot tell you: which markets it names, and when
+ * it fires against which closure. Times are on the device clock, not SGT. Dev-only, so it is not
+ * translated — only the market names follow the app's language, because the notification's do.
+ */
+function describeScheduled(
+  reminder: ScheduledReminder,
+  lang: Lang
+): { label: string; detail: string } {
+  const { entry } = reminder;
+  if (!entry) {
+    return {
+      label: reminder.title || reminder.identifier,
+      detail: `${reminder.identifier} · stale, no longer in the schedule`,
+    };
+  }
+  return {
+    label: entry.markets.join(', '),
+    detail: `fires ${formatDateTime(entry.at, lang)} · closes ${formatDate(entry.date, lang)} · ${entry.reasons.join(', ')}`,
+  };
 }
 
 const styles = StyleSheet.create({

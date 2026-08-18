@@ -21,9 +21,12 @@ export interface ScheduleEntry {
   body: string;
   /** The instant to fire, as a real point in time. */
   at: Date;
+  /** Civil date of the closure being reminded about — a day after `at` for the evening reminder. */
+  date: Date;
   markets: string[];
   /** Raw NEA names, so a notification tap can open the market it is about. */
   rawNames: string[];
+  reasons: ClosureReason[];
 }
 
 // Singapore has been a fixed UTC+8 with no DST since 1982, so a constant offset is exact.
@@ -173,8 +176,10 @@ export function buildSchedule(
         title: copy.title,
         body: copy.body,
         at: when,
+        date: d,
         markets: group.names.slice(),
         rawNames: group.rawNames.slice(),
+        reasons: group.reasons.slice(),
       });
     }
   }

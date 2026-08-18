@@ -250,6 +250,16 @@ describe('buildSchedule', () => {
     }
   });
 
+  test('carries the closure date and reason, which the fire time alone does not give', () => {
+    const entries = buildSchedule(['A (Alpha)'], markets, 'en', now);
+    const feb5 = entries.filter((e) => e.identifier.startsWith('oa-2026-2-5-'));
+
+    for (const entry of feb5) {
+      assert.equal(civilKey(entry.date), '2026-2-5');
+      assert.deepEqual(entry.reasons, ['cleaning']);
+    }
+  });
+
   test('identifiers are unique', () => {
     const entries = buildSchedule(['A (Alpha)', 'B (Beta)'], markets, 'en', now);
     const ids = entries.map((e) => e.identifier);
