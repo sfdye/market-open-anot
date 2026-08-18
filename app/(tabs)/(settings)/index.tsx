@@ -6,7 +6,7 @@ import { Icon, Row } from '../../../components/ui';
 import { AUTHOR_URL, DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
 import { MAX_FAVORITES } from '../../../lib/core/favorites';
 import { formatDate, formatDateTime } from '../../../lib/date';
-import { MAP_CHOICE_SUPPORTED, useMapProvider } from '../../../lib/maps';
+import { MAP_CHOICE_SUPPORTED, MAP_PROVIDERS, useMapProvider } from '../../../lib/maps';
 import { listScheduled, sendTestReminder } from '../../../lib/notifications';
 import type { ScheduledReminder } from '../../../lib/notifications';
 import type { Lang } from '../../../lib/i18n';
@@ -34,7 +34,7 @@ export default function SettingsScreen() {
   const lang = useLang();
   const langPref = useLangPref();
   const mapPref = useMapProviderPref();
-  const { provider: mapProvider, installed: mapsInstalled } = useMapProvider(mapPref);
+  const { provider: mapProvider, availableProviders: mapsAvailable } = useMapProvider(mapPref);
   const favorites = useFavorites();
   const markets = useMarkets();
   const fetchedAt = useFetchedAt();
@@ -96,24 +96,17 @@ export default function SettingsScreen() {
 
       {/* iOS only: Android's `geo:` hand-off already goes to whichever map app is default there.
           Rows are shown optimistically before the probe lands, then filtered to installed apps. */}
-      {MAP_CHOICE_SUPPORTED && (mapsInstalled === null || mapsInstalled.apple || mapsInstalled.google) && (
+      {MAP_CHOICE_SUPPORTED && (mapsAvailable === null || mapsAvailable.length > 0) && (
         <SettingsSection title={t('mapsSection')} footer={t('addressOpensIn')}>
-          {(mapsInstalled === null || mapsInstalled.apple) && (
+          {(mapsAvailable ?? MAP_PROVIDERS).map((p, i, arr) => (
             <Row
-              label={t('appleMaps')}
-              accessory={mapProvider === 'apple' ? check : undefined}
-              onPress={() => setMapProvider('apple')}
-              last={mapsInstalled !== null && !mapsInstalled.google}
+              key={p}
+              label={p === 'apple' ? t('appleMaps') : t('googleMaps')}
+              accessory={mapProvider === p ? check : undefined}
+              onPress={() => setMapProvider(p)}
+              last={i === arr.length - 1}
             />
-          )}
-          {(mapsInstalled === null || mapsInstalled.google) && (
-            <Row
-              label={t('googleMaps')}
-              accessory={mapProvider === 'google' ? check : undefined}
-              onPress={() => setMapProvider('google')}
-              last
-            />
-          )}
+          ))}
         </SettingsSection>
       )}
 

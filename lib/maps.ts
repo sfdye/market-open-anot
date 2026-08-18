@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Linking, Platform } from 'react-native';
-import { MAP_SCHEMES, mapUrl, resolveMapProvider, supportsMapChoice } from './core/map-provider';
+import { MAP_PROVIDERS, MAP_SCHEMES, mapUrl, resolveMapProvider, supportsMapChoice } from './core/map-provider';
 import type { InstalledMaps, MapPlace, MapProvider, MapProviderPref } from './core/map-provider';
+
+export { MAP_PROVIDERS };
 
 /** The predicate bound to this device, for the Settings section that only iOS has a choice on. */
 export const MAP_CHOICE_SUPPORTED = supportsMapChoice(Platform.OS);
@@ -41,7 +43,7 @@ export async function probeInstalledMaps(): Promise<InstalledMaps> {
  */
 export function useMapProvider(pref: MapProviderPref): {
   provider: MapProvider | null;
-  installed: InstalledMaps | null;
+  availableProviders: MapProvider[] | null;
 } {
   const [installed, setInstalled] = useState<InstalledMaps | null>(null);
 
@@ -56,7 +58,10 @@ export function useMapProvider(pref: MapProviderPref): {
   }, []);
 
   const provider = pref !== 'auto' ? pref : installed && resolveMapProvider(pref, installed);
-  return { provider, installed };
+  const availableProviders: MapProvider[] | null = installed
+    ? MAP_PROVIDERS.filter((p) => installed[p])
+    : null;
+  return { provider, availableProviders };
 }
 
 /**
