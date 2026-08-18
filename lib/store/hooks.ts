@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import type { BasemapPref } from '../core/basemap';
 import type { Market } from '../core/market-logic';
 import type { Lang } from '../i18n';
 import type { LangPref } from '../lang';
@@ -30,6 +31,11 @@ export function useLang(): Lang {
 /** The *choice*, for Settings. Symmetric with `setLang`, so a row compares one value. */
 export function useLangPref(): LangPref {
   return useSelector((s) => s.langPref);
+}
+
+/** The choice, for Settings and for the map — `resolveBasemap` turns it into a basemap. */
+export function useBasemapPref(): BasemapPref {
+  return useSelector((s) => s.basemapPref);
 }
 
 export function useT(): Translate {

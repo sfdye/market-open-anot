@@ -1,5 +1,6 @@
 import { Alert, AppState, type AppStateStatus } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import type { BasemapPref } from '../core/basemap';
 import { MAX_FAVORITES, toggledFavorites } from '../core/favorites';
 import { sgInstant, sgToday } from '../core/reminder-schedule';
 import type { LangPref } from '../lang';
@@ -36,6 +37,12 @@ function isStaleByAge(fetchedAt: number | null): boolean {
 export function setLang(langPref: LangPref): void {
   setState({ langPref });
   void storage.saveLangPref(langPref);
+}
+
+/** The map is the only reader, so nothing else has to be told — it subscribes to this slice. */
+export function setBasemap(basemapPref: BasemapPref): void {
+  setState({ basemapPref });
+  void storage.saveBasemapPref(basemapPref);
 }
 
 function persistFavorites(favorites: string[]): void {
@@ -183,9 +190,10 @@ export function initStore(): void {
   });
 
   void (async () => {
-    const [langPref, favorites, remindersEnabled, cached, fetchedAt, cardDismissed] =
+    const [langPref, basemapPref, favorites, remindersEnabled, cached, fetchedAt, cardDismissed] =
       await Promise.all([
         storage.loadLangPref(),
+        storage.loadBasemapPref(),
         storage.loadFavorites(),
         storage.loadRemindersEnabled(),
         storage.loadCachedMarkets(),
@@ -195,6 +203,7 @@ export function initStore(): void {
 
     setState({
       langPref,
+      basemapPref,
       favorites,
       remindersEnabled,
       reminderCardDismissed: cardDismissed,

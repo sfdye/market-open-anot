@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isBasemap, type BasemapPref } from './core/basemap';
 import { isLang, normalizeMarkets, type Market } from './core/market-logic';
 import type { LangPref } from './lang';
 
@@ -10,6 +11,7 @@ const KEYS = {
   data: 'oa_data',
   fetched: 'oa_fetched',
   lang: 'oa_lang',
+  basemap: 'oa_basemap',
   reminders: 'oa_reminders_enabled',
   reminderCardDismissed: 'oa_reminder_card_dismissed',
 } as const;
@@ -69,6 +71,17 @@ export async function loadLangPref(): Promise<LangPref> {
 export async function saveLangPref(pref: LangPref): Promise<void> {
   if (pref === 'system') await AsyncStorage.removeItem(KEYS.lang);
   else await AsyncStorage.setItem(KEYS.lang, pref);
+}
+
+/** Absence is `'system'` here too, and `isBasemap` is what keeps a dropped style off the map. */
+export async function loadBasemapPref(): Promise<BasemapPref> {
+  const raw = await AsyncStorage.getItem(KEYS.basemap);
+  return isBasemap(raw) ? raw : 'system';
+}
+
+export async function saveBasemapPref(pref: BasemapPref): Promise<void> {
+  if (pref === 'system') await AsyncStorage.removeItem(KEYS.basemap);
+  else await AsyncStorage.setItem(KEYS.basemap, pref);
 }
 
 export async function loadRemindersEnabled(): Promise<boolean> {

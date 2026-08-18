@@ -2,6 +2,7 @@ export { type State, type Translate, getState, subscribe } from './state';
 export {
   initStore,
   refresh,
+  setBasemap,
   setLang,
   toggleFavorite,
   removeFavorite,
@@ -15,6 +16,7 @@ export {
   useFavorites,
   useLang,
   useLangPref,
+  useBasemapPref,
   useT,
   useToday,
   useRemindersEnabled,

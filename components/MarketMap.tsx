@@ -11,25 +11,29 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import ConstrainedCamera, { type ConstrainedCameraRef } from './ConstrainedCamera';
 import MapCallout from './MapCallout';
 import { Icon } from './ui';
+import { resolveBasemap, type Basemap } from '../lib/core/basemap';
 import type { Market } from '../lib/core/market-logic';
 import { SG_BOUNDS, type Center } from '../lib/core/map-bounds';
 import { configureMapLogging } from '../lib/maplibre';
 import { getMarketDistance, marketCoords } from '../lib/markets';
-import { useFavorites, useT } from '../lib/store';
-import { darkColors, lightColors, radius, space, useTheme, type Palette } from '../lib/theme';
+import { useBasemapPref, useFavorites, useT } from '../lib/store';
+import { darkColors, lightColors, radius, space, useTheme } from '../lib/theme';
 import { useLocation } from '../lib/useLocation';
 
 const SINGAPORE_CENTER: Center = [103.8198, 1.3521];
 const LOCATED_ZOOM = 15;
 
 /** OneMap raster tiles, the same source the web app fed to Leaflet. No API key needed. */
-function buildStyle(colors: Palette): StyleSpecification {
+function buildStyle(basemap: Basemap): StyleSpecification {
+  // The gap colour follows the *basemap* and not the app's appearance: someone reading a dark map
+  // in daylight should not get white flashing through the seams.
+  const colors = basemap === 'Night' ? darkColors : lightColors;
   return {
     version: 8,
     sources: {
       onemap: {
         type: 'raster',
-        tiles: ['https://www.onemap.gov.sg/maps/tiles/Default/{z}/{x}/{y}.png'],
+        tiles: [`https://www.onemap.gov.sg/maps/tiles/${basemap}/{z}/{x}/{y}.png`],
         tileSize: 256,
         minzoom: 11,
         maxzoom: 19,
@@ -46,8 +50,14 @@ function buildStyle(colors: Palette): StyleSpecification {
   };
 }
 
-// Module constants: a style object rebuilt per render would reload the map every time.
-const MAP_STYLES = { light: buildStyle(lightColors), dark: buildStyle(darkColors) };
+// Module constants: a style object rebuilt per render would reload the map every time. Spelled out
+// rather than mapped over `BASEMAPS`, so the `Record` makes a new basemap without a style fail
+// typecheck — the same trick `zh` in i18n.ts plays on a missing translation.
+const MAP_STYLES: Record<Basemap, StyleSpecification> = {
+  Default: buildStyle('Default'),
+  Grey: buildStyle('Grey'),
+  Night: buildStyle('Night'),
+};
 
 // Here rather than in the root layout, which would drag the whole MapLibre module graph into every
 // cold start: this file is its only importer, and the handler is read only while a `Map` is up.
@@ -57,6 +67,7 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
   const theme = useTheme();
   const t = useT();
   const favorites = useFavorites();
+  const basemapPref = useBasemapPref();
   const { coords, status, request } = useLocation();
   const camera = useRef<ConstrainedCameraRef>(null);
   const [selected, setSelected] = useState<Market | null>(null);
@@ -102,7 +113,7 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
     <View style={styles.container}>
       <Map
         style={styles.map}
-        mapStyle={MAP_STYLES[theme.scheme]}
+        mapStyle={MAP_STYLES[resolveBasemap(basemapPref, theme.scheme)]}
         logo={false}
         compass={false}
         onPress={() => setSelected(null)}

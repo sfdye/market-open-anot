@@ -4,15 +4,18 @@ import Constants from 'expo-constants';
 import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
 import { AUTHOR_URL, DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
+import { BASEMAPS, type Basemap } from '../../../lib/core/basemap';
 import { MAX_FAVORITES } from '../../../lib/core/favorites';
 import { formatDate, formatDateTime } from '../../../lib/date';
 import { listScheduled, sendTestReminder } from '../../../lib/notifications';
 import type { ScheduledReminder } from '../../../lib/notifications';
-import type { Lang } from '../../../lib/i18n';
+import type { Lang, StringKey } from '../../../lib/i18n';
 import {
   refresh,
   removeAllFavorites,
+  setBasemap,
   setLang,
+  useBasemapPref,
   useFavorites,
   useFetchedAt,
   useLang,
@@ -25,11 +28,19 @@ import {
 import { space, useTheme } from '../../../lib/theme';
 import { useReminders } from '../../../lib/useReminders';
 
+/** OneMap's tile-path names are no label for a settings row, so each one is worded here. */
+const MAP_STYLE_LABELS: Record<Basemap, StringKey> = {
+  Default: 'mapStyleStandard',
+  Grey: 'mapStyleGrey',
+  Night: 'mapStyleDark',
+};
+
 export default function SettingsScreen() {
   const theme = useTheme();
   const t = useT();
   const lang = useLang();
   const langPref = useLangPref();
+  const basemapPref = useBasemapPref();
   const favorites = useFavorites();
   const markets = useMarkets();
   const fetchedAt = useFetchedAt();
@@ -72,6 +83,23 @@ export default function SettingsScreen() {
           onPress={() => setLang('zh')}
           last
         />
+      </SettingsSection>
+
+      <SettingsSection title={t('mapStyle')} footer={t('mapStyleFooter')}>
+        <Row
+          label={t('mapStyleAuto')}
+          accessory={basemapPref === 'system' ? check : undefined}
+          onPress={() => setBasemap('system')}
+        />
+        {BASEMAPS.map((basemap, i) => (
+          <Row
+            key={basemap}
+            label={t(MAP_STYLE_LABELS[basemap])}
+            accessory={basemapPref === basemap ? check : undefined}
+            onPress={() => setBasemap(basemap)}
+            last={i === BASEMAPS.length - 1}
+          />
+        ))}
       </SettingsSection>
 
       <SettingsSection title={t('reminders')} footer={t('reminderSchedule')}>

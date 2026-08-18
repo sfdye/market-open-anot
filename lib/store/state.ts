@@ -1,3 +1,4 @@
+import type { BasemapPref } from '../core/basemap';
 import { sgToday } from '../core/reminder-schedule';
 import type { Market } from '../core/market-logic';
 import { translate, type Lang, type StringKey } from '../i18n';
@@ -16,6 +17,12 @@ export interface State {
   lang: Lang;
   /** Bound to `lang` so its identity is stable — components memoise on it. */
   t: Translate;
+  /**
+   * The map's basemap, as chosen. No resolved twin beside it the way `lang` has one: `'system'`
+   * resolves against the light/dark appearance, which lives in `useTheme` and not in this state,
+   * so `resolveBasemap` runs where the map is drawn.
+   */
+  basemapPref: BasemapPref;
   /** Today in Singapore. Advances on foreground and at SGT midnight. */
   today: Date;
   remindersEnabled: boolean;
@@ -40,6 +47,7 @@ let state: State = {
   langPref: 'system',
   lang: 'en',
   t: translators.en,
+  basemapPref: 'system',
   today: sgToday(),
   remindersEnabled: false,
   // Assume dismissed until storage says otherwise, so the prompt never flashes in.
