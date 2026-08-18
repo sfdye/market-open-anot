@@ -1,24 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import {
-  Camera,
   GeoJSONSource,
   Layer,
   Map,
   UserLocation,
-  type CameraRef,
   type StyleSpecification,
 } from '@maplibre/maplibre-react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import ConstrainedCamera, { type ConstrainedCameraRef } from './ConstrainedCamera';
 import MapCallout from './MapCallout';
 import { Icon } from './ui';
 import type { Market } from '../lib/core/market-logic';
+import { SG_BOUNDS, type Center } from '../lib/core/map-bounds';
+import { configureMapLogging } from '../lib/maplibre';
 import { getMarketDistance, marketCoords } from '../lib/markets';
 import { useFavorites, useT } from '../lib/store';
 import { darkColors, lightColors, radius, space, useTheme, type Palette } from '../lib/theme';
 import { useLocation } from '../lib/useLocation';
 
-const SINGAPORE_CENTER: [number, number] = [103.8198, 1.3521];
+const SINGAPORE_CENTER: Center = [103.8198, 1.3521];
 const LOCATED_ZOOM = 15;
 
 /** OneMap raster tiles, the same source the web app fed to Leaflet. No API key needed. */
@@ -32,6 +33,8 @@ function buildStyle(colors: Palette): StyleSpecification {
         tileSize: 256,
         minzoom: 11,
         maxzoom: 19,
+        // OneMap serves nothing outside this box, and asking anyway costs a failed decode.
+        bounds: SG_BOUNDS,
         attribution: 'OneMap | © Singapore Land Authority',
       },
     },
@@ -46,12 +49,16 @@ function buildStyle(colors: Palette): StyleSpecification {
 // Module constants: a style object rebuilt per render would reload the map every time.
 const MAP_STYLES = { light: buildStyle(lightColors), dark: buildStyle(darkColors) };
 
+// Here rather than in the root layout, which would drag the whole MapLibre module graph into every
+// cold start: this file is its only importer, and the handler is read only while a `Map` is up.
+configureMapLogging();
+
 export default function MarketMap({ markets }: { markets: Market[] }) {
   const theme = useTheme();
   const t = useT();
   const favorites = useFavorites();
   const { coords, status, request } = useLocation();
-  const camera = useRef<CameraRef>(null);
+  const camera = useRef<ConstrainedCameraRef>(null);
   const [selected, setSelected] = useState<Market | null>(null);
 
   // Circles are drawn by the GPU from one source, so all ~123 markets stay cheap. Native view
@@ -99,9 +106,12 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
         logo={false}
         compass={false}
         onPress={() => setSelected(null)}
+        onRegionDidChange={(e) => camera.current?.constrain(e.nativeEvent)}
       >
-        <Camera
+        {/* OneMap draws nothing outside Singapore, and every market is inside it. */}
+        <ConstrainedCamera
           ref={camera}
+          limit={SG_BOUNDS}
           initialViewState={{
             center: coords ? [coords.lng, coords.lat] : SINGAPORE_CENTER,
             zoom: coords ? 14 : 12,
