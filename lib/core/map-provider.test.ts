@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { isMapProvider, mapUrl, resolveMapProvider } from './map-provider.ts';
+import { isMapProvider, mapUrl, resolveMapProvider, type InstalledMaps } from './map-provider.ts';
 
 const PLACE = { lat: 1.3521, lng: 103.8198, label: 'Tekka Market', address: 'Blk 665 Buffalo Rd' };
 
@@ -24,39 +24,43 @@ describe('resolveMapProvider', () => {
   });
 });
 
+const BOTH: InstalledMaps = { apple: true, google: true };
+const GOOGLE_ONLY: InstalledMaps = { apple: false, google: true };
+const APPLE_ONLY: InstalledMaps = { apple: true, google: false };
+
 describe('mapUrl', () => {
-  test('Apple Maps carries the label so the pin reads as the market', () => {
-    const url = mapUrl(PLACE, { provider: 'apple', platform: 'ios', googleAppInstalled: false });
+  test('Apple Maps searches by market name near the coordinates to find the POI listing', () => {
+    const url = mapUrl(PLACE, { provider: 'apple', platform: 'ios', installed: BOTH });
     assert.equal(url, 'maps:0,0?q=Tekka%20Market@1.3521,103.8198');
   });
 
   test('Google Maps uses the address string so the pin has a readable label', () => {
-    const url = mapUrl(PLACE, { provider: 'google', platform: 'ios', googleAppInstalled: true });
+    const url = mapUrl(PLACE, { provider: 'google', platform: 'ios', installed: BOTH });
     assert.equal(url, 'comgooglemaps://?q=Blk%20665%20Buffalo%20Rd&center=1.3521,103.8198');
   });
 
   test('Google Maps web fallback also uses the address string', () => {
-    const url = mapUrl(PLACE, { provider: 'google', platform: 'ios', googleAppInstalled: false });
+    const url = mapUrl(PLACE, { provider: 'google', platform: 'ios', installed: APPLE_ONLY });
     assert.equal(url, 'https://www.google.com/maps/search/?api=1&query=Blk%20665%20Buffalo%20Rd');
   });
 
   test('Google Maps falls back to coordinates when no address is supplied', () => {
     const noAddr = { lat: 1.3521, lng: 103.8198, label: 'Tekka Market' };
-    const url = mapUrl(noAddr, { provider: 'google', platform: 'ios', googleAppInstalled: true });
+    const url = mapUrl(noAddr, { provider: 'google', platform: 'ios', installed: BOTH });
     assert.equal(url, 'comgooglemaps://?q=1.3521%2C103.8198&center=1.3521,103.8198');
   });
 
   test('Android hands off to the default map app whatever the provider says', () => {
     // There is no Apple Maps to prefer, and `geo:` is already the user's own choice of app.
     const geo = 'geo:0,0?q=1.3521,103.8198(Tekka%20Market)';
-    const android = { platform: 'android', googleAppInstalled: true } as const;
+    const android = { platform: 'android', installed: GOOGLE_ONLY } as const;
     assert.equal(mapUrl(PLACE, { ...android, provider: 'apple' }), geo);
     assert.equal(mapUrl(PLACE, { ...android, provider: 'google' }), geo);
   });
 
-  test('escapes a name that would otherwise break the query', () => {
-    const place = { ...PLACE, label: 'Blk 1 & 2 (Market)' };
-    const url = mapUrl(place, { provider: 'apple', platform: 'ios', googleAppInstalled: false });
+  test('escapes special characters in the address query', () => {
+    const place = { ...PLACE, address: 'Blk 1 & 2 (Market)' };
+    const url = mapUrl(place, { provider: 'google', platform: 'ios', installed: APPLE_ONLY });
     assert.ok(url.includes('%20%26%20'), url);
   });
 });

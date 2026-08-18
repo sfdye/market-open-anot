@@ -85,18 +85,18 @@ export interface MapPlace {
  */
 export function mapUrl(
   place: MapPlace,
-  env: { provider: MapProvider; platform: PlatformName; googleAppInstalled: boolean }
+  env: { provider: MapProvider; platform: PlatformName; installed: InstalledMaps }
 ): string {
   const { lat, lng } = place;
   const label = encodeURIComponent(place.label);
   const at = `${lat},${lng}`;
-  const googleQuery = encodeURIComponent(place.address ?? at);
+  const query = encodeURIComponent(place.address ?? at);
 
   if (!supportsMapChoice(env.platform)) return `geo:0,0?q=${at}(${label})`;
   if (env.provider === 'google') {
-    return env.googleAppInstalled
-      ? `${MAP_SCHEMES.google}://?q=${googleQuery}&center=${at}`
-      : `https://www.google.com/maps/search/?api=1&query=${googleQuery}`;
+    return env.installed.google
+      ? `${MAP_SCHEMES.google}://?q=${query}&center=${at}`
+      : `https://www.google.com/maps/search/?api=1&query=${query}`;
   }
   return `${MAP_SCHEMES.apple}:0,0?q=${label}@${at}`;
 }

@@ -43,6 +43,7 @@ export function useMapProvider(pref: MapProviderPref): MapProvider | null {
   const [installed, setInstalled] = useState<InstalledMaps | null>(null);
 
   useEffect(() => {
+    if (pref !== 'auto') return;
     let alive = true;
     void probeInstalledMaps().then((next) => {
       if (alive) setInstalled(next);
@@ -50,7 +51,7 @@ export function useMapProvider(pref: MapProviderPref): MapProvider | null {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [pref]);
 
   if (pref !== 'auto') return pref;
   return installed && resolveMapProvider(pref, installed);
@@ -69,7 +70,7 @@ export async function openInMaps(place: MapPlace, pref: MapProviderPref): Promis
   const url = mapUrl(place, {
     provider: resolveMapProvider(pref, installed),
     platform: Platform.OS,
-    googleAppInstalled: installed.google,
+    installed,
   });
   try {
     await Linking.openURL(url);
