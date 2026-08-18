@@ -21,6 +21,11 @@
     },
     "ios": {
       "bundleIdentifier": "com.sfdye.openanot",
+      "icon": {
+        "light": "./assets/icon.png",
+        "dark": "./assets/mark-white.png",
+        "tinted": "./assets/icon-tinted.png"
+      },
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -30,6 +35,7 @@
       "package": "com.sfdye.openanot",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2e7d32"
       },
       "predictiveBackGestureEnabled": false,
@@ -45,10 +51,13 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
+          "image": "./assets/mark-white.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#2e7d32"
+          "backgroundColor": "#2e7d32",
+          "dark": {
+            "backgroundColor": "#1b5e20"
+          }
         }
       ],
       [

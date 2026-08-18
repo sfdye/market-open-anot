@@ -27,6 +27,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     // Derived, so it cannot drift from `app.json`. A scheme of its own matters: sharing the release
     // one would leave iOS to pick whichever app it liked for a deep link.
     scheme: `${config.scheme}dev`,
+    // Spread, not replaced, so `app.json`'s icon variants reach the dev app too.
     ios: { ...config.ios, bundleIdentifier: id },
     android: { ...config.android, package: id },
   } as ExpoConfig;
