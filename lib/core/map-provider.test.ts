@@ -52,7 +52,7 @@ describe('mapUrl', () => {
 
   test('Android hands off to the default map app whatever the provider says', () => {
     // There is no Apple Maps to prefer, and `geo:` is already the user's own choice of app.
-    const geo = 'geo:0,0?q=1.3521,103.8198(Tekka%20Market)';
+    const geo = 'geo:1.3521,103.8198?q=Blk%20665%20Buffalo%20Rd';
     const android = { platform: 'android', installed: GOOGLE_ONLY } as const;
     assert.equal(mapUrl(PLACE, { ...android, provider: 'apple' }), geo);
     assert.equal(mapUrl(PLACE, { ...android, provider: 'google' }), geo);

@@ -92,7 +92,7 @@ export function mapUrl(
   const at = `${lat},${lng}`;
   const query = encodeURIComponent(place.address ?? at);
 
-  if (!supportsMapChoice(env.platform)) return `geo:0,0?q=${at}(${label})`;
+  if (!supportsMapChoice(env.platform)) return `geo:${at}?q=${query}`;
   if (env.provider === 'google') {
     return env.installed.google
       ? `${MAP_SCHEMES.google}://?q=${query}&center=${at}`
