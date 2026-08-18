@@ -15,6 +15,10 @@ import { useNotificationRouting } from '../lib/useNotificationRouting';
 void SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ fade: true, duration: 200 });
 
+// The labelled back-button modes are space-aware, so the same button reads "< Back" behind a
+// short market name and "<" behind a long one; "minimal" is the only mode that never varies.
+const rootScreenOptions = { headerBackButtonDisplayMode: 'minimal' } as const;
+
 export default function RootLayout() {
   const theme = useTheme();
   const t = useT();
@@ -33,12 +37,7 @@ export default function RootLayout() {
         <ThemeProvider value={navigationTheme(theme)}>
           <SplashGate />
           <StatusBar style="auto" />
-          {/* The screen under every pushed route is `(tabs)`, which has no header and so no
-              title, so `headerBackTitle` supplies one — otherwise iOS labels the back button
-              "(tabs)". Disabling the menu — it holds one entry at this depth — turns off iOS's
-              space-aware shrinking, which otherwise reads "<" behind a long market name where a
-              short one reads "< Back". The label is worth more than the title width it costs. */}
-          <Stack screenOptions={{ headerBackTitle: t('back'), headerBackButtonMenuEnabled: false }}>
+          <Stack screenOptions={rootScreenOptions}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             {/* Detail and the add modal sit above the tabs, so a notification tap, the map
                 callout and the Today list can all reach them the same way. */}
