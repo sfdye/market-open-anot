@@ -27,7 +27,7 @@ export const zhNames: Record<string, string> = {
   'Holland Drive Market and Food Centre': '荷兰通道巴刹与熟食中心',
   'Ghim Moh Road Blk 20': '锦茂路第20座',
   'Clementi Ave 2 Market/Cooked Food Centre': '金文泰2道巴刹与熟食中心',
-  'Taman Jurong Market and Food Centre': '淡滨尼花园巴刹与熟食中心',
+  'Taman Jurong Market and Food Centre': '达曼裕廊巴刹与熟食中心',
   'Boon Lay Place Market and Food Village': '文礼坊巴刹与美食村',
   'Jurong West Hawker Centre': '裕廊西小贩中心',
   'Yuhua Market and Hawker Centre': '裕华巴刹与小贩中心',
