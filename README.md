@@ -95,6 +95,25 @@ One number set by hand instead of `autoIncrement`, which bumps each platform in 
 
 TestFlight needs a paid Apple Developer account; the certificate a local `expo run:ios` uses is development-only and expires. EAS stores signing credentials on its servers rather than on disk, so none of it belongs in this repo — and because the repo is public, leave `appleId` out of `eas.json` and let `eas submit` prompt, or pass `EXPO_APPLE_ID`.
 
+## Over-the-air updates
+
+JS and asset changes — a translation fix, a market-name correction in `zh-names.ts`, a closure-logic quirk in `normalizeMarkets` — ship without a store release via EAS Update. `expo-updates` is baked into the binary, `app.json` sets a `runtimeVersion` policy of `appVersion` (an update targets the current `version`, so it reaches every install of that store release), and the `production` EAS profile carries `channel: "production"`, which the `apk` profile inherits through `extends`. The first build that contains `expo-updates` still goes through the stores — a binary without the module can never receive an OTA, so the build already in TestFlight/Play is unreachable until users install the release that adds it.
+
+```sh
+eas update --channel production --message "Fix 芽笼巴刹 translation" --environment production
+```
+
+`eas update` bundles the **working tree**, not committed git state — the opposite of `eas build`, which uploads the committed tree — so a clean working tree matters at publish time even though nothing is built in the cloud. Users get the update on the next cold start (it downloads in the background) and run it on the cold start after that; reminder copy and the schedule rebuild on that cold start, because the store reschedules from a fresh key on launch.
+
+What still needs a store release: a new native dependency, an SDK upgrade, or any `app.json` change that touches native config (permissions, icons, splash, `infoPlist`). Bumping `version` for such a release moves the runtime version, so later updates target the new version; to also reach users who have not updated from the store, republish the same update against the old runtime version.
+
+```sh
+eas channel:view production              # the branch the channel points at, and its latest update
+eas branch:view production               # the update history on that branch
+eas update:republish --branch production # re-push a previous update — the practical rollback
+eas update:rollback                      # interactive: roll back to a prior update or to the embedded bundle
+```
+
 ## Install a local build on a device
 
 `eas build --local` writes `build-<timestamp>.ipa` to the repo root (gitignored). Getting it onto a phone is a cable job — iOS will not install an `.ipa` that arrives by AirDrop. Connect and unlock the phone, then:

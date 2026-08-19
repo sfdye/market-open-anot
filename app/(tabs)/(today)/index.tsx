@@ -7,12 +7,10 @@ import { EmptyState, Fab, FAB_CLEARANCE, Notice, Text } from '../../../component
 import { formatDateLong } from '../../../lib/date';
 import { findMarket } from '../../../lib/markets';
 import {
-  refresh,
   useFavorites,
   useLang,
   useMarkets,
   useReady,
-  useRefreshing,
   useStale,
   useT,
   useToday,
@@ -30,7 +28,6 @@ export default function TodayScreen() {
   const today = useToday();
   const t = useT();
   const stale = useStale();
-  const refreshing = useRefreshing();
   const reminders = useReminders();
   const { fontScale } = useWindowDimensions();
 
@@ -66,13 +63,6 @@ export default function TodayScreen() {
         ItemSeparatorComponent={() => (
           <View style={[styles.separator, { backgroundColor: theme.colors.borderLight }]} />
         )}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => void refresh()}
-            tintColor={theme.colors.textMuted}
-          />
-        }
         ListHeaderComponent={
           <View style={styles.header}>
             <Text variant="subhead" tone="muted">
