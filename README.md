@@ -95,6 +95,23 @@ One number set by hand instead of `autoIncrement`, which bumps each platform in 
 
 TestFlight needs a paid Apple Developer account; the certificate a local `expo run:ios` uses is development-only and expires. EAS stores signing credentials on its servers rather than on disk, so none of it belongs in this repo — and because the repo is public, leave `appleId` out of `eas.json` and let `eas submit` prompt, or pass `EXPO_APPLE_ID`.
 
+## Install a local build on a device
+
+`eas build --local` writes `build-<timestamp>.ipa` to the repo root (gitignored). Getting it onto a phone is a cable job — iOS will not install an `.ipa` that arrives by AirDrop. Connect and unlock the phone, then:
+
+```sh
+xcrun devicectl list devices
+xcrun devicectl device install app --device <identifier> <path-to-ipa>
+```
+
+Which phones accept the file is fixed at build time by `distribution`: `development` and `apk` are `internal`, ad-hoc signed for exactly the UDIDs registered on the account; `production` provisions no devices and is TestFlight-only. Register a phone with `eas device:create` and rebuild. To read back what a given `.ipa` allows:
+
+```sh
+unzip -p <path-to-ipa> 'Payload/*.app/embedded.mobileprovision' | security cms -D -i /dev/stdin | plutil -p -
+```
+
+A `development` `.ipa` is a dev client with no JS bundle, so it needs `npm start` on the same network. For a self-contained dev app, skip EAS: `APP_VARIANT=development npx expo run:ios --configuration Release` builds, signs and installs in one step.
+
 ## History
 
 This started as a plain HTML/CSS/TypeScript PWA at openanot.com, with a Cloudflare Worker for web push. The native app replaced it: reminders are scheduled on-device, so there is nothing left to host. The web app, its service worker and the Worker were removed — `git log` has them if you want to look.
