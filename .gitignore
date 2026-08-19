@@ -6,6 +6,11 @@ node_modules/
 dist/
 expo-env.d.ts
 
+# local build artifacts — `eas build --local` writes these to the repo root
+/*.ipa
+/*.apk
+/*.aab
+
 # generated native projects — regenerate from app.json with `expo prebuild`
 /ios
 /android

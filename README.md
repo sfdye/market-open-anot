@@ -95,6 +95,25 @@ One number set by hand instead of `autoIncrement`, which bumps each platform in 
 
 TestFlight needs a paid Apple Developer account; the certificate a local `expo run:ios` uses is development-only and expires. EAS stores signing credentials on its servers rather than on disk, so none of it belongs in this repo — and because the repo is public, leave `appleId` out of `eas.json` and let `eas submit` prompt, or pass `EXPO_APPLE_ID`.
 
+## Install a local build on a device
+
+Adding `--local` to any `eas build` runs it on this machine instead of in the cloud and writes `build-<timestamp>.ipa` to the repo root, gitignored. Getting that file onto a phone is a cable job, not a transfer: iOS will not install an `.ipa` that arrives by AirDrop or through the Files app. Connect the phone, unlock it, trust the Mac, then:
+
+```sh
+xcrun devicectl list devices                                          # copy the device's identifier
+xcrun devicectl device install app --device <identifier> <path-to-ipa>
+```
+
+A phone reads `unavailable` in that list until it is connected and unlocked. Xcode's **Window → Devices and Simulators** does the same thing by dragging the `.ipa` onto *Installed Apps*, if you would rather see it happen.
+
+Which phones will accept the file was fixed at build time by the profile, and no amount of retrying changes it. `development` and `apk` are `distribution: internal`, so the binary is ad-hoc signed and the profile inside it lists exactly the device UDIDs registered on the Apple account — any other phone refuses the install without saying why. `production` is signed for the App Store and provisions no devices at all, so a production `.ipa` cannot be sideloaded onto anything; that one goes to TestFlight. Register a phone with `eas device:create` and rebuild, because the device list is baked into the binary. To read back what a given `.ipa` allows:
+
+```sh
+unzip -p <path-to-ipa> 'Payload/*.app/embedded.mobileprovision' | security cms -D -i /dev/stdin | plutil -p -
+```
+
+An `.ipa` from the `development` profile is a dev client with no JS bundle inside it, so what installs is the launcher and it needs `npm start` on the same network to have anything to show. For a dev-variant app that stands on its own, skip EAS: `APP_VARIANT=development npx expo run:ios --configuration Release` builds, signs and installs in one step, and stays until `npm run ios` puts the debug build back.
+
 ## History
 
 This started as a plain HTML/CSS/TypeScript PWA at openanot.com, with a Cloudflare Worker for web push. The native app replaced it: reminders are scheduled on-device, so there is nothing left to host. The web app, its service worker and the Worker were removed — `git log` has them if you want to look.
