@@ -20,11 +20,11 @@ describe('versionLabel', () => {
 
 describe('buildSummary', () => {
   test('is one line naming the app, build and platform', () => {
-    assert.equal(buildSummary(INFO), 'Open Anot? 1.0.0 (4) · ios 18.5');
+    assert.equal(buildSummary(INFO), 'Open Anot? 1.0.0 (4) · iOS 18.5');
   });
 
   test('Android reports its API level, which is what Platform.Version gives there', () => {
-    assert.equal(buildSummary({ ...INFO, os: 'android', osVersion: 35 }), 'Open Anot? 1.0.0 (4) · android 35');
+    assert.equal(buildSummary({ ...INFO, os: 'android', osVersion: 35 }), 'Open Anot? 1.0.0 (4) · Android 35');
   });
 });
 
@@ -32,7 +32,7 @@ describe('feedbackUrl', () => {
   test('quotes the build summary below a blank writing area', () => {
     assert.equal(
       feedbackUrl('mailto:t@sfdye.com', INFO),
-      'mailto:t@sfdye.com?subject=Open%20Anot%3F%20feedback&body=%0A%0A%E2%80%94%0AOpen%20Anot%3F%201.0.0%20(4)%20%C2%B7%20ios%2018.5'
+      'mailto:t@sfdye.com?subject=Open%20Anot%3F%20feedback&body=%0A%0A%E2%80%94%0AOpen%20Anot%3F%201.0.0%20(4)%20%C2%B7%20iOS%2018.5'
     );
   });
 });

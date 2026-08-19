@@ -18,9 +18,13 @@ export function versionLabel({ version, build }: BuildInfo): string {
   return build ? `${version} (${build})` : version;
 }
 
-/** One paste-ready line — "Open Anot? 1.0.0 (4) · ios 18.5" — everything a bug report needs. */
+/** Platform.OS values are lowercase identifiers; an email to a human wants the real names. */
+const OS_NAMES: Record<string, string> = { ios: 'iOS', android: 'Android' };
+
+/** One paste-ready line — "Open Anot? 1.0.0 (4) · iOS 18.5" — everything a bug report needs. */
 export function buildSummary(info: BuildInfo): string {
-  return `Open Anot? ${versionLabel(info)} · ${info.os} ${info.osVersion}`;
+  const os = OS_NAMES[info.os] ?? info.os;
+  return `Open Anot? ${versionLabel(info)} · ${os} ${info.osVersion}`;
 }
 
 /** The mailto opens with the build details already quoted below a blank writing area. */
