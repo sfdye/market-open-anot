@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Linking, Platform, ScrollView, StyleSheet, Switch } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
 import Constants from 'expo-constants';
 import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
 import { DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
 import { MAX_FAVORITES } from '../../../lib/core/favorites';
-import { buildSummary, feedbackUrl, versionLabel, type BuildInfo } from '../../../lib/core/version-info';
+import { feedbackUrl, versionLabel, type BuildInfo } from '../../../lib/core/version-info';
 import { formatDate, formatDateTime } from '../../../lib/date';
 import { MAP_CHOICE_SUPPORTED, MAP_PROVIDERS, useMapProvider } from '../../../lib/maps';
 import { listScheduled, sendTestReminder } from '../../../lib/notifications';
@@ -55,11 +54,6 @@ export default function SettingsScreen() {
     }),
     os: Platform.OS,
     osVersion: Platform.Version,
-  };
-
-  const copyVersion = () => {
-    void Clipboard.setStringAsync(buildSummary(buildInfo));
-    Alert.alert(t('versionCopied'));
   };
 
   const confirmRemoveAll = () => {
@@ -173,13 +167,7 @@ export default function SettingsScreen() {
           accessory={external}
           onPress={() => void Linking.openURL(feedbackUrl(FEEDBACK_URL, buildInfo))}
         />
-        <Row
-          label={t('version')}
-          detail={versionLabel(buildInfo)}
-          accessibilityHint={t('versionCopyHint')}
-          onPress={copyVersion}
-          last
-        />
+        <Row label={t('version')} detail={versionLabel(buildInfo)} last />
       </SettingsSection>
 
       {__DEV__ && (
