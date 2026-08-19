@@ -97,22 +97,20 @@ TestFlight needs a paid Apple Developer account; the certificate a local `expo r
 
 ## Install a local build on a device
 
-Adding `--local` to any `eas build` runs it on this machine instead of in the cloud and writes `build-<timestamp>.ipa` to the repo root, gitignored. Getting that file onto a phone is a cable job, not a transfer: iOS will not install an `.ipa` that arrives by AirDrop or through the Files app. Connect the phone, unlock it, trust the Mac, then:
+`eas build --local` writes `build-<timestamp>.ipa` to the repo root (gitignored). Getting it onto a phone is a cable job — iOS will not install an `.ipa` that arrives by AirDrop. Connect and unlock the phone, then:
 
 ```sh
-xcrun devicectl list devices                                          # copy the device's identifier
+xcrun devicectl list devices
 xcrun devicectl device install app --device <identifier> <path-to-ipa>
 ```
 
-A phone reads `unavailable` in that list until it is connected and unlocked. Xcode's **Window → Devices and Simulators** does the same thing by dragging the `.ipa` onto *Installed Apps*, if you would rather see it happen.
-
-Which phones will accept the file was fixed at build time by the profile, and no amount of retrying changes it. `development` and `apk` are `distribution: internal`, so the binary is ad-hoc signed and the profile inside it lists exactly the device UDIDs registered on the Apple account — any other phone refuses the install without saying why. `production` is signed for the App Store and provisions no devices at all, so a production `.ipa` cannot be sideloaded onto anything; that one goes to TestFlight. Register a phone with `eas device:create` and rebuild, because the device list is baked into the binary. To read back what a given `.ipa` allows:
+Which phones accept the file is fixed at build time by `distribution`: `development` and `apk` are `internal`, ad-hoc signed for exactly the UDIDs registered on the account; `production` provisions no devices and is TestFlight-only. Register a phone with `eas device:create` and rebuild. To read back what a given `.ipa` allows:
 
 ```sh
 unzip -p <path-to-ipa> 'Payload/*.app/embedded.mobileprovision' | security cms -D -i /dev/stdin | plutil -p -
 ```
 
-An `.ipa` from the `development` profile is a dev client with no JS bundle inside it, so what installs is the launcher and it needs `npm start` on the same network to have anything to show. For a dev-variant app that stands on its own, skip EAS: `APP_VARIANT=development npx expo run:ios --configuration Release` builds, signs and installs in one step, and stays until `npm run ios` puts the debug build back.
+A `development` `.ipa` is a dev client with no JS bundle, so it needs `npm start` on the same network. For a self-contained dev app, skip EAS: `APP_VARIANT=development npx expo run:ios --configuration Release` builds, signs and installs in one step.
 
 ## History
 
