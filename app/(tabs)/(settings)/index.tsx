@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Switch } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Platform, ScrollView, StyleSheet, Switch } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import Constants from 'expo-constants';
 import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
-import { AUTHOR_URL, DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
+import { DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
 import { MAX_FAVORITES } from '../../../lib/core/favorites';
+import { buildSummary, feedbackUrl, versionLabel, type BuildInfo } from '../../../lib/core/version-info';
 import { formatDate, formatDateTime } from '../../../lib/date';
 import { MAP_CHOICE_SUPPORTED, MAP_PROVIDERS, useMapProvider } from '../../../lib/maps';
 import { listScheduled, sendTestReminder } from '../../../lib/notifications';
@@ -42,6 +44,23 @@ export default function SettingsScreen() {
   const stale = useStale();
   const reminders = useReminders();
   const [scheduled, setScheduled] = useState<ScheduledReminder[] | null>(null);
+
+  // The build number lives under different keys per platform (app.json) but is one number —
+  // `npm run release` sets both. Version alone is useless for "what build are you on?" feedback.
+  const buildInfo: BuildInfo = {
+    version: Constants.expoConfig?.version ?? null,
+    build: Platform.select({
+      ios: Constants.expoConfig?.ios?.buildNumber,
+      default: Constants.expoConfig?.android?.versionCode?.toString(),
+    }),
+    os: Platform.OS,
+    osVersion: Platform.Version,
+  };
+
+  const copyVersion = () => {
+    void Clipboard.setStringAsync(buildSummary(buildInfo));
+    Alert.alert(t('versionCopied'));
+  };
 
   const confirmRemoveAll = () => {
     Alert.alert(t('removeAllTitle'), t('removeAllConfirm'), [
@@ -145,11 +164,6 @@ export default function SettingsScreen() {
 
       <SettingsSection title={t('about')}>
         <Row
-          label={t('madeBy')}
-          accessory={external}
-          onPress={() => void Linking.openURL(AUTHOR_URL)}
-        />
-        <Row
           label={t('source')}
           accessory={external}
           onPress={() => void Linking.openURL(REPO_URL)}
@@ -157,9 +171,15 @@ export default function SettingsScreen() {
         <Row
           label={t('feedback')}
           accessory={external}
-          onPress={() => void Linking.openURL(FEEDBACK_URL)}
+          onPress={() => void Linking.openURL(feedbackUrl(FEEDBACK_URL, buildInfo))}
         />
-        <Row label={t('version')} detail={Constants.expoConfig?.version ?? '—'} last />
+        <Row
+          label={t('version')}
+          detail={versionLabel(buildInfo)}
+          accessibilityHint={t('versionCopyHint')}
+          onPress={copyVersion}
+          last
+        />
       </SettingsSection>
 
       {__DEV__ && (
