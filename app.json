@@ -21,7 +21,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.sfdye.openanot",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "icon": {
         "light": "./assets/icon.png",
         "dark": "./assets/mark-white.png",
@@ -38,7 +38,7 @@
     },
     "android": {
       "package": "com.sfdye.openanot",
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "monochromeImage": "./assets/adaptive-icon.png",
