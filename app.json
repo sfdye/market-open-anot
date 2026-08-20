@@ -47,8 +47,8 @@
       "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "monochromeImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#2e7d32"
+        "monochromeImage": "./assets/monochrome-icon.png",
+        "backgroundImage": "./assets/adaptive-background.png"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
