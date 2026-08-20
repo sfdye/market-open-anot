@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { PixelRatio, StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import StatusPill from './StatusPill';
@@ -11,7 +11,7 @@ import { formatDate } from '../lib/date';
 import { getDisplayName, getNextCleaningDate } from '../lib/markets';
 import { statusLabel, statusTone } from '../lib/status';
 import { removeFavorite, useLang, useMarket, useT, useToday } from '../lib/store';
-import { radius, REFLOW_FONT_SCALE, space, useTheme } from '../lib/theme';
+import { COMPACT_FONT_SCALE, radius, space, useTheme } from '../lib/theme';
 
 const THUMB_SIZE = 56;
 
@@ -26,6 +26,7 @@ function MarketRowInner({ name }: { name: string }) {
   const today = useToday();
   const lang = useLang();
   const t = useT();
+  const { fontScale } = useWindowDimensions();
 
   // A market can vanish from the NEA dataset between refreshes; the store prunes it, so this is
   // only the render in between.
@@ -45,9 +46,9 @@ function MarketRowInner({ name }: { name: string }) {
       ? `${t('nextClosure')} ${formatDate(nextCleaning, lang)}`
       : '';
 
-  // Past this font scale the pill wins the horizontal squeeze and truncates the name, so the row
-  // becomes a column and drops the thumbnail to buy the text its width back.
-  const stacked = PixelRatio.getFontScale() > REFLOW_FONT_SCALE;
+  // Keep the status on the same visual row at accessibility sizes. The compact hierarchy buys the
+  // pill enough width without capping anything: every label still follows its UIKit type ramp.
+  const compact = fontScale > COMPACT_FONT_SCALE;
   const remove = () => removeFavorite(market.name);
 
   return (
@@ -63,31 +64,32 @@ function MarketRowInner({ name }: { name: string }) {
         }}
         style={({ pressed }) => [
           styles.row,
-          stacked && styles.rowStacked,
           { backgroundColor: pressed ? theme.colors.borderLight : theme.colors.surface },
         ]}
       >
-        {!!market.photourl && !stacked && (
-          <Image
-            source={{ uri: market.photourl }}
-            style={[styles.thumb, { backgroundColor: theme.colors.borderLight }]}
-            contentFit="cover"
-            cachePolicy="memory-disk"
-            transition={150}
-            accessible={false}
-          />
-        )}
-        <View style={[styles.info, stacked && styles.infoStacked]}>
-          <Text variant="headline">{displayName}</Text>
-          {!!next && (
-            <Text variant="subhead" tone="muted">
-              {next}
-            </Text>
+        <View style={styles.main}>
+          {!!market.photourl && (
+            <Image
+              source={{ uri: market.photourl }}
+              style={[styles.thumb, { backgroundColor: theme.colors.borderLight }]}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={150}
+              accessible={false}
+            />
           )}
+          <View style={styles.info}>
+            <Text variant={compact ? 'bodyStrong' : 'headline'}>{displayName}</Text>
+            {!!next && (
+              <Text variant={compact ? 'footnote' : 'subhead'} tone="muted">
+                {next}
+              </Text>
+            )}
+          </View>
         </View>
-        <View style={[styles.trailing, stacked && styles.trailingStacked]}>
-          <StatusPill tone={tone} label={label} />
-          {!stacked && <Icon name="chevron" size={18} color="textFaint" />}
+        <View style={styles.trailing}>
+          <StatusPill tone={tone} label={label} compact={compact} />
+          <Icon name="chevron" size={18} color="textFaint" />
         </View>
       </Pressable>
     </SwipeToDeleteRow>
@@ -106,11 +108,9 @@ const styles = StyleSheet.create({
     // minHeight, never height: the row grows with the system font size.
     minHeight: 76,
   },
-  rowStacked: { flexDirection: 'column', alignItems: 'flex-start' },
   thumb: { width: THUMB_SIZE, height: THUMB_SIZE, borderRadius: radius.thumb },
   info: { flex: 1, gap: 2 },
-  infoStacked: { flex: 0, alignSelf: 'stretch' },
+  main: { flexDirection: 'row', alignItems: 'center', gap: space.md, flex: 1, minWidth: 0 },
   // Bounded so "MOST STALLS CLOSED" wraps inside the pill rather than eating the name's width.
-  trailing: { flexDirection: 'row', alignItems: 'center', gap: space.sm, maxWidth: 132 },
-  trailingStacked: { maxWidth: undefined },
+  trailing: { flexDirection: 'row', alignItems: 'center', gap: space.sm, maxWidth: 132, flexShrink: 0 },
 });
