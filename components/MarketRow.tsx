@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import StatusPill from './StatusPill';
@@ -103,7 +103,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.md,
-    paddingHorizontal: space.lg,
+    paddingLeft: space.lg,
+    // Android's full-bleed list spec is 16dp and reads natively; iOS's inset-grouped
+    // convention puts a disclosure chevron further in, so 16pt reads as edge-cramped.
+    paddingRight: Platform.OS === 'ios' ? space.xl : space.lg,
     paddingVertical: space.md,
     // minHeight, never height: the row grows with the system font size.
     minHeight: 76,
