@@ -3,6 +3,12 @@
     "name": "Open Anot?",
     "slug": "open-anot",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d5839351-432f-4eb1-980d-c5497d98f7dc"
+    },
     "scheme": "openanot",
     "orientation": "portrait",
     "platforms": [

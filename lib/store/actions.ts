@@ -12,11 +12,14 @@ import { getState, setState, subscribe } from './state';
 /**
  * How long cached NEA data is trusted before a background revalidation.
  *
- * The web app kept data for a week. Six hours instead, because the closures this misses are
- * exactly the ones that matter: a maintenance closure announced at short notice is invisible
- * to stale data, and the reminders scheduled from it would be wrong.
+ * The dataset is a planned schedule, not a live feed: quarterly cleaning and other-works closures
+ * are published days to weeks ahead, so nothing worth catching arrives with sub-day notice. A daily
+ * check lands any new entry with margin, and means one fetch a day per active user — the app is
+ * opened once a day to answer "is it open today?". Reminders are unaffected: the schedule rebuilds
+ * from the cache on every cold start regardless of when the last fetch ran. A manual refresh is
+ * still available in Settings and as pull-to-refresh on Today, for when a user wants it now.
  */
-const REVALIDATE_AFTER_MS = 6 * 60 * 60 * 1000;
+const REVALIDATE_AFTER_MS = 24 * 60 * 60 * 1000;
 
 /** Collapses the burst of updates from adding several markets in a row into one reschedule. */
 const RESCHEDULE_DEBOUNCE_MS = 400;
