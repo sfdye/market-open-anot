@@ -5,10 +5,12 @@ derived and gets overwritten. Nothing here ships: `assetBundlePatterns` only dec
 which *resolved* assets get bundled, so what keeps the 135 KB master out of the app is
 simply that no code `require`s it.
 
-`layers/` is the approved source artwork: a market-stall awning, its supporting frame,
-and a lit bulb on an emerald ground. The stall still reads as *the place* rather than as
-a product, so it covers cooked-food centres and wet markets alike. Separating the
-foreground forms adds depth without baking in fake glass effects or shadows.
+`icon-master-1024.png` is the approved mark: a market-stall awning with a lit bulb
+above it, white line art on green. It reads as *the place* rather than as a product,
+which is what makes it cover cooked-food centres and wet markets alike, and the bulb
+carries the "open" idea in pure shape — so the mark survives Android's themed-icon
+layer and iOS's tinted variant, both of which throw colour away. Its geometry is not
+redesigned: the only visual treatment is a restrained green surface gradient behind it.
 
 ## Regenerating `assets/`
 
@@ -18,8 +20,9 @@ npm run icons
 
 Needs Pillow and librsvg (`pip install pillow`, `brew install librsvg`) — neither is a
 repo dependency, because this runs by hand when the mark changes, not in CI. The script
-renders the SVG layers, composites platform-specific variants, and verifies that the
-Android foreground fits the Material safe zone.
+cuts one alpha matte from the master and derives every raster from it; it prints its
+measurements and exits non-zero on a master it cannot trust. Why each threshold is what
+it is lives next to that threshold in `make_icons.py`.
 
 The generated outputs feed distinct consumers, so their framing is not free to change:
 
@@ -34,11 +37,11 @@ The generated outputs feed distinct consumers, so their framing is not free to c
 | `notification-icon.png` | the `expo-notifications` status-bar glyph |
 | `open-anot-google-play-512.png` | Google Play listing upload, not bundled into the app |
 
-The Android foreground is centered and scaled to the `66dp` safe zone inside its `108dp`
-canvas. The Play listing export is a full, unmasked 512px square: Google Play supplies
-its own rounding and shadow. The tinted variant has to be authored opaque because
-`@expo/prebuild-config` flattens everything except `dark` onto white — a transparent
-tinted master would render as a white rectangle.
+So padding the splash art would quietly reframe the App Store dark icon, and the Android
+keyline scale governs the themed icon too. The Android foreground and background are
+separate layers, allowing each launcher to apply its own mask and effects. The tinted
+variant has to be authored opaque because `@expo/prebuild-config` flattens everything
+except `dark` onto white — a transparent tinted master would render as a white rectangle.
 
 The notification glyph is the one asset that is *not* mechanically derived. Downscaling
 the app-icon art turns the line work to mush at 24dp, so `notification-icon.svg` is a
@@ -49,17 +52,18 @@ dot. The awning alone is unambiguous, and it is the app icon's dominant shape, s
 still look like the same app. The deep scallop fringe is what makes it a canopy at that
 size; it is the first thing to lose if the lobes are flattened.
 
-## iOS Liquid Glass
+## If the mark is ever revised
 
-The SVG layers are deliberately ready for Icon Composer: opaque full-bleed background,
-and crisp foreground edges with no pre-applied bevel, glow, shadow, or mask. Import them
-in this order: `background.svg`, `frame.svg`, `awning.svg`, `bulb.svg`; then tune the
-default, dark, and mono appearances in Icon Composer and commit the resulting `.icon`
-bundle. Expo SDK 57 accepts that bundle as a direct string at `ios.icon`, replacing the
-raster icon object in `app.json`. Keep the raster pipeline until the Composer bundle has
-been inspected on device; Icon Composer has no supported document-authoring CLI.
+Author the new version as **SVG**, not as a raster. About a third of `make_icons.py` —
+finding the rounded rect, thresholding luminance into a matte, probing that the ground is
+flat, and hand-rolling a disc dilation because Pillow's `MaxFilter` is square — exists
+only because the master is pixels rather than paths. From an SVG, `rsvg-convert` (already
+a prerequisite here) plus a `stroke-width` change replaces all of it, and the master
+becomes text-diffable. The current raster master stays because it is the approved,
+pixel-verified artwork and re-tracing it would change it — that is a reason to keep this
+one, not a reason to produce the next one the same way.
 
-The app-facing icon outputs are 1024px; `expo prebuild` generates the whole native size
-matrix from them, every `mipmap-*dpi` density for Android and a single 1024 per
-appearance for iOS. The only smaller committed export is the 512px Google Play listing
-asset, which is uploaded separately and never bundled into the app.
+Only 1024px masters are committed; `expo prebuild` generates the whole native size matrix
+from them, every `mipmap-*dpi` density for Android and a single 1024 per appearance for
+iOS, which is all Xcode 16+ wants. `open-anot-google-play-512.png` is the one smaller
+export: upload it separately to Google Play, which provides its own corner mask and shadow.
