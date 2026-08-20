@@ -4,8 +4,7 @@ export {
   radius,
   typeScale,
   HIT_SIZE,
-  REFLOW_FONT_SCALE,
-  fontCap,
+  COMPACT_FONT_SCALE,
   type TypeVariant,
 } from './tokens';
 export { type Theme, lightTheme, darkTheme, useTheme, useThemedStyles } from './useTheme';

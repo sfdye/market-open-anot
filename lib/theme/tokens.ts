@@ -36,11 +36,7 @@ export const typeScale = {
 export type TypeVariant = keyof typeof typeScale;
 
 /**
- * Font-scale threshold past which rows stop trying to fit a name and a status pill on one
- * line and stack instead. Above roughly 1.4 the pill wins the squeeze and the name truncates
- * to nothing, which is exactly backwards.
+ * At iOS's first accessibility category, Today rows use their compact hierarchy so the daily
+ * status remains beside its market instead of becoming a separate block below it.
  */
-export const REFLOW_FONT_SCALE = 1.4;
-
-/** Caps for text that shares a fixed-height native container. Never cap body copy. */
-export const fontCap = { pill: 1.6, tabLabel: 1.4 } as const;
+export const COMPACT_FONT_SCALE = 1.4;

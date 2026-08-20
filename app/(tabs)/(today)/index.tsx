@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import MarketRow from '../../../components/MarketRow';
 import ReminderPrompt from '../../../components/ReminderPrompt';
@@ -32,6 +32,7 @@ export default function TodayScreen() {
   const stale = useStale();
   const refreshing = useRefreshing();
   const reminders = useReminders();
+  const { fontScale } = useWindowDimensions();
 
   // First run: open the picker straight away rather than showing an empty list. A push
   // rather than a redirect, so the tab and the modal do not fight over the route.
@@ -57,6 +58,9 @@ export default function TodayScreen() {
         renderItem={({ item }) => <MarketRow name={item} />}
         // Required for the large title to collapse on scroll.
         contentInsetAdjustmentBehavior="automatic"
+        // FlatList caches its header layout. Re-rendering on a Dynamic Type change prevents the
+        // date from keeping its former one-line height and being covered by the first market.
+        extraData={fontScale}
         initialNumToRender={8}
         contentContainerStyle={styles.content}
         ItemSeparatorComponent={() => (

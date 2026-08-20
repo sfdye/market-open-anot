@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { Text } from './ui';
 import type { StatusTone } from '../lib/status';
-import { fontCap, radius, space, useTheme } from '../lib/theme';
+import { radius, space, useTheme } from '../lib/theme';
 
 const FILL: Record<StatusTone, 'statusOpen' | 'statusWarn' | 'statusClosed'> = {
   open: 'statusOpen',
@@ -10,20 +10,23 @@ const FILL: Record<StatusTone, 'statusOpen' | 'statusWarn' | 'statusClosed'> = {
 };
 
 /**
- * The pill is one of the two places that caps font scaling: it sits next to a market name in a
- * row, and past ~1.6× it would push the name out entirely. The row reflows to a column first.
+ * The pill grows freely with Dynamic Type. Today uses the compact variant at accessibility sizes
+ * so the daily status remains alongside the market rather than becoming its own row.
  */
-export default function StatusPill({ tone, label }: { tone: StatusTone; label: string }) {
+export default function StatusPill({
+  tone,
+  label,
+  compact = false,
+}: {
+  tone: StatusTone;
+  label: string;
+  compact?: boolean;
+}) {
   const theme = useTheme();
 
   return (
     <View style={[styles.pill, { backgroundColor: theme.colors[FILL[tone]] }]}>
-      <Text
-        variant="callout"
-        tone="onStatus"
-        maxFontSizeMultiplier={fontCap.pill}
-        style={styles.label}
-      >
+      <Text variant={compact ? 'footnote' : 'callout'} tone="onStatus" style={styles.label}>
         {label}
       </Text>
     </View>
@@ -37,5 +40,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     alignItems: 'center',
   },
-  label: { textTransform: 'uppercase', textAlign: 'center' },
+  label: { fontWeight: '600', textTransform: 'uppercase', textAlign: 'center' },
 });
