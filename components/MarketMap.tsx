@@ -60,6 +60,8 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
   const t = useT();
   const favorites = useFavorites();
   const { coords, status, request } = useLocation();
+  const coordsRef = useRef(coords);
+  coordsRef.current = coords;
   const camera = useRef<ConstrainedCameraRef>(null);
   const [selected, setSelected] = useState<Market | null>(null);
 
@@ -123,21 +125,18 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
   }, []);
 
   const locate = () => {
-    if (coords) {
-      const view: MapView = { center: [coords.lng, coords.lat], zoom: LOCATED_ZOOM };
-      clearTimeout(saveTimer.current);
-      pendingUserView.current = null;
-      latestView.current = view;
-      saveMapView(view);
-      camera.current?.easeTo(view);
-      return;
-    }
-    if (status === 'denied') {
+    if (!coords && status === 'denied') {
       void Linking.openSettings();
       return;
     }
+    // The puck (MapLibre <UserLocation>) tracks the device continuously; `coords` from
+    // useLocation is a one-shot fix that goes stale. Always re-acquire on tap so the camera
+    // heads to where the blue dot actually is, not where it was at app start.
     awaitingFix.current = true;
-    request();
+    const before = coordsRef.current;
+    void request({ fresh: true }).then(() => {
+      if (coordsRef.current === before) awaitingFix.current = false;
+    });
   };
 
   return (

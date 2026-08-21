@@ -28,8 +28,8 @@ function subscribe(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
-function acquire(): Promise<void> {
-  if (inflight) return inflight;
+function acquire(options?: { fresh?: boolean }): Promise<void> {
+  if (inflight && !options?.fresh) return inflight;
   inflight = (async () => {
     set({ status: 'requesting' });
     try {
@@ -38,7 +38,11 @@ function acquire(): Promise<void> {
         set({ status: 'denied' });
         return;
       }
-      const last = await Location.getLastKnownPositionAsync({ maxAge: MAX_AGE_MS });
+      // A user-initiated "locate me" wants the current position, not a stale last-known fix
+      // that may predate a physical move. The 5-minute cache stays for background acquisition.
+      const last = options?.fresh
+        ? null
+        : await Location.getLastKnownPositionAsync({ maxAge: MAX_AGE_MS });
       const position =
         last ??
         (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }));
@@ -59,7 +63,7 @@ function acquire(): Promise<void> {
 export function useLocation(): {
   coords: Coords | null;
   status: LocationStatus;
-  request: () => void;
+  request: (options?: { fresh?: boolean }) => Promise<void>;
 } {
   const current = useSyncExternalStore(subscribe, () => snapshot);
 
@@ -67,5 +71,5 @@ export function useLocation(): {
     if (snapshot.status === 'idle') void acquire();
   }, []);
 
-  return { ...current, request: () => void acquire() };
+  return { ...current, request: (options) => acquire(options) };
 }
