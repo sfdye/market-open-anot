@@ -9,6 +9,7 @@ export {
   removeAllFavorites,
   setRemindersEnabled,
   dismissReminderCard,
+  saveMapView,
 } from './actions';
 export {
   useReady,

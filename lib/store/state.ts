@@ -1,6 +1,7 @@
 import { sgToday } from '../core/reminder-schedule';
 import type { Market } from '../core/market-logic';
 import type { MapProviderPref } from '../core/map-provider';
+import type { MapView } from '../core/map-view';
 import { translate, type Lang, type StringKey } from '../i18n';
 import { resolveLang, type LangPref } from '../lang';
 
@@ -31,6 +32,8 @@ export interface State {
   /** A user-initiated refresh is in flight, for the pull-to-refresh spinner. */
   refreshing: boolean;
   fetchedAt: number | null;
+  /** Where the map was last left, so a return visit reopens there instead of the overview. */
+  mapView: MapView | null;
 }
 
 // One translator per language rather than a closure per render, so `t` is a stable reference.
@@ -54,6 +57,7 @@ let state: State = {
   stale: false,
   refreshing: false,
   fetchedAt: null,
+  mapView: null,
 };
 
 const listeners = new Set<() => void>();

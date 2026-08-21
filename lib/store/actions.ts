@@ -2,6 +2,7 @@ import { Alert, AppState, type AppStateStatus } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { MAX_FAVORITES, toggledFavorites } from '../core/favorites';
 import type { MapProvider } from '../core/map-provider';
+import type { MapView } from '../core/map-view';
 import { sgInstant, sgToday } from '../core/reminder-schedule';
 import type { LangPref } from '../lang';
 import { fetchMarketsFromAPI, findMarket } from '../markets';
@@ -89,6 +90,16 @@ export function setRemindersEnabled(remindersEnabled: boolean): void {
 export function dismissReminderCard(): void {
   setState({ reminderCardDismissed: true });
   void storage.saveReminderCardDismissed();
+}
+
+/**
+ * Persisted on every map region settle, so the next visit reopens where the last one left off rather
+ * than the Singapore overview. `null` (a first-ever visit) is what makes the map default to the
+ * user's current location instead.
+ */
+export function saveMapView(view: MapView): void {
+  setState({ mapView: view });
+  void storage.saveMapView(view);
 }
 
 // ---------------------------------------------------------------------------
@@ -203,6 +214,7 @@ export function initStore(): void {
       cached,
       fetchedAt,
       cardDismissed,
+      mapView,
     ] = await Promise.all([
       storage.loadLangPref(),
       storage.loadMapProvider(),
@@ -211,6 +223,7 @@ export function initStore(): void {
       storage.loadCachedMarkets(),
       storage.loadFetchedAt(),
       storage.loadReminderCardDismissed(),
+      storage.loadMapView(),
     ]);
 
     setState({
@@ -221,6 +234,7 @@ export function initStore(): void {
       reminderCardDismissed: cardDismissed,
       fetchedAt,
       today: sgToday(),
+      mapView,
       ...(cached ? { markets: cached } : {}),
       ready: true,
     });
