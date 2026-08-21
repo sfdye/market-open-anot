@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
 import {
   GeoJSONSource,
   Layer,
@@ -10,7 +11,7 @@ import {
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import ConstrainedCamera, { type ConstrainedCameraRef } from './ConstrainedCamera';
 import MapCallout from './MapCallout';
-import { Icon } from './ui';
+import { Icon, Text } from './ui';
 import type { Market } from '../lib/core/market-logic';
 import { SG_BOUNDS, type Center } from '../lib/core/map-bounds';
 import { MAX_MAP_ZOOM, MIN_MAP_ZOOM, type MapView } from '../lib/core/map-view';
@@ -242,6 +243,21 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
         {!!coords && <UserLocation />}
       </Map>
 
+      <View
+        pointerEvents="none"
+        style={[
+          styles.attribution,
+          { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+        ]}
+      >
+        <Image
+          source={require('../assets/attribution/onemap-logo.png')}
+          style={styles.attributionLogo}
+          accessible={false}
+        />
+        <Text variant="footnote">OneMap © contributors | Singapore Land Authority</Text>
+      </View>
+
       {!selected && (
         <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.controlWrap}>
           <Pressable
@@ -277,6 +293,20 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
+  attribution: {
+    position: 'absolute',
+    top: space.sm,
+    left: space.sm,
+    maxWidth: '90%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.xs,
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+    borderRadius: radius.pill,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  attributionLogo: { width: 20, height: 20 },
   // Not the ui/Fab: a map control, squarer and on a surface fill, and placed by the animated
   // wrapper it fades in with rather than by itself.
   controlWrap: { position: 'absolute', right: space.md, bottom: space.md },

@@ -50,7 +50,7 @@ Those two are the whole of CI (`.github/workflows/test.yml`); there is no lint s
 
 - `npm run metadata:ios` / `metadata:android` — push metadata + screenshots (no binary).
 - `npm run metadata:pull:ios` / `metadata:pull:android` — re-sync after dashboard edits; skip this and a later push overwrites your manual changes.
-- iOS metadata lives in `fastlane/metadata/{en-US,zh-Hans}/`; Android in `fastlane/metadata/android/{en-US,zh-CN}/` — note the different locale codes for Simplified Chinese.
+- iOS metadata lives in `fastlane/metadata/{en-US,zh-Hans}/`; Android's default listing is `fastlane/metadata/android/en-SG/`, with `en-US/` and `zh-CN/` localizations.
 - Screenshots are captured via Maestro (`npm run screenshots:ios` / `screenshots:android`), not fastlane's `snapshot`/`screengrab` — the repo has no XCTest or UiAutomator. The flow in `e2e/screenshots/` reuses `testID`s from the e2e flows. After capture, copy PNGs into `fastlane/screenshots/<locale>/` (deliver) and `fastlane/metadata/android/<locale>/images/phoneScreenshots/` (supply).
 - Play feature graphic and 512px icon are derived from `brand/icon-master-1024.png` (Pillow), not hand-drawn — regenerate if the mark changes.
 - Credentials (gitignored): ASC API key `.p8` in `~/.appstoreconnect/private_keys/`; Play service account JSON at `fastlane/play-service-account.json`. Reuse the Play key from EAS Submit credentials.
@@ -105,6 +105,7 @@ Tapping the address opens Apple Maps or Google Maps; the setting is iOS-only (An
 
 ### Map (MapLibre + OneMap)
 
+- OneMap's terms require its logo and attribution on the map plus licence links in Settings; do not remove either.
 - Tiles end at `SG_BOUNDS` (`lib/core/map-bounds.ts`). The raster source's `bounds` only stops requests, so OneMap still serves non-PNG boundary tiles that MapLibre logs as errors — silenced in dev by `configureMapLogging()` (`lib/maplibre.ts`), called at module scope from `MarketMap` to keep MapLibre out of cold start.
 - `ConstrainedCamera` keeps empty background unreachable: `maxBounds` gets `SG_BOUNDS` inset by half the viewport span, and `constrain()` eases the centre back after an outgrowing zoom-out. A reported centre outside `SG_BOUNDS` is startup garbage — ignore it, don't clamp it. Keep its state in that component; a settle in `MarketMap` would re-serialise the tile style and all features.
 - Initial view priority: saved `mapView` → user's current location (first visit, via `awaitingFix`) → Singapore overview.

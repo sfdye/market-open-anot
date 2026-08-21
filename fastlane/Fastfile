@@ -25,7 +25,7 @@ end
 
 # ─── Android: Google Play metadata + screenshots ────────────────────────
 # EAS owns builds and binary submission. This lane only pushes listing text
-# and screenshots. Run after editing fastlane/metadata/android/{en-US,zh-CN}/.
+# and screenshots. Run after editing fastlane/metadata/android/{en-SG,en-US,zh-CN}/.
 #
 # To pull existing metadata: fastlane supply init
 platform :android do
@@ -35,9 +35,11 @@ platform :android do
       skip_upload_aab: true,
       skip_upload_apk: true,
       skip_upload_changelogs: true,
-      skip_upload_screenshots: true,
+      skip_upload_screenshots: false,
       track: "internal",
       metadata_path: "fastlane/metadata/android",
+      changes_not_sent_for_review: false,
+      rescue_changes_not_sent_for_review: false,
     )
   end
 end
