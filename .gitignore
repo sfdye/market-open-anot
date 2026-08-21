@@ -46,5 +46,12 @@ yarn-error.*
 # tooling
 .playwright-mcp/
 
+# fastlane — credentials and generated reports
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/play-service-account.json
+fastlane/asc-api-key.json
+fastlane/README.md
+
 # lib/ here is source, not build output — some global ignore files exclude it by convention
 !/lib/
