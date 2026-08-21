@@ -1,0 +1,43 @@
+ASC_API_KEY_PATH = "fastlane/asc-api-key.json"
+
+default_platform(:ios)
+
+# ─── iOS: App Store Connect metadata + screenshots ──────────────────────
+# EAS owns builds and binary submission. This lane only pushes listing text
+# and screenshots. Run after editing fastlane/metadata/{en-US,zh-Hans}/.
+#
+# To pull existing metadata: fastlane deliver download_metadata
+platform :ios do
+  desc "Push metadata and screenshots to App Store Connect (no binary)"
+  lane :metadata do
+    deliver(
+      api_key_path: ASC_API_KEY_PATH,
+      skip_binary_upload: true,
+      skip_screenshots: false,
+      force: true,
+      run_precheck_before_submit: false,
+      metadata_path: "fastlane/metadata",
+      screenshots_path: "fastlane/screenshots",
+      submit_for_review: false,
+    )
+  end
+end
+
+# ─── Android: Google Play metadata + screenshots ────────────────────────
+# EAS owns builds and binary submission. This lane only pushes listing text
+# and screenshots. Run after editing fastlane/metadata/android/{en-US,zh-CN}/.
+#
+# To pull existing metadata: fastlane supply init
+platform :android do
+  desc "Push metadata and screenshots to Google Play (no binary)"
+  lane :metadata do
+    supply(
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_changelogs: true,
+      skip_upload_screenshots: true,
+      track: "internal",
+      metadata_path: "fastlane/metadata/android",
+    )
+  end
+end
