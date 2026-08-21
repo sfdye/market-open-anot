@@ -88,7 +88,7 @@ function MarketRowInner({ name }: { name: string }) {
           </View>
         </View>
         <View style={styles.trailing}>
-          <StatusPill tone={tone} label={label} compact={compact} />
+          <StatusPill tone={tone} label={label} compact={compact} style={styles.pill} />
           <Icon name="chevron" size={18} color="textFaint" />
         </View>
       </Pressable>
@@ -104,8 +104,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space.md,
     paddingLeft: space.lg,
-    // Android's full-bleed list spec is 16dp and reads natively; iOS's inset-grouped
-    // convention puts a disclosure chevron further in, so 16pt reads as edge-cramped.
+    // A little extra iOS breathing room; Android retains its Material row inset.
     paddingRight: Platform.OS === 'ios' ? space.xl : space.lg,
     paddingVertical: space.md,
     // minHeight, never height: the row grows with the system font size.
@@ -114,6 +113,7 @@ const styles = StyleSheet.create({
   thumb: { width: THUMB_SIZE, height: THUMB_SIZE, borderRadius: radius.thumb },
   info: { flex: 1, gap: 2 },
   main: { flexDirection: 'row', alignItems: 'center', gap: space.md, flex: 1, minWidth: 0 },
-  // Bounded so "MOST STALLS CLOSED" wraps inside the pill rather than eating the name's width.
-  trailing: { flexDirection: 'row', alignItems: 'center', gap: space.sm, maxWidth: 132, flexShrink: 0 },
+  // Bound the pill, not this whole group: the chevron and its gap must fit inside the row too.
+  trailing: { flexDirection: 'row', alignItems: 'center', gap: space.sm, flexShrink: 0 },
+  pill: { maxWidth: 132 },
 });
