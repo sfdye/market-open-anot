@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isLang, normalizeMarkets, type Market } from './core/market-logic';
 import { isMapProvider, type MapProvider, type MapProviderPref } from './core/map-provider';
+import { parseMapView, type MapView } from './core/map-view';
 import type { LangPref } from './lang';
 
 // Namespaced `oa_`. Nothing migrates the `moa_`/`poa_` keys these were renamed from across two
@@ -12,9 +13,14 @@ const KEYS = {
   fetched: 'oa_fetched',
   lang: 'oa_lang',
   mapProvider: 'oa_map_provider',
+  mapView: 'oa_map_view',
   reminders: 'oa_reminders_enabled',
   reminderCardDismissed: 'oa_reminder_card_dismissed',
 } as const;
+
+// Region events can arrive close together; queue writes so an older view can never finish after a
+// newer one and become the next launch's starting point.
+let mapViewWrite = Promise.resolve();
 
 async function readJSON<T>(key: string, fallback: T): Promise<T> {
   try {
@@ -97,4 +103,18 @@ export async function loadReminderCardDismissed(): Promise<boolean> {
 
 export async function saveReminderCardDismissed(): Promise<void> {
   await AsyncStorage.setItem(KEYS.reminderCardDismissed, 'true');
+}
+
+export async function loadMapView(): Promise<MapView | null> {
+  const raw = await readJSON<unknown>(KEYS.mapView, null);
+  const view = parseMapView(raw);
+  return view;
+}
+
+export async function saveMapView(view: MapView): Promise<void> {
+  const value = JSON.stringify(view);
+  mapViewWrite = mapViewWrite
+    .catch(() => undefined)
+    .then(() => AsyncStorage.setItem(KEYS.mapView, value));
+  await mapViewWrite;
 }

@@ -39,6 +39,10 @@ export default function ConstrainedCamera({ limit, ref, ...cameraProps }: Props)
     () => ({
       easeTo: (options) => camera.current?.easeTo(options),
       constrain: ({ bounds, center }) => {
+        // A real camera centre cannot sit outside `limit` — the native clamp forbids it — so one
+        // that does is a startup artefact (the map reports [0, 0] before applying
+        // `initialViewState`). Acting on it would ease the restored view to a clamped corner.
+        if (clampCenter(center, limit) !== null) return;
         const inset = centerLimit(bounds, limit);
         setCenterBounds((current) => (sameBounds(current, inset) ? current : inset));
         // Only a zoom changes the span, and zooming out near an edge lands the centre outside the

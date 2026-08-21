@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { AppState, Linking, Pressable, StyleSheet, View } from 'react-native';
 import {
   GeoJSONSource,
   Layer,
@@ -13,14 +13,16 @@ import MapCallout from './MapCallout';
 import { Icon } from './ui';
 import type { Market } from '../lib/core/market-logic';
 import { SG_BOUNDS, type Center } from '../lib/core/map-bounds';
+import { MAX_MAP_ZOOM, MIN_MAP_ZOOM, type MapView } from '../lib/core/map-view';
 import { configureMapLogging } from '../lib/maplibre';
 import { getMarketDistance, marketCoords } from '../lib/markets';
-import { useFavorites, useT } from '../lib/store';
+import { getState, saveMapView, useFavorites, useT } from '../lib/store';
 import { darkColors, lightColors, radius, space, useTheme, type Palette } from '../lib/theme';
 import { useLocation } from '../lib/useLocation';
 
 const SINGAPORE_CENTER: Center = [103.8198, 1.3521];
 const LOCATED_ZOOM = 15;
+const USER_VIEW_SAVE_DELAY_MS = 500;
 
 /** OneMap raster tiles, the same source the web app fed to Leaflet. No API key needed. */
 function buildStyle(colors: Palette): StyleSpecification {
@@ -61,6 +63,14 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
   const camera = useRef<ConstrainedCameraRef>(null);
   const [selected, setSelected] = useState<Market | null>(null);
 
+  // Read once at mount, not subscribed: a re-render on every save (i.e. every region settle) would
+  // re-serialise the tile style and all ~123 features, the cost ConstrainedCamera's state placement
+  // exists to avoid. The store is hydrated before the map tab can be reached, so this is current.
+  const [savedView] = useState<MapView | null>(() => getState().mapView);
+  const latestView = useRef<MapView | null>(savedView);
+  const pendingUserView = useRef<MapView | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
   // Circles are drawn by the GPU from one source, so all ~123 markets stay cheap. Native view
   // annotations would not.
   const collection = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(() => {
@@ -78,16 +88,48 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
   }, [markets, favorites]);
 
   // Set when "locate me" is tapped before a fix exists, so the camera moves as soon as one lands.
+  // Also armed on a first-ever visit (no saved view) so the map defaults to the user's location.
   const awaitingFix = useRef(false);
   useEffect(() => {
-    if (!coords || !awaitingFix.current) return;
+    if (!savedView && !coords) awaitingFix.current = true;
+  }, []);
+  useEffect(() => {
+    if (!coords || (savedView && !awaitingFix.current)) return;
+    const view: MapView = {
+      center: [coords.lng, coords.lat],
+      zoom: awaitingFix.current ? LOCATED_ZOOM : 14,
+    };
+    clearTimeout(saveTimer.current);
+    pendingUserView.current = null;
+    latestView.current = view;
+    saveMapView(view);
+    if (!awaitingFix.current) return;
     awaitingFix.current = false;
-    camera.current?.easeTo({ center: [coords.lng, coords.lat], zoom: LOCATED_ZOOM });
-  }, [coords]);
+    camera.current?.easeTo(view);
+  }, [coords, savedView]);
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (next) => {
+      if (next === 'active') return;
+      clearTimeout(saveTimer.current);
+      pendingUserView.current = null;
+      if (latestView.current) saveMapView(latestView.current);
+    });
+    return () => {
+      subscription.remove();
+      clearTimeout(saveTimer.current);
+      pendingUserView.current = null;
+      if (latestView.current) saveMapView(latestView.current);
+    };
+  }, []);
 
   const locate = () => {
     if (coords) {
-      camera.current?.easeTo({ center: [coords.lng, coords.lat], zoom: LOCATED_ZOOM });
+      const view: MapView = { center: [coords.lng, coords.lat], zoom: LOCATED_ZOOM };
+      clearTimeout(saveTimer.current);
+      pendingUserView.current = null;
+      latestView.current = view;
+      saveMapView(view);
+      camera.current?.easeTo(view);
       return;
     }
     if (status === 'denied') {
@@ -106,18 +148,49 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
         logo={false}
         compass={false}
         onPress={() => setSelected(null)}
-        onRegionDidChange={(e) => camera.current?.constrain(e.nativeEvent)}
+        onRegionIsChanging={(e) => {
+          if (!e.nativeEvent.userInteraction) return;
+          latestView.current = { center: e.nativeEvent.center, zoom: e.nativeEvent.zoom };
+        }}
+        onRegionDidChange={(e) => {
+          camera.current?.constrain(e.nativeEvent);
+          const view = { center: e.nativeEvent.center, zoom: e.nativeEvent.zoom };
+
+          if (!e.nativeEvent.userInteraction) {
+            // A user at an edge can trigger ConstrainedCamera's corrective ease. Keep the camera
+            // position it actually settles on rather than the pre-correction gesture position.
+            if (!pendingUserView.current) return;
+            clearTimeout(saveTimer.current);
+            pendingUserView.current = null;
+            latestView.current = view;
+            saveMapView(view);
+            return;
+          }
+
+          latestView.current = view;
+          pendingUserView.current = view;
+          clearTimeout(saveTimer.current);
+          saveTimer.current = setTimeout(() => {
+            if (!pendingUserView.current) return;
+            pendingUserView.current = null;
+            if (latestView.current) saveMapView(latestView.current);
+          }, USER_VIEW_SAVE_DELAY_MS);
+        }}
       >
         {/* OneMap draws nothing outside Singapore, and every market is inside it. */}
         <ConstrainedCamera
           ref={camera}
           limit={SG_BOUNDS}
           initialViewState={{
-            center: coords ? [coords.lng, coords.lat] : SINGAPORE_CENTER,
-            zoom: coords ? 14 : 12,
+            center: savedView
+              ? savedView.center
+              : coords
+                ? [coords.lng, coords.lat]
+                : SINGAPORE_CENTER,
+            zoom: savedView ? savedView.zoom : coords ? 14 : 12,
           }}
-          minZoom={11}
-          maxZoom={19}
+          minZoom={MIN_MAP_ZOOM}
+          maxZoom={MAX_MAP_ZOOM}
         />
 
         <GeoJSONSource
