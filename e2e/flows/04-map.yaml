@@ -2,21 +2,27 @@ appId: ${APP_ID}
 tags: [smoke]
 ---
 # Map tab: renders, location permission denied, my-location button present.
-- runFlow: e2e/utils/launch.yaml
+- runFlow: ../utils/launch.yaml
+- tapOn:
+    id: tab-today
 - waitForAnimationToEnd
 # Dismiss auto-opened add modal if present.
-- runScript:
+- runFlow:
     when:
       visible: { id: done-button }
     commands:
-      - tapOn:
-          text: "Tiong Bahru"
-          partial: true
+      - tapOn: "Search.*"
+      - inputText: Tiong Bahru
+      - tapOn: "Tiong Bahru Market"
+      - tapOn: "close"
+      - waitForAnimationToEnd
       - tapOn:
           id: done-button
+      - waitForAnimationToEnd
 # Navigate to Map tab.
 - tapOn:
     id: tab-map
+- waitForAnimationToEnd
 # The my-location button should be visible (location denied, so no user dot).
 - assertVisible:
     id: map-my-location

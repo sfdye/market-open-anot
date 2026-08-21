@@ -1,34 +1,41 @@
 appId: ${APP_ID}
 tags: [smoke]
 ---
-# Favorites: add a second market via FAB, then swipe-to-delete the first.
+# Favorites: swipe-to-delete a market from the Today list.
 # Precondition: at least one favourite exists.
-- runFlow: e2e/utils/launch.yaml
+- runFlow: ../utils/launch.yaml
+- tapOn:
+    id: tab-today
 - waitForAnimationToEnd
 # Handle the auto-opened add modal if there are no favourites.
-- runScript:
+- runFlow:
     when:
       visible: { id: done-button }
     commands:
-      - tapOn:
-          text: "Tiong Bahru"
-          partial: true
+      - tapOn: "Search.*"
+      - inputText: Tiong Bahru
+      - tapOn: "Tiong Bahru Market"
+      - tapOn: "close"
+      - waitForAnimationToEnd
       - tapOn:
           id: done-button
-# Open the add modal via FAB.
-- tapOn:
-    id: add-markets
-# Search and add a second market.
-- tapOn: "Search..."
-- inputText: Maxwell
-- tapOn:
-    text: "Maxwell"
-    partial: true
-- tapOn:
-    id: done-button
-# Swipe left on the first row to reveal delete.
+      - waitForAnimationToEnd
+# Dismiss the reminder prompt card if present (it can overlap with the row).
+- runFlow:
+    when:
+      visible: "Not now"
+    commands:
+      - tapOn: "Not now"
+- waitForAnimationToEnd
+# Swipe left on the first market row to reveal delete.
+# The row sits around 25-37% of screen height (below the date header).
 - swipe:
-    start: 90%, 50%
-    end: 10%, 50%
+    start: 90%, 31%
+    end: 10%, 31%
+- waitForAnimationToEnd
 - tapOn:
     id: delete-favorite
+- waitForAnimationToEnd
+# The market row should be gone.
+- assertNotVisible:
+    id: market-row

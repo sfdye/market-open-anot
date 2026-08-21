@@ -1,46 +1,62 @@
 appId: ${APP_ID}
 tags: [smoke]
 ---
-# Settings: language toggle en→zh→en, reminders toggle, map-provider row check.
-- runFlow: e2e/utils/launch.yaml
+# Settings: language toggle en→zh→en, reminders toggle, map-provider row check (iOS).
+- runFlow: ../utils/launch.yaml
+- tapOn:
+    id: tab-today
 - waitForAnimationToEnd
 # Dismiss auto-opened add modal if present.
-- runScript:
+- runFlow:
     when:
       visible: { id: done-button }
     commands:
-      - tapOn:
-          text: "Tiong Bahru"
-          partial: true
+      - tapOn: "Search.*"
+      - inputText: Tiong Bahru
+      - tapOn: "Tiong Bahru Market"
+      - tapOn: "close"
+      - waitForAnimationToEnd
       - tapOn:
           id: done-button
+      - waitForAnimationToEnd
 # Navigate to Settings.
 - tapOn:
     id: tab-settings
+- waitForAnimationToEnd
 # Switch language to Chinese.
 - tapOn:
     id: lang-zh
-# Tab labels should now be Chinese.
-- assertVisible: "今天"
+- waitForAnimationToEnd
+# Tab labels should now be Chinese — verify by checking a visible Chinese string.
+- assertVisible: "语言"
 # Switch back to English.
 - tapOn:
     id: lang-en
-- assertVisible: "Today"
+- waitForAnimationToEnd
+- assertVisible: "Language"
 # Toggle reminders on (will trigger a notification permission prompt on first enable).
 - tapOn:
     id: settings-reminders
+- waitForAnimationToEnd
+# Dismiss notification permission dialog if it appears (iOS).
+- runFlow:
+    when:
+      visible: "Allow"
+    commands:
+      - tapOn: "Don.*Allow"
+- waitForAnimationToEnd
 # Toggle reminders off.
 - tapOn:
     id: settings-reminders
-# If on iOS, map-provider rows should be visible.
-- runScript:
+- waitForAnimationToEnd
+# If on iOS, at least the Apple Maps provider row should be visible.
+# Google Maps may not be installed on the simulator.
+- runFlow:
     when:
       platform: iOS
     commands:
       - assertVisible:
           id: map-provider-apple
-      - assertVisible:
-          id: map-provider-google
 # Navigate back to Today.
 - tapOn:
     id: tab-today

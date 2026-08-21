@@ -38,6 +38,7 @@ export function Row({
 
   const body = (
     <View
+      testID={testID}
       style={[
         styles.row,
         {

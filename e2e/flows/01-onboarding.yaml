@@ -1,22 +1,28 @@
 appId: ${APP_ID}
 tags: [smoke]
 ---
-# Onboarding: fresh launch auto-pushes /add → search for a market → pick it → Today shows the row.
-- runFlow: e2e/utils/launch.yaml
-# The app auto-navigates to the add-markets modal on first run (no favourites).
-# Give it a moment to hydrate and push the route.
-- waitForAnimationToEnd
+# Onboarding: fresh launch → go to Today → auto-push to /add → search → pick market → back to Today.
+- runFlow: ../utils/launch.yaml
+# Ensure we're on the Today tab (app sometimes starts on Map).
+- tapOn:
+    id: tab-today
+# Wait for the app to hydrate and the auto-push to /add to fire.
+- extendedWaitUntil:
+    visible:
+      id: done-button
+    timeout: 20000
 # Search for a well-known market.
-# The search bar is a native UISearchBar (no testID), so target by placeholder text.
-- tapOn: "Search..."
+- tapOn: "Search.*"
 - inputText: Tiong Bahru
 # Tap the matching picker row.
-- tapOn:
-    text: "Tiong Bahru"
-    partial: true
-# Dismiss the add modal via the Done button.
+- tapOn: "Tiong Bahru Market"
+# Dismiss the keyboard by tapping the search bar's Close button.
+- tapOn: "close"
+- waitForAnimationToEnd
+# Dismiss the add modal via the Done button (now visible after keyboard dismissal).
 - tapOn:
     id: done-button
+- waitForAnimationToEnd
 # Back on Today — the market row should be visible.
 - assertVisible:
     id: market-row
