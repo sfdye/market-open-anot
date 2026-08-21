@@ -1,0 +1,82 @@
+appId: ${APP_ID}
+tags: [smoke]
+---
+# Settings: language toggle en→zh→en, reminders toggle, map-provider row check (iOS).
+- runFlow: ../utils/launch.yaml
+- tapOn:
+    id: tab-today
+- waitForAnimationToEnd
+# Dismiss auto-opened add modal if present.
+- runFlow:
+    when:
+      visible: { id: picker-row }
+    commands:
+      - tapOn: "Search.*"
+      - inputText: Tiong Bahru
+      - tapOn: "Tiong Bahru Market"
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn: "close"
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: Back
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn:
+                id: done-button
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - tapOn: "Navigate up"
+            - waitForAnimationToEnd
+# Navigate to Settings.
+- tapOn:
+    id: tab-settings
+- waitForAnimationToEnd
+# Switch language to Chinese.
+- tapOn:
+    id: lang-zh
+- waitForAnimationToEnd
+# Verify language switch by checking a visible Chinese string.
+- assertVisible: "语言"
+# Switch back to English.
+- tapOn:
+    id: lang-en
+- waitForAnimationToEnd
+- assertVisible: "Language"
+# Toggle reminders on (will trigger a notification permission prompt on first enable).
+- tapOn:
+    id: settings-reminders
+- waitForAnimationToEnd
+# Dismiss notification permission dialog if it appears (iOS uses curly apostrophe).
+- runFlow:
+    when:
+      visible: "Allow"
+    commands:
+      - tapOn: "Don.*Allow"
+- waitForAnimationToEnd
+# Toggle reminders off.
+- tapOn:
+    id: settings-reminders
+- waitForAnimationToEnd
+# If on iOS, at least the Apple Maps provider row should be visible.
+# Google Maps may not be installed on the simulator.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          id: map-provider-apple
+# Navigate back to Today.
+- tapOn:
+    id: tab-today

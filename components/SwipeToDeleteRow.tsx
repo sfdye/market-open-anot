@@ -95,6 +95,7 @@ function DeleteAction({
       <Pressable
         onPress={onPress}
         accessibilityRole="button"
+        testID="delete-favorite"
         accessibilityLabel={label}
         style={({ pressed }) => [
           styles.button,

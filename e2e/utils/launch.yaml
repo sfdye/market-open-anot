@@ -1,0 +1,14 @@
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+    permissions: { all: deny }
+# The app requests location on launch. With clearState + permissions denied,
+# the system dialog may or may not appear depending on prior state.
+# Conditionally dismiss it if present. The apostrophe in "Don't Allow" is a
+# Unicode right single quote (U+2019), so match by regex.
+- runFlow:
+    when:
+      visible: "Don.*Allow"
+    commands:
+      - tapOn: "Don.*Allow"

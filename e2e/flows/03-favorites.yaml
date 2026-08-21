@@ -1,0 +1,72 @@
+appId: ${APP_ID}
+tags: [smoke]
+---
+# Favorites: swipe-to-delete a market from the Today list.
+# Precondition: at least one favourite exists.
+- runFlow: ../utils/launch.yaml
+- tapOn:
+    id: tab-today
+- waitForAnimationToEnd
+# Handle the auto-opened add modal if there are no favourites.
+- runFlow:
+    when:
+      visible: { id: picker-row }
+    commands:
+      - tapOn: "Search.*"
+      - inputText: Tiong Bahru
+      - tapOn: "Tiong Bahru Market"
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn: "close"
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: Back
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn:
+                id: done-button
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - tapOn: "Navigate up"
+            - waitForAnimationToEnd
+# Dismiss the reminder prompt card if present (it can overlap with the row).
+- runFlow:
+    when:
+      visible: "Not now"
+    commands:
+      - tapOn: "Not now"
+- waitForAnimationToEnd
+# Swipe left on the first market row to reveal delete.
+# Row position differs by platform: iOS ~31%, Android ~23%.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 90%, 31%
+          end: 10%, 31%
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - swipe:
+          start: 90%, 23%
+          end: 10%, 23%
+- waitForAnimationToEnd
+- tapOn:
+    id: delete-favorite
+- waitForAnimationToEnd
+# The market row should be gone.
+- assertNotVisible:
+    id: market-row

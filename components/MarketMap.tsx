@@ -247,6 +247,7 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
           <Pressable
             onPress={locate}
             accessibilityRole="button"
+            testID="map-my-location"
             accessibilityLabel={t('myLocation')}
             style={({ pressed }) => [
               styles.control,

@@ -15,6 +15,7 @@ export default function TabsLayout() {
         name="(today)"
         options={{
           title: t('tabToday'),
+          tabBarButtonTestID: 'tab-today',
           tabBarIcon: ({ focused, color }) => (
             <Icon name={focused ? 'today' : 'todayOutline'} size={26} color={color as string} />
           ),
@@ -24,6 +25,7 @@ export default function TabsLayout() {
         name="(map)"
         options={{
           title: t('tabMap'),
+          tabBarButtonTestID: 'tab-map',
           tabBarIcon: ({ focused, color }) => (
             <Icon name={focused ? 'map' : 'mapOutline'} size={26} color={color as string} />
           ),
@@ -33,6 +35,7 @@ export default function TabsLayout() {
         name="(settings)"
         options={{
           title: t('tabSettings'),
+          tabBarButtonTestID: 'tab-settings',
           tabBarIcon: ({ focused, color }) => (
             <Icon
               name={focused ? 'settings' : 'settingsOutline'}

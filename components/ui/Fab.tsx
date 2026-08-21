@@ -13,6 +13,7 @@ export interface FabProps {
   icon: IconName;
   onPress: () => void;
   accessibilityLabel: string;
+  testID?: string;
 }
 
 /**
@@ -21,7 +22,7 @@ export interface FabProps {
  * absorbed the bottom safe-area inset — so a screen outside `(tabs)` would float it over the
  * home indicator, and adding safe-area padding to a tab screen would double-count.
  */
-export function Fab({ icon, onPress, accessibilityLabel }: FabProps) {
+export function Fab({ icon, onPress, accessibilityLabel, testID }: FabProps) {
   const theme = useTheme();
 
   return (
@@ -29,6 +30,7 @@ export function Fab({ icon, onPress, accessibilityLabel }: FabProps) {
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      testID={testID}
       style={({ pressed }) => [
         styles.fab,
         // A filled accent circle already reads as lifted, so dark mode drops the shadow rather

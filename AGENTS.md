@@ -9,9 +9,20 @@ npm test                                  # node --test over lib/core/*.test.ts 
 node --test lib/core/market-logic.test.ts # one file
 node --test --test-name-pattern="parses D/M/YYYY" lib/core/market-logic.test.ts   # one test
 npm run typecheck                         # both TS programs: the app, then lib/core
+npm run e2e                               # maestro test against a running dev build
 ```
 
 Those two are the whole of CI (`.github/workflows/test.yml`); there is no lint step. Screens are not unit-tested — verifying them means a device build, and notifications cannot be checked in a simulator.
+
+## E2E (Maestro)
+
+`e2e/flows/` holds Maestro YAML; `e2e/utils/` holds shared subflows. Local-only — not in CI.
+
+- Install the CLI standalone (`brew tap mobile-dev-inc/tap && brew install maestro`); nothing goes in `package.json` dependencies. Requires Java 17+.
+- Run against the standalone dev build (`com.sfdye.openanot.dev`): `APP_VARIANT=development npx expo run:ios --configuration Release` then `npm run e2e:ios`. Android: `--variant release` on an API ≤ 34 emulator.
+- Flows target elements by `testID` (Maestro's `id:` selector), not by text — accessibility labels are localized. Add a `testID` to any new interactive element a flow needs to address.
+- Notifications, deep-link routing, and background refresh remain untestable in simulators.
+- Before marking a PR ready for review, prompt the user to run `npm run e2e:ios` and `npm run e2e:android` locally against a fresh dev build.
 
 ## Editing across the two TypeScript programs
 

@@ -1,0 +1,74 @@
+appId: ${APP_ID}
+tags: [smoke]
+---
+# Market detail: tap a row → detail shows status, address → favorite toggle → back.
+# Precondition: at least one favourite exists.
+- runFlow: ../utils/launch.yaml
+- tapOn:
+    id: tab-today
+- waitForAnimationToEnd
+# If the add modal auto-opened (no favourites), add one first.
+- runFlow:
+    when:
+      visible: { id: picker-row }
+    commands:
+      - tapOn: "Search.*"
+      - inputText: Tiong Bahru
+      - tapOn: "Tiong Bahru Market"
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn: "close"
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: Back
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn:
+                id: done-button
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - tapOn: "Navigate up"
+            - waitForAnimationToEnd
+# Tap the first market row.
+- tapOn:
+    id: market-row
+    index: 0
+- waitForAnimationToEnd
+# Detail screen: address row should be present.
+- assertVisible:
+    id: address-row
+# Toggle favorite (star in header).
+- tapOn:
+    id: favorite-toggle
+# Toggle back.
+- tapOn:
+    id: favorite-toggle
+# Go back — iOS uses the nav bar Back button, Android uses hardware back.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: BackButton
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: Back
+      - waitForAnimationToEnd
+# Should be back on Today.
+- assertVisible:
+    id: market-row
+    index: 0
