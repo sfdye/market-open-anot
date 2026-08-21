@@ -69,7 +69,7 @@ export function useMapProvider(pref: MapProviderPref): {
  *
  * One probe answers both halves — which app to use, and whether Google Maps is there to take its
  * own scheme — at the moment of the tap, which is the only moment the answer cannot be stale. It
- * costs two `canOpenURL` calls on iOS, on a gesture that is about to leave the app anyway, and
+ * costs one `canOpenURL` call on iOS, on a gesture that is about to leave the app anyway, and
  * none at all on Android.
  */
 export async function openInMaps(place: MapPlace, pref: MapProviderPref): Promise<void> {
