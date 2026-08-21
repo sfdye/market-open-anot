@@ -9,16 +9,36 @@ tags: [smoke]
 # Dismiss auto-opened add modal if present.
 - runFlow:
     when:
-      visible: { id: done-button }
+      visible: { id: picker-row }
     commands:
       - tapOn: "Search.*"
       - inputText: Tiong Bahru
       - tapOn: "Tiong Bahru Market"
-      - tapOn: "close"
-      - waitForAnimationToEnd
-      - tapOn:
-          id: done-button
-      - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn: "close"
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: Back
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn:
+                id: done-button
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - tapOn: "Navigate up"
+            - waitForAnimationToEnd
 # Navigate to Settings.
 - tapOn:
     id: tab-settings
@@ -27,7 +47,7 @@ tags: [smoke]
 - tapOn:
     id: lang-zh
 - waitForAnimationToEnd
-# Tab labels should now be Chinese — verify by checking a visible Chinese string.
+# Verify language switch by checking a visible Chinese string.
 - assertVisible: "语言"
 # Switch back to English.
 - tapOn:
@@ -38,7 +58,7 @@ tags: [smoke]
 - tapOn:
     id: settings-reminders
 - waitForAnimationToEnd
-# Dismiss notification permission dialog if it appears (iOS).
+# Dismiss notification permission dialog if it appears (iOS uses curly apostrophe).
 - runFlow:
     when:
       visible: "Allow"

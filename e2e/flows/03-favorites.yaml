@@ -10,16 +10,36 @@ tags: [smoke]
 # Handle the auto-opened add modal if there are no favourites.
 - runFlow:
     when:
-      visible: { id: done-button }
+      visible: { id: picker-row }
     commands:
       - tapOn: "Search.*"
       - inputText: Tiong Bahru
       - tapOn: "Tiong Bahru Market"
-      - tapOn: "close"
-      - waitForAnimationToEnd
-      - tapOn:
-          id: done-button
-      - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn: "close"
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: Back
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn:
+                id: done-button
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - tapOn: "Navigate up"
+            - waitForAnimationToEnd
 # Dismiss the reminder prompt card if present (it can overlap with the row).
 - runFlow:
     when:
@@ -28,10 +48,21 @@ tags: [smoke]
       - tapOn: "Not now"
 - waitForAnimationToEnd
 # Swipe left on the first market row to reveal delete.
-# The row sits around 25-37% of screen height (below the date header).
-- swipe:
-    start: 90%, 31%
-    end: 10%, 31%
+# Row position differs by platform: iOS ~31%, Android ~23%.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 90%, 31%
+          end: 10%, 31%
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - swipe:
+          start: 90%, 23%
+          end: 10%, 23%
 - waitForAnimationToEnd
 - tapOn:
     id: delete-favorite

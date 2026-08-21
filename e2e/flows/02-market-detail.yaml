@@ -10,16 +10,36 @@ tags: [smoke]
 # If the add modal auto-opened (no favourites), add one first.
 - runFlow:
     when:
-      visible: { id: done-button }
+      visible: { id: picker-row }
     commands:
       - tapOn: "Search.*"
       - inputText: Tiong Bahru
       - tapOn: "Tiong Bahru Market"
-      - tapOn: "close"
-      - waitForAnimationToEnd
-      - tapOn:
-          id: done-button
-      - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn: "close"
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: Back
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn:
+                id: done-button
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - tapOn: "Navigate up"
+            - waitForAnimationToEnd
 # Tap the first market row.
 - tapOn:
     id: market-row
@@ -34,10 +54,20 @@ tags: [smoke]
 # Toggle back.
 - tapOn:
     id: favorite-toggle
-# Go back via the navigation Back button.
-- tapOn:
-    id: BackButton
-- waitForAnimationToEnd
+# Go back — iOS uses the nav bar Back button, Android uses hardware back.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: BackButton
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: Back
+      - waitForAnimationToEnd
 # Should be back on Today.
 - assertVisible:
     id: market-row

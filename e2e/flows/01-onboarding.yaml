@@ -9,20 +9,40 @@ tags: [smoke]
 # Wait for the app to hydrate and the auto-push to /add to fire.
 - extendedWaitUntil:
     visible:
-      id: done-button
+      id: picker-row
     timeout: 20000
 # Search for a well-known market.
 - tapOn: "Search.*"
 - inputText: Tiong Bahru
 # Tap the matching picker row.
 - tapOn: "Tiong Bahru Market"
-# Dismiss the keyboard by tapping the search bar's Close button.
-- tapOn: "close"
-- waitForAnimationToEnd
-# Dismiss the add modal via the Done button (now visible after keyboard dismissal).
-- tapOn:
-    id: done-button
-- waitForAnimationToEnd
+# Dismiss the keyboard — iOS uses the search bar Close button, Android uses back key.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "close"
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: Back
+      - waitForAnimationToEnd
+# Dismiss the add modal — iOS uses Done button, Android uses back.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: done-button
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn: "Navigate up"
+      - waitForAnimationToEnd
 # Back on Today — the market row should be visible.
 - assertVisible:
     id: market-row
