@@ -22,6 +22,7 @@ Those two are the whole of CI (`.github/workflows/test.yml`); there is no lint s
 - Run against the standalone dev build (`com.sfdye.openanot.dev`): `APP_VARIANT=development npx expo run:ios --configuration Release` then `npm run e2e:ios`. Android: `--variant release` on an API ≤ 34 emulator.
 - Flows target elements by `testID` (Maestro's `id:` selector), not by text — accessibility labels are localized. Add a `testID` to any new interactive element a flow needs to address.
 - Notifications, deep-link routing, and background refresh remain untestable in simulators.
+- Before marking a PR ready for review, prompt the user to run `npm run e2e:ios` and `npm run e2e:android` locally against a fresh dev build.
 
 ## Editing across the two TypeScript programs
 
