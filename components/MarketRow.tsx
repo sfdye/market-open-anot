@@ -56,6 +56,7 @@ function MarketRowInner({ name }: { name: string }) {
       <Pressable
         onPress={() => router.push({ pathname: '/market/[name]', params: { name: market.name } })}
         accessibilityRole="button"
+        testID="market-row"
         accessibilityLabel={[displayName, label, next].filter(Boolean).join('. ')}
         accessibilityHint={t('details')}
         accessibilityActions={[{ name: 'delete', label: t('removeFav') }]}

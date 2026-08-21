@@ -1,0 +1,34 @@
+appId: ${APP_ID}
+tags: [smoke]
+---
+# Favorites: add a second market via FAB, then swipe-to-delete the first.
+# Precondition: at least one favourite exists.
+- runFlow: e2e/utils/launch.yaml
+- waitForAnimationToEnd
+# Handle the auto-opened add modal if there are no favourites.
+- runScript:
+    when:
+      visible: { id: done-button }
+    commands:
+      - tapOn:
+          text: "Tiong Bahru"
+          partial: true
+      - tapOn:
+          id: done-button
+# Open the add modal via FAB.
+- tapOn:
+    id: add-markets
+# Search and add a second market.
+- tapOn: "Search..."
+- inputText: Maxwell
+- tapOn:
+    text: "Maxwell"
+    partial: true
+- tapOn:
+    id: done-button
+# Swipe left on the first row to reveal delete.
+- swipe:
+    start: 90%, 50%
+    end: 10%, 50%
+- tapOn:
+    id: delete-favorite

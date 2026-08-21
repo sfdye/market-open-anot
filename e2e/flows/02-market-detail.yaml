@@ -1,0 +1,36 @@
+appId: ${APP_ID}
+tags: [smoke]
+---
+# Market detail: tap a row → detail shows status, address → favorite toggle → back.
+# Precondition: at least one favourite exists (run after onboarding or add one first).
+- runFlow: e2e/utils/launch.yaml
+- waitForAnimationToEnd
+# If the add modal auto-opened (no favourites), add one first.
+- runScript:
+    when:
+      visible: { id: done-button }
+    commands:
+      - tapOn:
+          text: "Tiong Bahru"
+          partial: true
+      - tapOn:
+          id: done-button
+# Tap the first market row.
+- tapOn:
+    id: market-row
+    index: 0
+# Detail screen: address row should be present.
+- assertVisible:
+    id: address-row
+# Toggle favorite (star in header).
+- tapOn:
+    id: favorite-toggle
+# Toggle back.
+- tapOn:
+    id: favorite-toggle
+# Go back.
+- back
+# Should be back on Today.
+- assertVisible:
+    id: market-row
+    index: 0

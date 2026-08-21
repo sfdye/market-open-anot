@@ -53,6 +53,28 @@ Both run on push and PR via GitHub Actions. `tsconfig.test.json` deliberately gi
 
 The screens are not unit-tested; verifying them means a device build. Notifications especially cannot be checked in a simulator.
 
+### E2E (Maestro)
+
+Screen flows are covered by [Maestro](https://maestro.dev) YAML in `e2e/flows/`. The CLI is a standalone tool — nothing to install into the project:
+
+```sh
+brew tap mobile-dev-inc/tap && brew install maestro   # needs Java 17+, Xcode, Android SDK
+```
+
+Build a standalone dev app (embeds its JS, no Metro needed), then run the flows against it:
+
+```sh
+# iOS — boot a simulator first
+APP_VARIANT=development npx expo run:ios --configuration Release
+npm run e2e:ios
+
+# Android — boot an emulator (API 29–34; 35/36 unsupported by Maestro)
+APP_VARIANT=development npx expo run:android --variant release
+npm run e2e:android
+```
+
+Flows target elements by `testID` (stable across languages) and run against `com.sfdye.openanot.dev`, the dev build identity. Notifications and deep-link handling remain untestable in simulators.
+
 ## Develop
 
 ```sh

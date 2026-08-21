@@ -65,7 +65,7 @@ export default function AddMarketsScreen() {
             headerIconColor: theme.colors.textMuted,
           },
           headerRight: () => (
-            <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button">
+            <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button" testID="done-button">
               <Text variant="bodyStrong" tone="accent">
                 {favorites.length > 0
                   ? t('doneCount', { n: favorites.length, max: MAX_FAVORITES })

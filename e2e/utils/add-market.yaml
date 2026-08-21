@@ -1,0 +1,7 @@
+appId: ${APP_ID}
+---
+# Taps the first picker row whose visible name contains MARKET_NAME.
+# Caller sets env: MARKET_NAME (a substring of the market's display name).
+- tapOn:
+    text: ${MARKET_NAME}
+    partial: true

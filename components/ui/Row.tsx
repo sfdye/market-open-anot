@@ -16,6 +16,7 @@ export interface RowProps {
   destructive?: boolean;
   onPress?: () => void;
   accessibilityHint?: string;
+  testID?: string;
   /** Last row in its group: no divider. */
   last?: boolean;
 }
@@ -29,6 +30,7 @@ export function Row({
   destructive,
   onPress,
   accessibilityHint,
+  testID,
   last,
 }: RowProps) {
   const theme = useTheme();
@@ -68,6 +70,7 @@ export function Row({
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityHint={accessibilityHint}
+      testID={testID}
       style={({ pressed }) => ({
         backgroundColor: pressed ? theme.colors.borderLight : 'transparent',
       })}

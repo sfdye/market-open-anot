@@ -93,7 +93,7 @@ export default function TodayScreen() {
           ) : null
         }
       />
-      <Fab icon="add" onPress={() => router.push('/add')} accessibilityLabel={t('addMarkets')} />
+      <Fab icon="add" onPress={() => router.push('/add')} accessibilityLabel={t('addMarkets')} testID="add-markets" />
     </View>
   );
 }

@@ -38,6 +38,7 @@ function PickerRowInner({
     <Pressable
       onPress={() => toggleFavorite(market.name)}
       accessibilityRole="checkbox"
+      testID="picker-row"
       accessibilityState={{ checked: favorite }}
       accessibilityLabel={getDisplayName(parsed, lang)}
       accessibilityHint={favorite ? t('removeFav') : t('addFav')}

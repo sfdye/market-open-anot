@@ -65,6 +65,7 @@ export default function MapCallout({
           onPress={() => toggleFavorite(market.name)}
           style={styles.star}
           accessibilityRole="checkbox"
+          testID="favorite-toggle"
           accessibilityState={{ checked: favorite }}
           accessibilityLabel={favorite ? t('removeFav') : t('addFav')}
         >

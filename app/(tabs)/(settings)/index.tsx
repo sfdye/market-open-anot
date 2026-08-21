@@ -78,16 +78,19 @@ export default function SettingsScreen() {
           label={t('langSystem')}
           accessory={langPref === 'system' ? check : undefined}
           onPress={() => setLang('system')}
+          testID="lang-system"
         />
         <Row
           label="English"
           accessory={langPref === 'en' ? check : undefined}
           onPress={() => setLang('en')}
+          testID="lang-en"
         />
         <Row
           label="中文"
           accessory={langPref === 'zh' ? check : undefined}
           onPress={() => setLang('zh')}
+          testID="lang-zh"
           last
         />
       </SettingsSection>
@@ -96,6 +99,7 @@ export default function SettingsScreen() {
         <Row
           label={t('enableReminders')}
           last
+          testID="settings-reminders"
           accessory={
             <Switch
               value={reminders.enabled}
@@ -117,6 +121,7 @@ export default function SettingsScreen() {
               label={p === 'apple' ? t('appleMaps') : t('googleMaps')}
               accessory={mapProvider === p ? check : undefined}
               onPress={() => setMapProvider(p)}
+              testID={`map-provider-${p}`}
               last={i === arr.length - 1}
             />
           ))}

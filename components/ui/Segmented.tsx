@@ -29,6 +29,7 @@ export function Segmented<T extends string>({ options, value, onChange }: Segmen
             disabled={option.disabled}
             accessibilityRole="button"
             accessibilityState={{ selected, disabled: option.disabled }}
+            testID={`segment-${option.value}`}
             style={[
               styles.segment,
               selected && { backgroundColor: theme.colors.surface },

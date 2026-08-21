@@ -1,0 +1,5 @@
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+    permissions: { all: deny }

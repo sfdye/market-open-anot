@@ -1,0 +1,46 @@
+appId: ${APP_ID}
+tags: [smoke]
+---
+# Settings: language toggle en→zh→en, reminders toggle, map-provider row check.
+- runFlow: e2e/utils/launch.yaml
+- waitForAnimationToEnd
+# Dismiss auto-opened add modal if present.
+- runScript:
+    when:
+      visible: { id: done-button }
+    commands:
+      - tapOn:
+          text: "Tiong Bahru"
+          partial: true
+      - tapOn:
+          id: done-button
+# Navigate to Settings.
+- tapOn:
+    id: tab-settings
+# Switch language to Chinese.
+- tapOn:
+    id: lang-zh
+# Tab labels should now be Chinese.
+- assertVisible: "今天"
+# Switch back to English.
+- tapOn:
+    id: lang-en
+- assertVisible: "Today"
+# Toggle reminders on (will trigger a notification permission prompt on first enable).
+- tapOn:
+    id: settings-reminders
+# Toggle reminders off.
+- tapOn:
+    id: settings-reminders
+# If on iOS, map-provider rows should be visible.
+- runScript:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          id: map-provider-apple
+      - assertVisible:
+          id: map-provider-google
+# Navigate back to Today.
+- tapOn:
+    id: tab-today

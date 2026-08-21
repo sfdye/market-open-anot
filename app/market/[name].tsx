@@ -65,6 +65,7 @@ export default function MarketDetailScreen() {
               onPress={() => toggleFavorite(market.name)}
               hitSlop={12}
               accessibilityRole="checkbox"
+              testID="favorite-toggle"
               accessibilityState={{ checked: favorite }}
               accessibilityLabel={favorite ? t('removeFav') : t('addFav')}
             >
@@ -97,6 +98,7 @@ export default function MarketDetailScreen() {
               <Pressable
                 onPress={openAddress}
                 disabled={!coords}
+                testID="address-row"
                 accessibilityRole={coords ? 'link' : 'text'}
                 accessibilityLabel={`${t('address')}: ${address}`}
                 style={({ pressed }) => [
