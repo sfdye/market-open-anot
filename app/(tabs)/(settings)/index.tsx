@@ -3,7 +3,14 @@ import { ActivityIndicator, Alert, Linking, Platform, ScrollView, StyleSheet, Sw
 import Constants from 'expo-constants';
 import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
-import { DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
+import {
+  DATA_LICENCE_URL,
+  DATA_SOURCE_URL,
+  FEEDBACK_URL,
+  MAP_LICENCE_URL,
+  MAP_SOURCE_URL,
+  REPO_URL,
+} from '../../../lib/constants';
 import { MAX_FAVORITES } from '../../../lib/core/favorites';
 import { feedbackUrl, versionLabel, type BuildInfo } from '../../../lib/core/version-info';
 import { formatDate, formatDateTime } from '../../../lib/date';
@@ -157,6 +164,24 @@ export default function SettingsScreen() {
           detail={t('dataSourceLink')}
           accessory={external}
           onPress={() => void Linking.openURL(DATA_SOURCE_URL)}
+        />
+        <Row
+          label={t('dataLicence')}
+          detail={t('openDataLicence')}
+          accessory={external}
+          onPress={() => void Linking.openURL(DATA_LICENCE_URL)}
+        />
+        <Row
+          label={t('mapSource')}
+          detail={t('mapSourceLink')}
+          accessory={external}
+          onPress={() => void Linking.openURL(MAP_SOURCE_URL)}
+        />
+        <Row
+          label={t('mapLicence')}
+          detail={t('openDataLicence')}
+          accessory={external}
+          onPress={() => void Linking.openURL(MAP_LICENCE_URL)}
           last
         />
       </SettingsSection>

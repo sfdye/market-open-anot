@@ -33,7 +33,7 @@
         "dark": "./assets/mark-white.png",
         "tinted": "./assets/icon-tinted.png"
       },
-      "supportsTablet": true,
+      "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "LSApplicationQueriesSchemes": [

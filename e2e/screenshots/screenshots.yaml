@@ -1,0 +1,98 @@
+appId: ${APP_ID}
+tags: [screenshots]
+---
+# Screenshot capture flow — run against a standalone dev build.
+# Produces 5 screenshots per locale for App Store and Play Store listings.
+#
+# Usage:
+#   1. Build: APP_VARIANT=development npx expo run:ios --configuration Release
+#   2. Set simulator language to en-US (or zh-Hans), then:
+#      npm run screenshots:ios
+#
+# Screenshots save to Maestro's default output dir (.maestro/tests/...).
+# Copy them into fastlane/screenshots/<locale>/ and
+# fastlane/metadata/android/<locale>/images/phoneScreenshots/ after capture.
+
+- runFlow: ../utils/launch.yaml
+- tapOn:
+    id: tab-today
+- waitForAnimationToEnd
+
+# If the add modal auto-opened (no favourites), add Tiong Bahru Market.
+- runFlow:
+    when:
+      visible: { id: picker-row }
+    commands:
+      - tapOn: "Search.*"
+      - inputText: Tiong Bahru
+      - tapOn: "Tiong Bahru Market"
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn: "close"
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: Back
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn:
+                id: done-button
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - tapOn: "Navigate up"
+            - waitForAnimationToEnd
+
+# Dismiss the reminder prompt card if present.
+- runFlow:
+    when:
+      visible: "Not now"
+    commands:
+      - tapOn: "Not now"
+      - waitForAnimationToEnd
+
+# Screenshot 1: Today list with a favourited market.
+- takeScreenshot: 01-today-list
+
+# Screenshot 2: Market detail.
+- tapOn:
+    id: market-row
+    index: 0
+- waitForAnimationToEnd
+- takeScreenshot: 02-market-detail
+
+# Go back.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: BackButton
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: Back
+      - waitForAnimationToEnd
+
+# Screenshot 3: Map.
+- tapOn:
+    id: tab-map
+- waitForAnimationToEnd
+- takeScreenshot: 03-map
+
+# Screenshot 4: Settings.
+- tapOn:
+    id: tab-settings
+- waitForAnimationToEnd
+- takeScreenshot: 04-settings

@@ -1,0 +1,103 @@
+appId: ${APP_ID}
+tags: [screenshots-zh]
+---
+# Screenshot capture flow for Chinese (zh-Hans) locale.
+# Switches to Chinese first, captures all screens, then switches back to English.
+
+- runFlow: ../utils/launch.yaml
+- tapOn:
+    id: tab-today
+- waitForAnimationToEnd
+
+# Handle auto-opened add modal if present.
+- runFlow:
+    when:
+      visible: { id: picker-row }
+    commands:
+      - tapOn: "Search.*"
+      - inputText: Tiong Bahru
+      - tapOn: "Tiong Bahru Market"
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn: "close"
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: Back
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn:
+                id: done-button
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - tapOn: "Navigate up"
+            - waitForAnimationToEnd
+
+# Dismiss the reminder prompt card if present.
+- runFlow:
+    when:
+      visible: "Not now"
+    commands:
+      - tapOn: "Not now"
+      - waitForAnimationToEnd
+
+# Switch to Chinese.
+- tapOn:
+    id: tab-settings
+- waitForAnimationToEnd
+- tapOn:
+    id: lang-zh
+- waitForAnimationToEnd
+
+# Screenshot 1: Today list in Chinese.
+- tapOn:
+    id: tab-today
+- waitForAnimationToEnd
+- takeScreenshot: 01-today-list-zh
+
+# Screenshot 2: Market detail in Chinese.
+- tapOn:
+    id: market-row
+    index: 0
+- waitForAnimationToEnd
+- takeScreenshot: 02-market-detail-zh
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: BackButton
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: Back
+      - waitForAnimationToEnd
+
+# Screenshot 3: Map in Chinese.
+- tapOn:
+    id: tab-map
+- waitForAnimationToEnd
+- takeScreenshot: 03-map-zh
+
+# Screenshot 4: Settings in Chinese.
+- tapOn:
+    id: tab-settings
+- waitForAnimationToEnd
+- takeScreenshot: 04-settings-zh
+
+# Switch back to English.
+- tapOn:
+    id: lang-en
+- waitForAnimationToEnd
