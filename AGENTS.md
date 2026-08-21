@@ -2,6 +2,8 @@
 
 Invariants and conventions an agent cannot infer from a single file. `README.md` owns the product, dev setup, the generated native projects and EAS release, and is not repeated here.
 
+Editing this file: state the rule, not its history — justification only when it prevents repeating a past bug. One rule per bullet. `npm run agents-md` (part of `npm run ci`) enforces a size budget; hitting it means cut prose, not raise the cap.
+
 ## Commands
 
 ```sh
