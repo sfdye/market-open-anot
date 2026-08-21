@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Text } from './ui';
 import type { StatusTone } from '../lib/status';
 import { radius, space, useTheme } from '../lib/theme';
@@ -17,15 +17,17 @@ export default function StatusPill({
   tone,
   label,
   compact = false,
+  style,
 }: {
   tone: StatusTone;
   label: string;
   compact?: boolean;
+  style?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
 
   return (
-    <View style={[styles.pill, { backgroundColor: theme.colors[FILL[tone]] }]}>
+    <View style={[styles.pill, { backgroundColor: theme.colors[FILL[tone]] }, style]}>
       <Text variant={compact ? 'footnote' : 'callout'} tone="onStatus" style={styles.label}>
         {label}
       </Text>
