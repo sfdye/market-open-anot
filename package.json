@@ -48,7 +48,6 @@
     "e2e": "maestro test -e APP_ID=com.sfdye.openanot.dev e2e/flows",
     "e2e:ios": "maestro test --platform ios -e APP_ID=com.sfdye.openanot.dev e2e/flows",
     "e2e:android": "maestro test --platform android -e APP_ID=com.sfdye.openanot.dev e2e/flows",
-    "screenshots": "maestro test -e APP_ID=com.sfdye.openanot.dev e2e/screenshots",
     "screenshots:ios": "maestro test --platform ios -e APP_ID=com.sfdye.openanot.dev e2e/screenshots",
     "screenshots:android": "maestro test --platform android -e APP_ID=com.sfdye.openanot.dev e2e/screenshots",
     "metadata:ios": "fastlane ios metadata",

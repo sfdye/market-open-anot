@@ -1,24 +1,15 @@
 appId: ${APP_ID}
-tags: [screenshots]
+tags: [screenshots-zh]
 ---
-# Screenshot capture flow — run against a standalone dev build.
-# Produces 5 screenshots per locale for App Store and Play Store listings.
-#
-# Usage:
-#   1. Build: APP_VARIANT=development npx expo run:ios --configuration Release
-#   2. Set simulator language to en-US (or zh-Hans), then:
-#      npm run screenshots:ios
-#
-# Screenshots save to Maestro's default output dir (.maestro/tests/...).
-# Copy them into fastlane/screenshots/<locale>/ and
-# fastlane/metadata/android/<locale>/images/phoneScreenshots/ after capture.
+# Screenshot capture flow for Chinese (zh-Hans) locale.
+# Switches to Chinese first, captures all screens, then switches back to English.
 
 - runFlow: ../utils/launch.yaml
 - tapOn:
     id: tab-today
 - waitForAnimationToEnd
 
-# If the add modal auto-opened (no favourites), add Tiong Bahru Market.
+# Handle auto-opened add modal if present.
 - runFlow:
     when:
       visible: { id: picker-row }
@@ -60,17 +51,26 @@ tags: [screenshots]
       - tapOn: "Not now"
       - waitForAnimationToEnd
 
-# Screenshot 1: Today list with a favourited market.
-- takeScreenshot: 01-today-list
+# Switch to Chinese.
+- tapOn:
+    id: tab-settings
+- waitForAnimationToEnd
+- tapOn:
+    id: lang-zh
+- waitForAnimationToEnd
 
-# Screenshot 2: Market detail.
+# Screenshot 1: Today list in Chinese.
+- tapOn:
+    id: tab-today
+- waitForAnimationToEnd
+- takeScreenshot: 01-today-list-zh
+
+# Screenshot 2: Market detail in Chinese.
 - tapOn:
     id: market-row
     index: 0
 - waitForAnimationToEnd
-- takeScreenshot: 02-market-detail
-
-# Go back.
+- takeScreenshot: 02-market-detail-zh
 - runFlow:
     when:
       platform: iOS
@@ -85,14 +85,19 @@ tags: [screenshots]
       - pressKey: Back
       - waitForAnimationToEnd
 
-# Screenshot 3: Map.
+# Screenshot 3: Map in Chinese.
 - tapOn:
     id: tab-map
 - waitForAnimationToEnd
-- takeScreenshot: 03-map
+- takeScreenshot: 03-map-zh
 
-# Screenshot 4: Settings.
+# Screenshot 4: Settings in Chinese.
 - tapOn:
     id: tab-settings
 - waitForAnimationToEnd
-- takeScreenshot: 04-settings
+- takeScreenshot: 04-settings-zh
+
+# Switch back to English.
+- tapOn:
+    id: lang-en
+- waitForAnimationToEnd

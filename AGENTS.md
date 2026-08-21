@@ -51,7 +51,7 @@ Those two are the whole of CI (`.github/workflows/test.yml`); there is no lint s
 - `npm run metadata:ios` / `metadata:android` — push metadata + screenshots (no binary).
 - `npm run metadata:pull:ios` / `metadata:pull:android` — re-sync after dashboard edits; skip this and a later push overwrites your manual changes.
 - iOS metadata lives in `fastlane/metadata/{en-US,zh-Hans}/`; Android in `fastlane/metadata/android/{en-US,zh-CN}/` — note the different locale codes for Simplified Chinese.
-- Screenshots are captured via Maestro (`npm run screenshots`), not fastlane's `snapshot`/`screengrab` — the repo has no XCTest or UiAutomator. The flow in `e2e/screenshots/` reuses `testID`s from the e2e flows. After capture, copy PNGs into `fastlane/screenshots/<locale>/` (deliver) and `fastlane/metadata/android/<locale>/images/phoneScreenshots/` (supply).
+- Screenshots are captured via Maestro (`npm run screenshots:ios` / `screenshots:android`), not fastlane's `snapshot`/`screengrab` — the repo has no XCTest or UiAutomator. The flow in `e2e/screenshots/` reuses `testID`s from the e2e flows. After capture, copy PNGs into `fastlane/screenshots/<locale>/` (deliver) and `fastlane/metadata/android/<locale>/images/phoneScreenshots/` (supply).
 - Play feature graphic and 512px icon are derived from `brand/icon-master-1024.png` (Pillow), not hand-drawn — regenerate if the mark changes.
 - Credentials (gitignored): ASC API key `.p8` in `~/.appstoreconnect/private_keys/`; Play service account JSON at `fastlane/play-service-account.json`. Reuse the Play key from EAS Submit credentials.
 - `supply` can't manage the Play category or privacy-policy URL — those stay in Play Console. `deliver` covers privacy URL via `privacy_url.txt` per locale.
