@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, Linking, Platform, ScrollView, StyleSheet, Sw
 import Constants from 'expo-constants';
 import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
-import { DATA_SOURCE_URL, FEEDBACK_URL, REPO_URL } from '../../../lib/constants';
+import { DATA_SOURCE_URL, FEEDBACK_URL, ONEMAP_URL, OPEN_DATA_LICENCE_URL, REPO_URL } from '../../../lib/constants';
 import { MAX_FAVORITES } from '../../../lib/core/favorites';
 import { feedbackUrl, versionLabel, type BuildInfo } from '../../../lib/core/version-info';
 import { formatDate, formatDateTime } from '../../../lib/date';
@@ -151,12 +151,6 @@ export default function SettingsScreen() {
           icon="refresh"
           accessory={refreshing ? <ActivityIndicator size="small" /> : undefined}
           onPress={() => void refresh()}
-        />
-        <Row
-          label={t('dataSource')}
-          detail={t('dataSourceLink')}
-          accessory={external}
-          onPress={() => void Linking.openURL(DATA_SOURCE_URL)}
           last
         />
       </SettingsSection>
@@ -173,6 +167,31 @@ export default function SettingsScreen() {
           onPress={() => void Linking.openURL(feedbackUrl(FEEDBACK_URL, buildInfo))}
         />
         <Row label={t('version')} detail={versionLabel(buildInfo)} last />
+      </SettingsSection>
+
+      <SettingsSection
+        title={t('attribution')}
+        footer={t('attributionFooter', {
+          date: fetchedAt ? formatDate(new Date(fetchedAt), lang) : '—',
+        })}
+      >
+        <Row
+          label={t('openDataLicence')}
+          accessory={external}
+          onPress={() => void Linking.openURL(OPEN_DATA_LICENCE_URL)}
+        />
+        <Row
+          label={t('onemapCredit')}
+          accessory={external}
+          onPress={() => void Linking.openURL(ONEMAP_URL)}
+        />
+        <Row
+          label={t('dataSource')}
+          detail={t('dataSourceLink')}
+          accessory={external}
+          onPress={() => void Linking.openURL(DATA_SOURCE_URL)}
+          last
+        />
       </SettingsSection>
 
       {__DEV__ && (

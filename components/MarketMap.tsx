@@ -9,6 +9,7 @@ import {
 } from '@maplibre/maplibre-react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import ConstrainedCamera, { type ConstrainedCameraRef } from './ConstrainedCamera';
+import MapAttribution from './MapAttribution';
 import MapCallout from './MapCallout';
 import { Icon } from './ui';
 import type { Market } from '../lib/core/market-logic';
@@ -37,7 +38,7 @@ function buildStyle(colors: Palette): StyleSpecification {
         maxzoom: 19,
         // OneMap serves nothing outside this box, and asking anyway costs a failed decode.
         bounds: SG_BOUNDS,
-        attribution: 'OneMap | © Singapore Land Authority',
+        attribution: 'OneMap © contributors | Singapore Land Authority',
       },
     },
     layers: [
@@ -145,6 +146,7 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
         style={styles.map}
         mapStyle={MAP_STYLES[theme.scheme]}
         logo={false}
+        attribution={false}
         compass={false}
         onPress={() => setSelected(null)}
         onRegionIsChanging={(e) => {
@@ -270,6 +272,8 @@ export default function MarketMap({ markets }: { markets: Market[] }) {
           onClose={() => setSelected(null)}
         />
       )}
+
+      <MapAttribution />
     </View>
   );
 }
