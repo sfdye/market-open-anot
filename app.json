@@ -37,7 +37,6 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "LSApplicationQueriesSchemes": [
-          "maps",
           "comgooglemaps"
         ]
       }

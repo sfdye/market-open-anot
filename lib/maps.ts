@@ -20,24 +20,26 @@ async function canOpen(url: string): Promise<boolean> {
  * Which map apps this phone has. Off iOS it answers without touching the bridge — there is nothing
  * to choose between, so nothing to ask about.
  *
- * Each scheme is only visible to `canOpenURL` while it is listed in `LSApplicationQueriesSchemes`
- * (app.json): an undeclared one reads as "not installed" rather than failing.
+ * Apple Maps is hardcoded `true`: `canOpenURL('maps://')` always answers yes on iOS, because
+ * deleting a stock app keeps its URL scheme registered with the OS (the binary stays). That makes
+ * the "Apple Maps is missing" state undetectable, so the probe is dead and not worth the bridge
+ * call — `resolveMapProvider` treats Apple as always present and leans on the Google probe alone.
+ * A scheme is only visible to `canOpenURL` while it is listed in `LSApplicationQueriesSchemes`
+ * (app.json); `comgooglemaps` is the one that matters now.
  */
 export async function probeInstalledMaps(): Promise<InstalledMaps> {
   if (!MAP_CHOICE_SUPPORTED) return { apple: false, google: false };
-  const [apple, google] = await Promise.all([
-    canOpen(`${MAP_SCHEMES.apple}://`),
-    canOpen(`${MAP_SCHEMES.google}://`),
-  ]);
-  return { apple, google };
+  const google = await canOpen(`${MAP_SCHEMES.google}://`);
+  return { apple: true, google };
 }
 
 /**
  * Which apps are installed and which would open for the current preference.
  *
- * `installed` is null until the probe lands — rows for uninstalled apps should be hidden once it
- * resolves, but shown optimistically before it does so the section doesn't flicker. `provider` is
- * null while auto is still resolving; an explicit choice answers immediately.
+ * `installed` is null until the probe lands — the Google Maps row should be hidden if the probe
+ * finds it missing, but shown optimistically before it does so the section doesn't flicker. Apple
+ * Maps always reports installed (see `probeInstalledMaps`). `provider` is null while auto is still
+ * resolving; an explicit choice answers immediately.
  *
  * Always probes on mount so the caller has `installed` to filter rows regardless of `pref`.
  */
@@ -69,7 +71,7 @@ export function useMapProvider(pref: MapProviderPref): {
  *
  * One probe answers both halves — which app to use, and whether Google Maps is there to take its
  * own scheme — at the moment of the tap, which is the only moment the answer cannot be stale. It
- * costs two `canOpenURL` calls on iOS, on a gesture that is about to leave the app anyway, and
+ * costs one `canOpenURL` call on iOS, on a gesture that is about to leave the app anyway, and
  * none at all on Android.
  */
 export async function openInMaps(place: MapPlace, pref: MapProviderPref): Promise<void> {

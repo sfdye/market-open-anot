@@ -5,12 +5,16 @@ import { isMapProvider, mapUrl, resolveMapProvider, type InstalledMaps } from '.
 const PLACE = { lat: 1.3521, lng: 103.8198, label: 'Tekka Market', address: 'Blk 665 Buffalo Rd' };
 
 describe('resolveMapProvider', () => {
-  test('defaults to Apple Maps when both are installed', () => {
-    assert.equal(resolveMapProvider('auto', { apple: true, google: true }), 'apple');
+  test('defaults to Google Maps when both are installed', () => {
+    assert.equal(resolveMapProvider('auto', { apple: true, google: true }), 'google');
   });
 
-  test('defaults to Google Maps only when Apple Maps is the missing one', () => {
+  test('defaults to Google Maps when only Google Maps is installed', () => {
     assert.equal(resolveMapProvider('auto', { apple: false, google: true }), 'google');
+  });
+
+  test('defaults to Apple Maps when only Apple Maps is installed', () => {
+    assert.equal(resolveMapProvider('auto', { apple: true, google: false }), 'apple');
   });
 
   test('defaults to Apple Maps when neither is installed', () => {

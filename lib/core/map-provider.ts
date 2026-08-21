@@ -16,10 +16,11 @@ export type MapProvider = (typeof MAP_PROVIDERS)[number];
 export type MapProviderPref = MapProvider | 'auto';
 
 /**
- * The scheme each app answers to, spelled once: it is both what a link is built from and what
- * `canOpenURL` probes for, and the two drifting apart would read as "not installed" rather than
- * fail. `LSApplicationQueriesSchemes` in app.json holds the same two names and cannot import them,
- * so a third map app is an edit here and an edit there.
+ * The scheme each app answers to, spelled once: it is what a link is built from, and for Google
+ * Maps also what `canOpenURL` probes for — the two drifting apart would read as "not installed"
+ * rather than fail. Apple Maps is not probed (see `resolveMapProvider`), so its scheme is only
+ * used to build URLs. `LSApplicationQueriesSchemes` in app.json holds the probed name
+ * (`comgooglemaps`) and cannot import it, so a third map app is an edit here and an edit there.
  */
 export const MAP_SCHEMES: Record<MapProvider, string> = {
   apple: 'maps',
@@ -49,16 +50,20 @@ export function supportsMapChoice(platform: PlatformName): boolean {
 }
 
 /**
- * Apple Maps unless it is the one that is missing.
+ * Google Maps when it is installed, Apple Maps otherwise.
  *
- * Apple Maps is deletable since iOS 14, and on a phone without it the default would open a URL
- * nothing handles — a dead tap, which is the outcome this app avoids hardest. Google Maps only
- * wins the toss-up when it is installed *and* Apple Maps is not; a phone with both, or with
- * neither, gets Apple Maps, whose scheme the OS answers again the moment it is reinstalled.
+ * `canOpenURL('maps://')` always returns `true` on iOS — deleting Apple Maps keeps the scheme
+ * registered with the OS (a stock-app deletion removes the icon and user data, not the binary),
+ * so the "Apple Maps is missing" state is undetectable and an auto default of Apple would route
+ * those users to an App Store restore page instead of a map. Google Maps is a real third-party
+ * app, so its probe tells the truth; the auto default leans on that one reliable signal. A phone
+ * with both apps gets Google, which is the deliberate deviation from the old "both → Apple" rule.
+ * Apple Maps answers its scheme again the moment it is reinstalled, so the neither-installed case
+ * defaults to Apple.
  */
 export function resolveMapProvider(pref: MapProviderPref, installed: InstalledMaps): MapProvider {
   if (pref !== 'auto') return pref;
-  return !installed.apple && installed.google ? 'google' : 'apple';
+  return installed.google ? 'google' : 'apple';
 }
 
 export interface MapPlace {
