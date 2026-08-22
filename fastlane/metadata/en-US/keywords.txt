@@ -1,0 +1,1 @@
+hawker,pasar,closure,wet market,Singapore,food,reminder,open,closed,status
