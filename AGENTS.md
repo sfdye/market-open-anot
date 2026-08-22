@@ -94,6 +94,7 @@ Tapping the address opens Apple Maps or Google Maps; the setting is iOS-only (An
 ### Map (MapLibre + OneMap)
 
 - Tiles end at `SG_BOUNDS` (`lib/core/map-bounds.ts`). The raster source's `bounds` only stops requests, so OneMap still serves non-PNG boundary tiles that MapLibre logs as errors — silenced in dev by `configureMapLogging()` (`lib/maplibre.ts`), called at module scope from `MarketMap` to keep MapLibre out of cold start.
+- Dark mode swaps the Default tileset for OneMap's Night variant; bounds, zoom range, and attribution are identical for both.
 - `ConstrainedCamera` keeps empty background unreachable: `maxBounds` gets `SG_BOUNDS` inset by half the viewport span, and `constrain()` eases the centre back after an outgrowing zoom-out. A reported centre outside `SG_BOUNDS` is startup garbage — ignore it, don't clamp it. Keep its state in that component; a settle in `MarketMap` would re-serialise the tile style and all features.
 - Initial view priority: saved `mapView` → user's current location (first visit, via `awaitingFix`) → Singapore overview.
 - `MapAttribution` (the OneMap logo + © SLA pill, bottom-left) is required by OneMap's Terms of Use — don't remove it or hide the native attribution behind it. The `attribution={false}` on `Map` is deliberate: the overlay replaces the text-only native button with the logo the licence demands.

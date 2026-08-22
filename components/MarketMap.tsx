@@ -26,13 +26,13 @@ const LOCATED_ZOOM = 15;
 const USER_VIEW_SAVE_DELAY_MS = 500;
 
 /** OneMap raster tiles, the same source the web app fed to Leaflet. No API key needed. */
-function buildStyle(colors: Palette): StyleSpecification {
+function buildStyle(colors: Palette, tileset: 'Default' | 'Night'): StyleSpecification {
   return {
     version: 8,
     sources: {
       onemap: {
         type: 'raster',
-        tiles: ['https://www.onemap.gov.sg/maps/tiles/Default/{z}/{x}/{y}.png'],
+        tiles: [`https://www.onemap.gov.sg/maps/tiles/${tileset}/{z}/{x}/{y}.png`],
         tileSize: 256,
         minzoom: 11,
         maxzoom: 19,
@@ -44,13 +44,17 @@ function buildStyle(colors: Palette): StyleSpecification {
     layers: [
       // Only visible in the gaps while tiles load, but a white flash in dark mode is jarring.
       { id: 'background', type: 'background', paint: { 'background-color': colors.mapBg } },
-      { id: 'onemap', type: 'raster', source: 'onemap' },
+      { id: `onemap-${tileset.toLowerCase()}`, type: 'raster', source: 'onemap' },
     ],
   };
 }
 
 // Module constants: a style object rebuilt per render would reload the map every time.
-const MAP_STYLES = { light: buildStyle(lightColors), dark: buildStyle(darkColors) };
+// Dark mode swaps the Default tileset for OneMap's Night variant.
+const MAP_STYLES = {
+  light: buildStyle(lightColors, 'Default'),
+  dark: buildStyle(darkColors, 'Night'),
+};
 
 // Here rather than in the root layout, which would drag the whole MapLibre module graph into every
 // cold start: this file is its only importer, and the handler is read only while a `Map` is up.
