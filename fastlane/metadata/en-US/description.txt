@@ -1,6 +1,6 @@
 Check if your Singapore hawker centre or wet market is open or closed — today and every day.
 
-Open Anot? covers all 123 NEA-managed hawker centres and wet markets. It detects Monday rest days, quarterly cleaning closures, and other maintenance shutdowns, so you always know before you go.
+Open Anot? covers every publicly listed hawker centre and wet market in Singapore. It shows you upcoming closure dates — quarterly cleaning, maintenance shutdowns, and other rest days — and reminds you before they happen, so you always know before you go.
 
 • Instant open/closed status for the markets you follow
 • Upcoming closures list with the next reopening date
@@ -11,4 +11,4 @@ Open Anot? covers all 123 NEA-managed hawker centres and wet markets. It detects
 • Works offline — the dataset is cached and revalidated in the background
 • Senior-friendly: honours Dynamic Type at every size, high contrast, light and dark
 
-No account, no backend, no tracking. The app fetches the NEA closure schedule directly and does everything on your device.
+This app is not affiliated with, endorsed by, or connected to any government agency.
