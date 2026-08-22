@@ -42,7 +42,7 @@ Those two are the whole of CI (`.github/workflows/test.yml`); there is no lint s
 - Branch config on `APP_VARIANT`, never `EAS_BUILD_PROFILE` — a local `expo run:ios` doesn't set the latter and would silently take the production branch.
 - A Debug build embeds no JS (`SKIP_BUNDLING=1`) and is dead without Metro. `APP_VARIANT=development npx expo run:ios --configuration Release` gives a standalone dev app with no new EAS profile. Judge performance only on Release builds.
 - `distribution: internal` ad-hoc signs for registered UDIDs; `production` provisions no devices and is TestFlight-only, not sideloadable.
-- Every icon raster in `assets/` is **generated**: `npm run icons` derives them from `brand/` (Pillow + librsvg, hand-run). Edit the master in `brand/`, never the output. The 96px notification glyph is the exception — a hand-drawn SVG.
+- Every icon raster in `assets/` is **generated**: `npm run icons` derives them from `brand/` (Pillow + librsvg, hand-run). Edit the master in `brand/`, never the output. The 96px notification glyph is the exception — a hand-drawn SVG. `onemap-logo.png` is a second exception — a third-party compliance asset fetched from OneMap, not generated.
 
 ## State: an external store, not context
 
@@ -96,6 +96,7 @@ Tapping the address opens Apple Maps or Google Maps; the setting is iOS-only (An
 - Tiles end at `SG_BOUNDS` (`lib/core/map-bounds.ts`). The raster source's `bounds` only stops requests, so OneMap still serves non-PNG boundary tiles that MapLibre logs as errors — silenced in dev by `configureMapLogging()` (`lib/maplibre.ts`), called at module scope from `MarketMap` to keep MapLibre out of cold start.
 - `ConstrainedCamera` keeps empty background unreachable: `maxBounds` gets `SG_BOUNDS` inset by half the viewport span, and `constrain()` eases the centre back after an outgrowing zoom-out. A reported centre outside `SG_BOUNDS` is startup garbage — ignore it, don't clamp it. Keep its state in that component; a settle in `MarketMap` would re-serialise the tile style and all features.
 - Initial view priority: saved `mapView` → user's current location (first visit, via `awaitingFix`) → Singapore overview.
+- `MapAttribution` (the OneMap logo + © SLA pill, bottom-left) is required by OneMap's Terms of Use — don't remove it or hide the native attribution behind it. The `attribution={false}` on `Map` is deliberate: the overlay replaces the text-only native button with the logo the licence demands.
 
 ## i18n
 

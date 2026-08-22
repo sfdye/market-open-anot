@@ -88,6 +88,12 @@ const en = {
   goHome: 'Back to Today',
   myLocation: 'My location',
   close: 'Close',
+  mapAttribution: 'OneMap',
+  attribution: 'Attribution',
+  attributionFooter:
+    "Contains information from 'Dates of Hawker Centres Closure' accessed on {date} from data.gov.sg which is made available under the terms of the Singapore Open Data Licence version 1.0. Basemap: OneMap © contributors | Singapore Land Authority.",
+  openDataLicence: 'Singapore Open Data Licence version 1.0',
+  onemapCredit: 'OneMap — Singapore Land Authority',
 };
 
 const zh: Record<keyof typeof en, string> = {
@@ -169,6 +175,12 @@ const zh: Record<keyof typeof en, string> = {
   goHome: '返回今天',
   myLocation: '我的位置',
   close: '关闭',
+  mapAttribution: 'OneMap',
+  attribution: '归属声明',
+  attributionFooter:
+    "本应用包含来自 data.gov.sg 的 'Dates of Hawker Centres Closure'（小贩中心休市日期）数据集，访问日期为 {date}，依据新加坡开放数据授权协议 1.0 版本使用。底图：OneMap © contributors | Singapore Land Authority.",
+  openDataLicence: '新加坡开放数据授权协议 1.0 版本',
+  onemapCredit: 'OneMap — 新加坡土地管理局',
 };
 
 export type StringKey = keyof typeof en;
