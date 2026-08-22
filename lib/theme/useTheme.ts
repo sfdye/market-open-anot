@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import { StyleSheet, useColorScheme, type ViewStyle } from 'react-native';
+import { resolveTheme } from '../core/theme-pref';
+import { useThemePref } from '../store/hooks';
 import { darkColors, lightColors, type Palette } from './colors';
 
 export interface Theme {
@@ -39,7 +41,11 @@ export const darkTheme: Theme = {
 };
 
 export function useTheme(): Theme {
-  return useColorScheme() === 'dark' ? darkTheme : lightTheme;
+  const pref = useThemePref();
+  const deviceScheme = useColorScheme();
+  return resolveTheme(pref, deviceScheme === 'dark' ? 'dark' : null) === 'dark'
+    ? darkTheme
+    : lightTheme;
 }
 
 /**

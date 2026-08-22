@@ -1,7 +1,7 @@
 appId: ${APP_ID}
 tags: [smoke]
 ---
-# Settings: language toggle en→zh→en, reminders toggle, map-provider row check (iOS).
+# Settings: reminders toggle, map-provider row check (iOS), language toggle en→zh→en.
 - runFlow: ../utils/launch.yaml
 - tapOn:
     id: tab-today
@@ -43,17 +43,6 @@ tags: [smoke]
 - tapOn:
     id: tab-settings
 - waitForAnimationToEnd
-# Switch language to Chinese.
-- tapOn:
-    id: lang-zh
-- waitForAnimationToEnd
-# Verify language switch by checking a visible Chinese string.
-- assertVisible: "语言"
-# Switch back to English.
-- tapOn:
-    id: lang-en
-- waitForAnimationToEnd
-- assertVisible: "Language"
 # Toggle reminders on (will trigger a notification permission prompt on first enable).
 - tapOn:
     id: settings-reminders
@@ -69,14 +58,33 @@ tags: [smoke]
 - tapOn:
     id: settings-reminders
 - waitForAnimationToEnd
-# If on iOS, at least the Apple Maps provider row should be visible.
-# Google Maps may not be installed on the simulator.
+# If on iOS, check the Apple Maps provider row on the maps sub-page.
 - runFlow:
     when:
       platform: iOS
     commands:
+      - tapOn:
+          id: row-maps
+      - waitForAnimationToEnd
       - assertVisible:
           id: map-provider-apple
+      - tapOn:
+          id: tab-settings
+      - waitForAnimationToEnd
+# Switch language to Chinese on the language sub-page.
+- tapOn:
+    id: row-language
+- waitForAnimationToEnd
+- tapOn:
+    id: lang-zh
+- waitForAnimationToEnd
+# Verify language switch by checking a visible Chinese string.
+- assertVisible: "语言"
+# Switch back to English.
+- tapOn:
+    id: lang-en
+- waitForAnimationToEnd
+- assertVisible: "Language"
 # Navigate back to Today.
 - tapOn:
     id: tab-today

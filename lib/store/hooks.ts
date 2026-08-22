@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import type { Market } from '../core/market-logic';
 import type { MapProviderPref } from '../core/map-provider';
+import type { ThemePref } from '../core/theme-pref';
 import type { Lang } from '../i18n';
 import type { LangPref } from '../lang';
 import { getState, subscribe, type State, type Translate } from './state';
@@ -36,6 +37,11 @@ export function useLangPref(): LangPref {
 /** The map app *choice*, symmetric with `useLangPref`. `lib/maps.ts` turns it into an app. */
 export function useMapProviderPref(): MapProviderPref {
   return useSelector((s) => s.mapProviderPref);
+}
+
+/** The theme *choice*, symmetric with `useLangPref`. `lib/theme/useTheme.ts` turns it into a scheme. */
+export function useThemePref(): ThemePref {
+  return useSelector((s) => s.themePref);
 }
 
 export function useT(): Translate {

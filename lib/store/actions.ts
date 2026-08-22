@@ -4,6 +4,7 @@ import { MAX_FAVORITES, toggledFavorites } from '../core/favorites';
 import type { MapProvider } from '../core/map-provider';
 import type { MapView } from '../core/map-view';
 import { sgInstant, sgToday } from '../core/reminder-schedule';
+import type { ThemePref } from '../core/theme-pref';
 import type { LangPref } from '../lang';
 import { fetchMarketsFromAPI, findMarket } from '../markets';
 import { isPermissionGranted, rescheduleAll } from '../notifications';
@@ -49,6 +50,11 @@ export function setLang(langPref: LangPref): void {
 export function setMapProvider(mapProviderPref: MapProvider): void {
   setState({ mapProviderPref });
   void storage.saveMapProvider(mapProviderPref);
+}
+
+export function setThemePref(themePref: ThemePref): void {
+  setState({ themePref });
+  void storage.saveThemePref(themePref);
 }
 
 function persistFavorites(favorites: string[]): void {
@@ -215,6 +221,7 @@ export function initStore(): void {
       fetchedAt,
       cardDismissed,
       mapView,
+      themePref,
     ] = await Promise.all([
       storage.loadLangPref(),
       storage.loadMapProvider(),
@@ -224,6 +231,7 @@ export function initStore(): void {
       storage.loadFetchedAt(),
       storage.loadReminderCardDismissed(),
       storage.loadMapView(),
+      storage.loadThemePref(),
     ]);
 
     setState({
@@ -235,6 +243,7 @@ export function initStore(): void {
       fetchedAt,
       today: sgToday(),
       mapView,
+      themePref,
       ...(cached ? { markets: cached } : {}),
       ready: true,
     });

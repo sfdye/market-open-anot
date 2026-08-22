@@ -1,21 +1,19 @@
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Linking, Platform, ScrollView, StyleSheet, Switch } from 'react-native';
+import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Switch } from 'react-native';
+import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import SettingsSection from '../../../components/SettingsSection';
 import { Icon, Row } from '../../../components/ui';
-import { DATA_SOURCE_URL, FEEDBACK_URL, ONEMAP_URL, OPEN_DATA_LICENCE_URL, REPO_URL } from '../../../lib/constants';
 import { MAX_FAVORITES } from '../../../lib/core/favorites';
-import { feedbackUrl, versionLabel, type BuildInfo } from '../../../lib/core/version-info';
+import { versionLabel, type BuildInfo } from '../../../lib/core/version-info';
 import { formatDate, formatDateTime } from '../../../lib/date';
-import { MAP_CHOICE_SUPPORTED, MAP_PROVIDERS, useMapProvider } from '../../../lib/maps';
+import { MAP_CHOICE_SUPPORTED, useMapProvider } from '../../../lib/maps';
 import { listScheduled, sendTestReminder } from '../../../lib/notifications';
 import type { ScheduledReminder } from '../../../lib/notifications';
 import type { Lang } from '../../../lib/i18n';
 import {
   refresh,
   removeAllFavorites,
-  setLang,
-  setMapProvider,
   useFavorites,
   useFetchedAt,
   useLang,
@@ -25,6 +23,7 @@ import {
   useRefreshing,
   useStale,
   useT,
+  useThemePref,
 } from '../../../lib/store';
 import { space, useTheme } from '../../../lib/theme';
 import { useReminders } from '../../../lib/useReminders';
@@ -32,8 +31,10 @@ import { useReminders } from '../../../lib/useReminders';
 export default function SettingsScreen() {
   const theme = useTheme();
   const t = useT();
+  const router = useRouter();
   const lang = useLang();
   const langPref = useLangPref();
+  const themePref = useThemePref();
   const mapPref = useMapProviderPref();
   const { provider: mapProvider, availableProviders: mapsAvailable } = useMapProvider(mapPref);
   const favorites = useFavorites();
@@ -44,8 +45,6 @@ export default function SettingsScreen() {
   const reminders = useReminders();
   const [scheduled, setScheduled] = useState<ScheduledReminder[] | null>(null);
 
-  // The build number lives under different keys per platform (app.json) but is one number —
-  // `npm run release` sets both. Version alone is useless for "what build are you on?" feedback.
   const buildInfo: BuildInfo = {
     version: Constants.expoConfig?.version ?? null,
     build: Platform.select({
@@ -63,39 +62,45 @@ export default function SettingsScreen() {
     ]);
   };
 
-  const check = <Icon name="check" size={20} color="accent" />;
-  const external = <Icon name="external" size={18} color="textFaint" />;
+  const langDetail = langPref === 'system' ? t('langSystem') : langPref === 'en' ? 'English' : '中文';
+  const themeDetail = themePref === 'system' ? t('themeSystem') : themePref === 'light' ? t('themeLight') : t('themeDark');
+  const mapsDetail = mapProvider === 'apple' ? t('appleMaps') : t('googleMaps');
+  const showMapsRow = MAP_CHOICE_SUPPORTED && (mapsAvailable === null || mapsAvailable.length > 0);
 
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       contentContainerStyle={styles.content}
     >
-      {/* The two languages stay in their own script — a reader looking for 中文 should not have
-          to find it behind an English label. "System default" is the one row that translates. */}
-      <SettingsSection title={t('language')}>
+      <SettingsSection title={t('general')} icon="general">
         <Row
-          label={t('langSystem')}
-          accessory={langPref === 'system' ? check : undefined}
-          onPress={() => setLang('system')}
-          testID="lang-system"
+          label={t('language')}
+          detail={langDetail}
+          chevron
+          onPress={() => router.push('/language')}
+          testID="row-language"
         />
         <Row
-          label="English"
-          accessory={langPref === 'en' ? check : undefined}
-          onPress={() => setLang('en')}
-          testID="lang-en"
+          label={t('appearance')}
+          detail={themeDetail}
+          chevron
+          onPress={() => router.push('/appearance')}
+          testID="row-appearance"
+          last={!showMapsRow}
         />
-        <Row
-          label="中文"
-          accessory={langPref === 'zh' ? check : undefined}
-          onPress={() => setLang('zh')}
-          testID="lang-zh"
-          last
-        />
+        {showMapsRow && (
+          <Row
+            label={t('mapsSection')}
+            detail={mapsDetail}
+            chevron
+            onPress={() => router.push('/maps')}
+            testID="row-maps"
+            last
+          />
+        )}
       </SettingsSection>
 
-      <SettingsSection title={t('reminders')} footer={t('reminderSchedule')}>
+      <SettingsSection title={t('reminders')} icon="bellOutline" footer={t('reminderSchedule')}>
         <Row
           label={t('enableReminders')}
           last
@@ -111,24 +116,7 @@ export default function SettingsScreen() {
         />
       </SettingsSection>
 
-      {/* iOS only: Android's `geo:` hand-off already goes to whichever map app is default there.
-          Rows are shown optimistically before the probe lands, then filtered to installed apps. */}
-      {MAP_CHOICE_SUPPORTED && (mapsAvailable === null || mapsAvailable.length > 0) && (
-        <SettingsSection title={t('mapsSection')} footer={t('addressOpensIn')}>
-          {(mapsAvailable ?? MAP_PROVIDERS).map((p, i, arr) => (
-            <Row
-              key={p}
-              label={p === 'apple' ? t('appleMaps') : t('googleMaps')}
-              accessory={mapProvider === p ? check : undefined}
-              onPress={() => setMapProvider(p)}
-              testID={`map-provider-${p}`}
-              last={i === arr.length - 1}
-            />
-          ))}
-        </SettingsSection>
-      )}
-
-      <SettingsSection title={t('myMarkets')} footer={t('swipeDelete')}>
+      <SettingsSection title={t('myMarkets')} icon="market">
         <Row
           label={t('removeAll')}
           detail={`${favorites.length}/${MAX_FAVORITES}`}
@@ -141,7 +129,7 @@ export default function SettingsScreen() {
 
       {/* The clock in "Last updated" is the proof the refresh landed — without it a same-day
           refresh changes nothing on screen, and the row reads as a dead button. */}
-      <SettingsSection title={t('dataSection')} footer={stale ? t('offline') : undefined}>
+      <SettingsSection title={t('dataSection')} icon="sync" footer={stale ? t('offline') : undefined}>
         <Row
           label={t('lastUpdated')}
           detail={fetchedAt ? formatDateTime(new Date(fetchedAt), lang) : '—'}
@@ -155,47 +143,19 @@ export default function SettingsScreen() {
         />
       </SettingsSection>
 
-      <SettingsSection title={t('about')}>
+      <SettingsSection title={t('about')} icon="info">
         <Row
-          label={t('source')}
-          accessory={external}
-          onPress={() => void Linking.openURL(REPO_URL)}
-        />
-        <Row
-          label={t('feedback')}
-          accessory={external}
-          onPress={() => void Linking.openURL(feedbackUrl(FEEDBACK_URL, buildInfo))}
-        />
-        <Row label={t('version')} detail={versionLabel(buildInfo)} last />
-      </SettingsSection>
-
-      <SettingsSection
-        title={t('attribution')}
-        footer={t('attributionFooter', {
-          date: fetchedAt ? formatDate(new Date(fetchedAt), lang) : '—',
-        })}
-      >
-        <Row
-          label={t('openDataLicence')}
-          accessory={external}
-          onPress={() => void Linking.openURL(OPEN_DATA_LICENCE_URL)}
-        />
-        <Row
-          label={t('onemapCredit')}
-          accessory={external}
-          onPress={() => void Linking.openURL(ONEMAP_URL)}
-        />
-        <Row
-          label={t('dataSource')}
-          detail={t('dataSourceLink')}
-          accessory={external}
-          onPress={() => void Linking.openURL(DATA_SOURCE_URL)}
+          label={t('about')}
+          detail={versionLabel(buildInfo)}
+          chevron
+          onPress={() => router.push('/about')}
+          testID="row-about"
           last
         />
       </SettingsSection>
 
       {__DEV__ && (
-        <SettingsSection title="Debug">
+        <SettingsSection title="Debug" icon="bug">
           <Row
             label={t('scheduledReminders')}
             icon="bell"

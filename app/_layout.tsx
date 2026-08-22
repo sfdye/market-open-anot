@@ -36,7 +36,7 @@ export default function RootLayout() {
         {/* One theme for the native chrome — headers, large titles, search bar, tab bar. */}
         <ThemeProvider value={navigationTheme(theme)}>
           <SplashGate />
-          <StatusBar style="auto" />
+          <StatusBar style={theme.dark ? 'light' : 'dark'} />
           <Stack screenOptions={rootScreenOptions}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             {/* Detail and the add modal sit above the tabs, so a notification tap, the map
