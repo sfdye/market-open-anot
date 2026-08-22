@@ -35,7 +35,7 @@ export default function SettingsSection({
         {children}
       </View>
       {!!footer && (
-        <Text variant="footnote" tone="faint" style={styles.title}>
+        <Text variant="footnote" tone="muted" style={styles.title}>
           {footer}
         </Text>
       )}

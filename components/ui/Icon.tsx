@@ -40,7 +40,7 @@ const GLYPHS = {
   info: 'information-circle-outline',
   cleaning: 'water-outline',
 
-  general: 'cog-outline',
+  general: 'options-outline',
   appearance: 'contrast-outline',
   market: 'storefront-outline',
   sync: 'sync-outline',

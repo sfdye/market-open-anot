@@ -116,7 +116,7 @@ export default function SettingsScreen() {
         />
       </SettingsSection>
 
-      <SettingsSection title={t('myMarkets')} icon="market" footer={t('swipeDelete')}>
+      <SettingsSection title={t('myMarkets')} icon="market">
         <Row
           label={t('removeAll')}
           detail={`${favorites.length}/${MAX_FAVORITES}`}
