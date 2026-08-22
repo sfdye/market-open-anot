@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   pill: {
     position: 'absolute',
     left: space.md,
-    bottom: space.md,
+    top: space.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.xs,
