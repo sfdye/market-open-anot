@@ -21,7 +21,7 @@ export default function SettingsSection({
   return (
     <View style={styles.section}>
       <View style={styles.header}>
-        {!!icon && <Icon name={icon} size={14} color="muted" />}
+        {!!icon && <Icon name={icon} size={16} color="muted" />}
         <Text variant="overline" tone="muted" style={styles.title}>
           {title.toUpperCase()}
         </Text>

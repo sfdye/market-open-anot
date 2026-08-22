@@ -50,7 +50,7 @@ const en = {
   reminderDismiss: 'Not now',
   reminderBlocked: 'Notifications are blocked. Enable them for this app in your device settings, then try again.',
   enableReminders: 'Enable reminders',
-  source: 'Source',
+  source: 'Source code',
   feedback: 'Feedback',
   offline: 'Showing saved data — could not reach NEA.',
   noResults: 'No markets found',
