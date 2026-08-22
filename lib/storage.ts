@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isLang, normalizeMarkets, type Market } from './core/market-logic';
 import { isMapProvider, type MapProvider, type MapProviderPref } from './core/map-provider';
 import { parseMapView, type MapView } from './core/map-view';
+import { isThemeScheme, type ThemePref } from './core/theme-pref';
 import type { LangPref } from './lang';
 
 // Namespaced `oa_`. Nothing migrates the `moa_`/`poa_` keys these were renamed from across two
@@ -16,6 +17,7 @@ const KEYS = {
   mapView: 'oa_map_view',
   reminders: 'oa_reminders_enabled',
   reminderCardDismissed: 'oa_reminder_card_dismissed',
+  theme: 'oa_theme',
 } as const;
 
 // Region events can arrive close together; queue writes so an older view can never finish after a
@@ -117,4 +119,19 @@ export async function saveMapView(view: MapView): Promise<void> {
     .catch(() => undefined)
     .then(() => AsyncStorage.setItem(KEYS.mapView, value));
   await mapViewWrite;
+}
+
+/** A missing key is `'system'` — the device decides — as `loadLangPref` returns `'system'`. */
+export async function loadThemePref(): Promise<ThemePref> {
+  const raw = await AsyncStorage.getItem(KEYS.theme);
+  return isThemeScheme(raw) ? raw : 'system';
+}
+
+/**
+ * Following the device again is stored as the *absence* of the key — the same state a fresh
+ * install is in — rather than as a sentinel value, matching `saveLangPref`.
+ */
+export async function saveThemePref(pref: ThemePref): Promise<void> {
+  if (pref === 'system') await AsyncStorage.removeItem(KEYS.theme);
+  else await AsyncStorage.setItem(KEYS.theme, pref);
 }

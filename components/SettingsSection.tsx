@@ -1,15 +1,18 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Icon, type IconName } from './ui';
 import { Text } from './ui';
 import { radius, space, useTheme } from '../lib/theme';
 
 /** A titled group of `ui/Row`s, the shape every native settings screen has. */
 export default function SettingsSection({
   title,
+  icon,
   footer,
   children,
 }: {
   title: string;
+  icon?: IconName;
   footer?: string;
   children: ReactNode;
 }) {
@@ -17,9 +20,12 @@ export default function SettingsSection({
 
   return (
     <View style={styles.section}>
-      <Text variant="overline" tone="muted" style={styles.title}>
-        {title.toUpperCase()}
-      </Text>
+      <View style={styles.header}>
+        {!!icon && <Icon name={icon} size={14} color="muted" />}
+        <Text variant="overline" tone="muted" style={styles.title}>
+          {title.toUpperCase()}
+        </Text>
+      </View>
       <View
         style={[
           styles.group,
@@ -39,7 +45,8 @@ export default function SettingsSection({
 
 const styles = StyleSheet.create({
   section: { gap: space.sm },
-  title: { paddingHorizontal: space.lg },
+  header: { flexDirection: 'row', alignItems: 'center', gap: space.xs, paddingHorizontal: space.lg },
+  title: { flexShrink: 1 },
   group: {
     borderRadius: radius.card,
     borderWidth: StyleSheet.hairlineWidth,

@@ -53,6 +53,7 @@ Those two are the whole of CI (`.github/workflows/test.yml`); there is no lint s
 - `actions.ts` owns every side effect: persistence, the NEA fetch, the SGT-midnight timer, the `AppState` foreground listener, and `watchSchedule()`. `initStore()` is called once from `app/_layout.tsx` and is idempotent (Fast Refresh and StrictMode both call it twice).
 - Rescheduling notifications is a **store subscriber**, not a React effect, so it runs when no screen is mounted. It debounces and dedupes on `lang|favorites|markets.length|remindersEnabled`.
 - `mapView` is the persisted last camera position. `MarketMap` reads it once at mount (never subscribes — a re-render would re-serialise the tile style and ~123 features), saves user-initiated settles after a 500ms wait (a following `ConstrainedCamera` correction saves the final camera), retains in-progress pans for app backgrounding, and ignores MapLibre's non-user events, which can report a default camera. `null` (first-ever visit) means default to the user's current location. Validation lives in `parseMapView` (`lib/core/map-view.ts`).
+- `themePref` (`'light'|'dark'|'system'`) follows the `langPref` pattern: `'system'` means the device decides. `useTheme` combines it with `useColorScheme()` via `resolveTheme` (`lib/core/theme-pref.ts`); no derivation in `setState` because the device scheme is a hook. Storage stores `'system'` as the key's absence. `app.json` `userInterfaceStyle` stays `"automatic"` — it governs native chrome, not the JS UI override.
 
 Launch sequence: read AsyncStorage → `setState({ ready: true })`, which lifts the splash via `SplashGate` → revalidate over the network only if the cache is older than 24 hours.
 
@@ -90,6 +91,7 @@ Tapping the address opens Apple Maps or Google Maps; the setting is iOS-only (An
 - Anything tappable inside a gesture takes `Pressable` from the gesture wrapper (`SwipeToDeleteRow` re-exports it), never from `react-native`.
 - The back button is a bare chevron everywhere via `headerBackButtonDisplayMode: 'minimal'` on the root `<Stack>`; a new nested `Stack` that pushes screens must repeat it — `screenOptions` don't reach nested navigators.
 - One `ThemeProvider` at the root themes the native chrome. react-navigation is vendored inside expo-router 57 — import from `expo-router`; there is no `@react-navigation/*` package. Leave tab bar labels to the default; a custom `tabBarLabel` bypasses iOS's fixed-height bar behaviour.
+- `SettingsSection` takes an optional `icon` (`IconName`) rendered beside the overline title. Settings is a hub of chevron rows pushing sub-pages (`language`, `appearance`, `maps`, `about`) in the settings `Stack`.
 
 ### Map (MapLibre + OneMap)
 

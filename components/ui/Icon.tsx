@@ -35,9 +35,16 @@ const GLYPHS = {
   food: 'restaurant-outline',
   bell: 'notifications',
   bellOff: 'notifications-off',
+  bellOutline: 'notifications-outline',
   warning: 'warning',
   info: 'information-circle-outline',
   cleaning: 'water-outline',
+
+  general: 'cog-outline',
+  appearance: 'contrast-outline',
+  market: 'storefront-outline',
+  sync: 'sync-outline',
+  bug: 'bug-outline',
 } as const satisfies Record<string, ComponentProps<typeof Ionicons>['name']>;
 
 export type IconName = keyof typeof GLYPHS;
