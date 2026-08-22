@@ -54,6 +54,7 @@ Those two are the whole of CI (`.github/workflows/test.yml`); there is no lint s
 - Play feature graphic and 512px icon are derived from `brand/icon-master-1024.png` (Pillow), not hand-drawn — regenerate if the mark changes.
 - Credentials (gitignored): ASC API key `.p8` in `~/.appstoreconnect/private_keys/`; Play service account JSON at `fastlane/play-service-account.json`. Reuse the Play key from EAS Submit credentials.
 - `supply` can't manage the Play category or privacy-policy URL — those stay in Play Console. `deliver` covers privacy URL via `privacy_url.txt` per locale.
+- Country/region availability isn't managed by fastlane for either store — set it manually in App Store Connect (App Availability) and Google Play Console (Production → Countries/regions).
 
 ## State: an external store, not context
 
