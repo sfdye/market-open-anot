@@ -2,13 +2,13 @@ Check if your Singapore hawker centre or wet market is open or closed — today 
 
 Open Anot? covers every publicly listed hawker centre and wet market in Singapore. It shows you upcoming closure dates — quarterly cleaning, maintenance shutdowns, and other rest days — and reminds you before they happen, so you always know before you go.
 
-• Instant open/closed status for the markets you follow
+• Open/closed status for the markets you follow
 • Upcoming closures list with the next reopening date
-• Local closure reminders: 7pm the evening before and 6am the morning of
-• Map of every market, sorted by distance when you share your location
-• Tap an address to open it in Google Maps
-• Bilingual: English and Chinese
-• Works offline — the dataset is cached and revalidated in the background
-• Senior-friendly: large text support, high contrast, light and dark
+• Closure reminders: 7pm the evening before and 6am the morning of
+• Discover markets near you when you share your location
+• Open an address in your favourite map app to get directions
+• Multilingual: English and Chinese, with more to come
+• Works offline — data stays on your phone and updates automatically
+• Large text and Dynamic Type support at every size, light and dark
 
 This app is not affiliated with, endorsed by, or connected to any government agency.
