@@ -1,7 +1,7 @@
 appId: ${APP_ID}
 tags: [smoke]
 ---
-# Settings: reminders toggle, map-provider row check (iOS), language toggle en→zh→en.
+# Settings: map-provider row check (iOS), reminders toggle, language toggle en→zh→en.
 - runFlow: ../utils/launch.yaml
 - tapOn:
     id: tab-today
@@ -43,6 +43,20 @@ tags: [smoke]
 - tapOn:
     id: tab-settings
 - waitForAnimationToEnd
+# If on iOS, check the Apple Maps provider row on the maps sub-page (do this first,
+# before toggling reminders scrolls the page down).
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: row-maps
+      - waitForAnimationToEnd
+      - assertVisible:
+          id: map-provider-apple
+      - tapOn:
+          id: tab-settings
+      - waitForAnimationToEnd
 # Toggle reminders on (will trigger a notification permission prompt on first enable).
 - tapOn:
     id: settings-reminders
@@ -58,20 +72,7 @@ tags: [smoke]
 - tapOn:
     id: settings-reminders
 - waitForAnimationToEnd
-# If on iOS, check the Apple Maps provider row on the maps sub-page.
-- runFlow:
-    when:
-      platform: iOS
-    commands:
-      - tapOn:
-          id: row-maps
-      - waitForAnimationToEnd
-      - assertVisible:
-          id: map-provider-apple
-      - tapOn:
-          id: tab-settings
-      - waitForAnimationToEnd
-# Switch language to Chinese on the language sub-page.
+# Switch language to Chinese on the language sub-page (last — no need to scroll back).
 - tapOn:
     id: row-language
 - waitForAnimationToEnd
